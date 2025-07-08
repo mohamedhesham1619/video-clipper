@@ -1,0 +1,6 @@
+*.exe
+*.PNG
+temp/*
+*.tar
+build/
+*.mp4
