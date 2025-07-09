@@ -49,15 +49,15 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 	data.addProgressChannel(fileId, progressChannel)
 	data.addProcess(fileId, cmd)
 
-	select{
-		// if the client disconnects or cancels the request, stop the process and clean up
-		case <- r.Context().Done():
-			slog.Warn("client disconnected, stopping the downloading process.", "ip", r.RemoteAddr)
-			cmd.Process.Kill() // Stop the ffmpeg process
-			data.cleanupAll(fileId) // Clean up all associated data
-			return
-		default:
-			// Continue with the normal processing
+	select {
+	// if the client disconnects or cancels the request, stop the process and clean up
+	case <-r.Context().Done():
+		slog.Warn("client disconnected, stopping the downloading process.", "ip", r.RemoteAddr)
+		cmd.Process.Kill()      // Stop the ffmpeg process
+		data.cleanupAll(fileId) // Clean up all associated data
+		return
+	default:
+		// Continue with the normal processing
 	}
 
 	// Respond with the process ID
@@ -66,7 +66,7 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 	// Start a goroutine to handle the rest of the download process
 	// This will monitor the ffmpeg command and clean up resources when done.
 	go func() {
-		
+
 		// If the download fails, send an error message on the channel and clean up.
 		if err := cmd.Wait(); err != nil {
 
@@ -94,11 +94,9 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 		close(progressChannel)
 
 		// wait for a while to ensure the client can download the file then clean up
-		time.Sleep(10 * time.Second) 
+		time.Sleep(10 * time.Second)
 		data.cleanupAll(fileId)
 		slog.Info("cleanup completed for process", "processId", fileId)
 	}()
-
-	
 
 }
