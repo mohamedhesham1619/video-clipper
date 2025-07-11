@@ -640,8 +640,16 @@
             }
         });
 
-        document.getElementById('clipForm').addEventListener('submit', async (e) => {
+        let isDownloading = false;
+
+document.getElementById('clipForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            if (isDownloading) {
+                alert('A download is already in progress. Please wait until it completes.');
+                return;
+            }
+            
             const videoUrl = document.getElementById('videoUrl').value.trim();
             const clipStart = document.getElementById('startTime').value;
             const clipEnd = document.getElementById('endTime').value;
@@ -652,10 +660,13 @@
                 return;
             }
 
+            isDownloading = true;
             const progressBar = document.querySelector('.progress-bar');
             const progressFill = document.querySelector('.progress-fill');
             const progressValue = document.querySelector('.progress-value');
             const progressLabel = document.querySelector('.progress-bar-label span:first-child');
+            const downloadBtn = document.querySelector('.download-btn');
+            downloadBtn.style.backgroundColor = '#718096';
 
             // Show connecting state with animation
             progressBar.style.display = 'block';
@@ -705,12 +716,21 @@
                             progressLabel.textContent = 'Error';
                             progressValue.textContent = data.message || 'Failed to process video';
                             progressValue.style.color = '#dc2626';
+                            const downloadBtn = document.querySelector('.download-btn');
+                            downloadBtn.textContent = 'Download Clip';
+                            downloadBtn.style.backgroundColor = '#1a202c';
+                            downloadBtn.disabled = false;
+                            isDownloading = false;
                             eventSource.close();
                         } else if (data.status === 'in_progress') {
                             progressFill.classList.remove('connecting');
                             progressFill.style.width = `${data.progress}%`;
                             progressValue.textContent = `${Math.round(data.progress)}%`;
                             progressLabel.textContent = 'Processing Clip';
+                            if (data.progress === 100) {
+                                downloadBtn.style.backgroundColor = '#1a202c';
+                                isDownloading = false;
+                            }
                         } else if (data.status === 'finished') {
                             progressFill.classList.remove('connecting');
                             progressFill.style.width = '100%';
@@ -724,6 +744,10 @@
                             document.body.appendChild(a);
                             a.click();
                             document.body.removeChild(a);
+                            
+                            // Reset button state after successful download
+                            downloadBtn.style.backgroundColor = '#1a202c';
+                            isDownloading = false;
                         }
                     } catch (error) {
                         console.error('Error parsing SSE message:', error, event.data);
@@ -739,6 +763,11 @@
                 progressLabel.textContent = 'Error';
                 progressValue.textContent = error.message;
                 progressValue.style.color = '#dc2626';
+                const downloadBtn = document.querySelector('.download-btn');
+                downloadBtn.textContent = 'Download Clip';
+                downloadBtn.style.backgroundColor = '#1a202c';
+                downloadBtn.disabled = false;
+                isDownloading = false;
             }
         });
     </script>
