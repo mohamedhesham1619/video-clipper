@@ -19,6 +19,7 @@ func New() *Server {
 	mux.HandleFunc("/submit", handlers.SubmitHandler)
 	mux.HandleFunc("/progress/", handlers.ProgressHandler)
 	mux.HandleFunc("/download/", handlers.DownloadHandler)
+	mux.HandleFunc("/feedback", handlers.FeedbackHandler)
 
 	return &Server{mux: mux}
 }

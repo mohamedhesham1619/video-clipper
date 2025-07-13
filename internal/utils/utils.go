@@ -97,3 +97,12 @@ func FormatSecondsToMMSS(secondsStr string) string {
 	secs := seconds % 60
 	return fmt.Sprintf("%02d:%02d", minutes, secs)
 }
+
+// GetEgyptTime returns the current time in Egypt (Africa/Cairo) location as a formatted 12-hour string with AM/PM.
+func GetEgyptTime() string {
+	location, err := time.LoadLocation("Africa/Cairo")
+	if err != nil {
+		location = time.FixedZone("EET", 2*60*60) // fallback to UTC+2
+	}
+	return time.Now().In(location).Format("2006-01-02 3:04:05 PM")
+}

@@ -4,3 +4,4 @@ temp/*
 *.tar
 build/
 *.mp4
+.env
