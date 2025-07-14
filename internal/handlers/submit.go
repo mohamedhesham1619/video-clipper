@@ -11,8 +11,8 @@ import (
 )
 
 type response struct {
-	Status    string `json:"status"`
-	ProcessId string `json:"processId"`
+	Status    string `json:"status"` // "started", "error"
+	ProcessId string `json:"processId,omitempty"`
 }
 
 // SubmitHandler handles the submission of a new video download request
@@ -30,53 +30,59 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 		"quality", videoRequest.Quality,
 		"clip duration", clipDurationFormatted)
 
-	// Start the download process
-	filePath, progressChannel, cmd, err := utils.DownloadVideo(videoRequest)
-
-	// If there was an error during the download, return an error response
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(response{Status: "error", ProcessId: ""})
-		slog.Error("Error downloading video", "error", err, "request", videoRequest)
-		return
-	}
-
-	// Generate a unique ID for the file
+	// Generate a unique ID for the file and create a progress channel
+	// This ID will be used to track the download process and progress updates.
 	fileId := utils.GenerateID()
+	progressChan := make(chan models.ProgressEvent)
+	data.addProgressChannel(fileId, progressChan)
 
-	// Store the file path, progress channel, and process in the shared maps
-	data.addFileID(fileId, filePath)
-	data.addProgressChannel(fileId, progressChannel)
-	data.addProcess(fileId, cmd)
-
-	select {
-	// if the client disconnects or cancels the request, stop the process and clean up
-	case <-r.Context().Done():
-		slog.Warn("client disconnected, stopping the downloading process.", "ip", r.RemoteAddr)
-		cmd.Process.Kill()      // Stop the ffmpeg process
-		data.cleanupAll(fileId) // Clean up all associated data
-		return
-	default:
-		// Continue with the normal processing
-	}
-
-	// Respond with the process ID
-	json.NewEncoder(w).Encode(response{Status: "started", ProcessId: fileId})
-
-	// Start a goroutine to handle the rest of the download process
-	// This will monitor the ffmpeg command and clean up resources when done.
+	// Start a goroutine to handle the download process
 	go func() {
+
+		// Get the video title and send it to the progress channel
+		videoTitle, err := utils.GetVideoTitle(videoRequest)
+		if err != nil {
+			slog.Error("Error getting video title", "error", err, "request", videoRequest)
+			progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Failed to get video title"}}
+			close(progressChan)
+			data.cleanupAll(fileId) // Clean up any resources associated with this process
+			return
+		}
+
+		progressChan <- models.ProgressEvent{
+			Event: models.EventTypeTitle,
+			Data:  map[string]string{"title": videoTitle},
+		}
+
+		// Start the download process
+		filePath, cmd, err := utils.DownloadVideo(videoRequest, videoTitle, progressChan)
+
+		// If there was an error during the download, close the goroutine
+		if err != nil {
+			slog.Error("Error downloading video", "error", err, "request", videoRequest)
+			progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Failed to download video"}}
+			close(progressChan)
+			data.cleanupAll(fileId) // Clean up any resources associated with this process
+			return
+		}
+
+		// Store the file path and the download command in the shared data
+		data.addProcess(fileId, cmd)
+		data.addFileID(fileId, filePath)
 
 		// If the download fails, send an error message on the channel and clean up.
 		if err := cmd.Wait(); err != nil {
 
-			slog.Error("ffmpeg process failed", "error", err, "processId", fileId)
+			slog.Error("ffmpeg process failed", "error", err,)
 
 			// Send a failure message on the channel before closing it.
-			progressChannel <- models.ProgressResponse{Status: "error"}
+			progressChan <- models.ProgressEvent{
+				Event: models.EventTypeError,
+				Data:  map[string]string{"message": "Failed to process video"},
+			}
 
 			// close the progress channel and clean up
-			close(progressChannel)
+			close(progressChan)
 			data.cleanupAll(fileId)
 			return
 		}
@@ -85,18 +91,20 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 		slog.Info("ffmpeg process finished successfully", "processId", fileId)
 
 		// Send the final success message on the channel before closing it.
-		progressChannel <- models.ProgressResponse{
-			Status:      "finished",
-			Progress:    100,
-			DownloadUrl: fmt.Sprintf("/download/%v", fileId),
+		progressChan <- models.ProgressEvent{
+			Event: models.EventTypeComplete,
+			Data:  map[string]string{"downloadUrl": fmt.Sprintf("/download/%s", fileId)},
 		}
 
-		close(progressChannel)
+		close(progressChan)
 
 		// wait for a while to ensure the client can download the file then clean up
 		time.Sleep(10 * time.Minute)
 		data.cleanupAll(fileId)
 		slog.Info("cleanup completed for process", "processId", fileId)
 	}()
+
+	// Respond with the process ID
+	json.NewEncoder(w).Encode(response{Status: "started", ProcessId: fileId})
 
 }

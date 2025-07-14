@@ -1,9 +1,17 @@
 package models
 
-type ProgressResponse struct {
-	Status      string `json:"status"`
-	Progress    int    `json:"progress"`
-	DownloadUrl string `json:"downloadUrl"`
+type EventName string
+
+const (
+	EventTypeTitle EventName = "title"
+	EventTypeProgress EventName = "progress"
+	EventTypeComplete EventName = "complete"
+	EventTypeError EventName = "error"
+)
+
+type ProgressEvent struct {
+	Event EventName           
+	Data  map[string]string
 }
 
 type VideoRequest struct {

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supported Sites - VideoClipper</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: white;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 3rem auto;
+            padding: 3rem 2.5rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.13);
+        }
+
+        h1 {
+            color: #1a202c;
+            margin-bottom: 2.5rem;
+            font-size: 2.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        h2 {
+            color: #1a202c;
+            margin: 2rem 0 1rem 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .sites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .site-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .site-card:hover {
+            border-color: #1a202c;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .site-logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            object-fit: cover;
+            background: #f8f9fa;
+            border: 1px solid #e2e8f0;
+            padding: 6px;
+            transition: transform 0.2s ease;
+            opacity: 0;
+        }
+
+        .site-card:hover .site-logo {
+            transform: scale(1.05);
+        }
+
+        .site-logo-placeholder {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            transition: transform 0.2s ease;
+        }
+
+        .site-card:hover .site-logo-placeholder {
+            transform: scale(1.05);
+        }
+
+        .site-card h3 {
+            color: #1a202c;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .site-card p {
+            color: #4a5568;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-working {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-limited {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        /* Navigation styles */
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: #1a202c;
+        }
+
+        /* Footer styles */
+        .footer {
+            background: white;
+            border-top: 1px solid #eee;
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            gap: 3rem;
+        }
+
+        .footer-section h3 {
+            color: #1a202c;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .footer-section p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section a {
+            display: block;
+            color: #4a5568;
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+            transition: color 0.2s ease;
+        }
+
+        .footer-section a:hover {
+            color: #1a202c;
+        }
+
+        /* Floating contact button styles */
+        .floating-contact-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #1a202c;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            z-index: 1000;
+        }
+
+        .floating-contact-btn:hover {
+            background: #2d3748;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Contact modal styles */
+        .contact-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .contact-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .contact-modal-content h2 {
+            color: #1a202c;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .contact-modal-content label {
+            display: block;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .contact-modal-content textarea,
+        .contact-modal-content input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            font-family: inherit;
+        }
+
+        .contact-modal-content textarea:focus,
+        .contact-modal-content input:focus {
+            outline: none;
+            border-color: #1a202c;
+        }
+
+        .contact-modal-content button {
+            background: #1a202c;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .contact-modal-content button:hover {
+            background: #2d3748;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+                margin: 1rem;
+                border-radius: 12px;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+                margin-bottom: 2rem;
+            }
+
+            .sites-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .site-card {
+                padding: 1.5rem;
+            }
+
+            .site-logo {
+                width: 48px;
+                height: 48px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .header {
+                padding: 1rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 2rem;
+                text-align: center;
+            }
+        }
+
+        /* Side ad container styles */
+        .ad-side {
+            position: sticky;
+            top: 2rem;
+            width: 160px;
+            min-height: 600px;
+            background: #f3f4f6;
+            border: 1.5px dashed #cbd5e0;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            margin: 0 1rem;
+        }
+        @media (max-width: 1100px) {
+            .ad-side {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <!-- Scissors SVG icon -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="6" cy="6" r="3"></circle>
+                <circle cx="6" cy="18" r="3"></circle>
+                <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
+                <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+                <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
+            </svg>
+            VideoClipper
+        </div>
+        <nav class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/contact" class="nav-link">Contact</a>
+            <a href="/supported-sites" class="nav-link">Supported Sites</a>
+            <a href="/faq" class="nav-link">FAQ</a>
+            <a href="/terms" class="nav-link">Terms</a>
+            <a href="/privacy" class="nav-link">Privacy</a>
+        </nav>
+    </header>
+    <!-- Side ads wrapper -->
+    <div style="display: flex; justify-content: center; max-width: 1600px; margin: 0 auto;">
+        <!-- Left Ad -->
+        <div class="ad-side">Left Ad</div>
+        <main class="container">
+            <h1>Supported Sites</h1>
+            <p>Download and clip videos from these popular platforms. Simply paste any video URL to get started.</p>
+            
+            <div id="sites-content">
+                <!-- Content will be loaded dynamically -->
+                <div style="text-align: center; padding: 2rem;">
+                    <p>Loading supported sites...</p>
+                </div>
+            </div>
+        </main>
+        <!-- Right Ad -->
+        <div class="ad-side">Right Ad</div>
+    </div>
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>VideoClipper</h3>
+                <p>Free online video clipping tool for creating custom video clips from your favorite content.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="/">Home</a>
+                <a href="/contact">Contact</a>
+                <a href="/supported-sites">Supported Sites</a>
+                <a href="/faq">FAQ</a>
+                <a href="/terms">Terms</a>
+                <a href="/privacy">Privacy</a>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <a href="/terms">Terms of Service</a>
+                <a href="/privacy">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+    <button id="floatingContactBtn" class="floating-contact-btn">Contact</button>
+    <div id="contactModal" class="contact-modal">
+        <div class="contact-modal-content">
+            <h2>Quick Contact</h2>
+            <form id="miniContactForm">
+                <label for="miniEmail">Email (optional)</label>
+                <input type="email" id="miniEmail" name="miniEmail" placeholder="your@email.com">
+                <label for="miniMessage">Message *</label>
+                <textarea id="miniMessage" name="miniMessage" rows="3" placeholder="Your message..." required></textarea>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        // Load supported sites data dynamically
+        async function loadSupportedSites() {
+            try {
+                const response = await fetch('/api/supported-sites');
+                const data = await response.json();
+                
+                const container = document.getElementById('sites-content');
+                
+                // Clear loading message
+                container.innerHTML = '';
+                
+                // Add dynamic content for current JSON structure
+                const categorySection = document.createElement('div');
+                categorySection.innerHTML = `
+                    <div class="sites-grid">
+                        ${data.sites.map(site => `
+                            <div class="site-card">
+                                <img src="${site.logo}" alt="${site.name} logo" class="site-logo" 
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                                     onload="this.style.opacity='1';">
+                                <div class="site-logo-placeholder" style="display: none;">${site.name.charAt(0)}</div>
+                                <h3>${site.name}</h3>
+                                <p>${site.description}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(categorySection);
+                
+
+                
+            } catch (error) {
+                console.error('Error loading supported sites:', error);
+                // Fallback to static content if API fails
+                const container = document.getElementById('sites-content');
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem;">
+                        <p>Unable to load supported sites. Please try again later.</p>
+                        <button onclick="loadSupportedSites()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #1a202c; color: white; border: none; border-radius: 6px; cursor: pointer;">Retry</button>
+                    </div>
+                `;
+            }
+        }
+        
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadSupportedSites);
+    </script>
+    <script src="/shared.js"></script>
+</body>
+</html> 

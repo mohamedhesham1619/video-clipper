@@ -161,16 +161,37 @@
         .progress-bar {
             display: none;
             /* Initially hidden */
-            margin: 2rem 0 0.75rem 0;
-            /* Less space after the bar */
+            margin: 1.5rem 0 0.25rem 0; /* Less space after the bar, more above */
         }
 
         .progress-bar-label {
             font-size: 1rem;
             margin-bottom: 0.5rem;
             display: flex;
+            flex-direction: row;
             justify-content: space-between;
             align-items: center;
+            gap: 0.5rem;
+            min-height: 2.6em;
+            height: 2.6em;
+        }
+        .progress-bar-label .label-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 2.6em;
+            height: 2.6em;
+            gap: 0.1rem;
+        }
+        .progress-bar-label .truncate-title {
+            max-width: 340px;
+            display: inline-block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: bottom;
+            color: #1a202c;
+            font-weight: 500;
         }
 
         .progress-track {
@@ -374,7 +395,7 @@
             display: inline-block;
             animation: ellipsis 1.2s steps(4, end) infinite;
             content: '';
-            vertical-align: bottom;
+            vertical-align: baseline;
         }
 
         /* Pulse effect for progress text */
@@ -441,7 +462,242 @@
                 width: 100%;
                 margin-top: 0.5rem;
             }
+
+            .nav-links {
+                display: none;
+            }
+
+            .header {
+                padding: 1rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 2rem;
+                text-align: center;
+            }
         }
+
+        /* Navigation styles */
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: #1a202c;
+        }
+
+        /* Footer styles */
+        .footer {
+            background: white;
+            border-top: 1px solid #eee;
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            gap: 3rem;
+        }
+
+        .footer-section h3 {
+            color: #1a202c;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .footer-section p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section a {
+            display: block;
+            color: #4a5568;
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+            transition: color 0.2s ease;
+        }
+
+        .footer-section a:hover {
+            color: #1a202c;
+        }
+
+        /* Floating contact button styles */
+        .floating-contact-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #1a202c;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            z-index: 1000;
+        }
+
+        .floating-contact-btn:hover {
+            background: #2d3748;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Contact modal styles */
+        .contact-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .contact-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .contact-modal-content h2 {
+            color: #1a202c;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .contact-modal-content label {
+            display: block;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .contact-modal-content textarea,
+        .contact-modal-content input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            font-family: inherit;
+        }
+
+        .contact-modal-content textarea:focus,
+        .contact-modal-content input:focus {
+            outline: none;
+            border-color: #1a202c;
+        }
+
+        .contact-modal-content button {
+            background: #1a202c;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .contact-modal-content button:hover {
+            background: #2d3748;
+        }
+        /* Ad container styles */
+        .ad-top, .ad-bottom {
+            width: 100%;
+            min-height: 90px;
+            background: #f3f4f6;
+            border: 1.5px dashed #cbd5e0;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem auto;
+            font-size: 1.1rem;
+        }
+        .ad-bottom {
+            margin: 2rem auto 0 auto;
+        }
+        .ad-side {
+            position: sticky;
+            top: 2rem;
+            width: 160px;
+            min-height: 600px;
+            background: #f3f4f6;
+            border: 1.5px dashed #cbd5e0;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            margin: 0 1rem;
+        }
+        @media (max-width: 1100px) {
+            .ad-side {
+                display: none;
+            }
+        }
+        .loader {
+  border: 3px solid #e2e8f0;
+  border-top: 3px solid #4a5568;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+.success-check {
+  color: #16a34a;
+  font-size: 1.5em;
+  vertical-align: middle;
+}
+.truncate {
+  max-width: 320px;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+.progress-bar-label .truncate {
+  max-width: 340px;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
     </style>
 </head>
 
@@ -458,9 +714,22 @@
             </svg>
             VideoClipper
         </div>
+        <nav class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/contact" class="nav-link">Contact</a>
+            <a href="/supported-sites" class="nav-link">Supported Sites</a>
+            <a href="/faq" class="nav-link">FAQ</a>
+            <a href="/terms" class="nav-link">Terms</a>
+            <a href="/privacy" class="nav-link">Privacy</a>
+        </nav>
     </header>
 
-    <div class="page-wrapper">
+    <!-- Top Ad -->
+    <div class="ad-top">Top Ad Space</div>
+    <div style="display: flex; justify-content: center; max-width: 1600px; margin: 0 auto;">
+        <!-- Left Ad -->
+        <div class="ad-side">Left Ad</div>
+        <div class="page-wrapper" style="flex:1; min-width:0;">
         <main class="container">
             <h1>Create Your Video Clip</h1>
 
@@ -528,6 +797,11 @@
             </form>
         </main>
     </div>
+        <!-- Right Ad -->
+        <div class="ad-side">Right Ad</div>
+    </div>
+    <!-- Bottom Ad -->
+    <div class="ad-bottom">Bottom Ad Space</div>
 
     <script>
 
@@ -642,134 +916,239 @@
 
         let isDownloading = false;
 
+function showLoading(text, opts = {}) {
+    progressLabel.innerHTML = '';
+    progressLabel.classList.remove('pulse-text', 'animated-ellipsis', 'truncate');
+    progressLabel.style.color = '';
+    progressLabel.style.opacity = 1;
+    progressFill.classList.add('connecting');
+    let labelText = document.createElement('span');
+    labelText.className = 'label-text';
+    if (opts.titleLine) {
+        // Two-line label: main text, then title
+        const mainLine = document.createElement('span');
+        mainLine.textContent = text;
+        if (opts.animated) {
+            mainLine.classList.add('pulse-text', 'animated-ellipsis');
+        }
+        labelText.appendChild(mainLine);
+        const titleLine = document.createElement('span');
+        titleLine.className = 'truncate-title';
+        titleLine.textContent = opts.titleLine;
+        titleLine.title = opts.titleLine;
+        labelText.appendChild(titleLine);
+    } else {
+        const mainLine = document.createElement('span');
+        mainLine.textContent = text;
+        if (opts.animated) {
+            mainLine.classList.add('pulse-text', 'animated-ellipsis');
+        }
+        labelText.appendChild(mainLine);
+    }
+    progressLabel.appendChild(labelText);
+    progressValue.innerHTML = `<span class="loader"></span>`;
+    progressValue.style.color = '';
+    progressValue.style.opacity = 1;
+}
+function showSuccess(text) {
+    progressLabel.textContent = text;
+    progressLabel.style.color = '#16a34a'; // green
+    progressLabel.style.opacity = 1;
+    progressValue.innerHTML = `<span class="success-check">&#10003;</span>`;
+    progressValue.style.color = '#16a34a';
+    progressValue.style.opacity = 1;
+    progressFill.classList.remove('connecting');
+}
+function fadeOutText(element, callback) {
+    element.style.transition = 'opacity 0.7s';
+    element.style.opacity = 0;
+    setTimeout(() => {
+        element.style.transition = '';
+        if (callback) callback();
+    }, 700);
+}
+function showError(text) {
+    progressLabel.textContent = 'Error';
+    progressLabel.style.color = '#dc2626';
+    progressValue.textContent = text;
+    progressValue.style.color = '#dc2626';
+    progressFill.classList.remove('connecting');
+    progressFill.style.width = '0%';
+}
+/*
+.loader {
+  border: 3px solid #e2e8f0;
+  border-top: 3px solid #4a5568;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+.success-check {
+  color: #16a34a;
+  font-size: 1.5em;
+  vertical-align: middle;
+}
+*/
+
+const progressBar = document.querySelector('.progress-bar');
+const progressFill = document.querySelector('.progress-fill');
+const progressValue = document.querySelector('.progress-value');
+const progressLabel = document.querySelector('.progress-bar-label span:first-child');
+const downloadBtn = document.querySelector('.download-btn');
+
 document.getElementById('clipForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (isDownloading) {
-                alert('A download is already in progress. Please wait until it completes.');
-                return;
-            }
-            
-            const videoUrl = document.getElementById('videoUrl').value.trim();
-            const clipStart = document.getElementById('startTime').value;
-            const clipEnd = document.getElementById('endTime').value;
-            const quality = document.getElementById('videoQuality').value;
+    e.preventDefault();
 
-            if (!videoUrl) {
-                alert('Please enter a video URL');
-                return;
-            }
+    if (isDownloading) {
+        alert('A download is already in progress. Please wait until it completes.');
+        return;
+    }
 
-            isDownloading = true;
-            const progressBar = document.querySelector('.progress-bar');
-            const progressFill = document.querySelector('.progress-fill');
-            const progressValue = document.querySelector('.progress-value');
-            const progressLabel = document.querySelector('.progress-bar-label span:first-child');
-            const downloadBtn = document.querySelector('.download-btn');
-            downloadBtn.style.backgroundColor = '#718096';
+    const videoUrl = document.getElementById('videoUrl').value.trim();
+    const clipStart = document.getElementById('startTime').value;
+    const clipEnd = document.getElementById('endTime').value;
+    const quality = document.getElementById('videoQuality').value;
+    isDownloading = true;
+    progressBar.style.display = 'block';
+    progressFill.classList.add('connecting');
+    progressFill.style.width = '0%';
+    showLoading('Getting the video title', { animated: true });
 
-            // Show connecting state with animation
-            progressBar.style.display = 'block';
-            progressFill.classList.add('connecting');
-            progressValue.textContent = '';
-            progressValue.classList.add('animated-ellipsis', 'pulse-text');
-            progressLabel.textContent = 'Preparing your clip';
-            progressLabel.classList.add('pulse-text', 'animated-ellipsis');
-
-            try {
-                // Submit request
-                const response = await fetch('/submit', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        videoUrl,
-                        clipStart,
-                        clipEnd,
-                        quality: quality
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.status === 'error') {
-                    throw new Error(data.message || 'Failed to process video');
-                }
-
-                // Connect to SSE endpoint for progress updates
-                const eventSource = new EventSource(`/progress/${data.processId}`);
-
-                eventSource.addEventListener('message', (event) => {
-                    try {
-                        const data = JSON.parse(event.data);
-                        console.log('Progress data:', data); // Debug log
-
-                        // Remove animation classes when progress starts
-                        progressValue.classList.remove('animated-ellipsis', 'pulse-text');
-                        progressLabel.classList.remove('animated-ellipsis', 'pulse-text');
-
-                        if (data.status === 'error') {
-                            alert(data.message || 'Failed to process video');
-                            progressFill.classList.remove('connecting');
-                            progressFill.style.width = '0%';
-                            progressLabel.textContent = 'Error';
-                            progressValue.textContent = data.message || 'Failed to process video';
-                            progressValue.style.color = '#dc2626';
-                            const downloadBtn = document.querySelector('.download-btn');
-                            downloadBtn.textContent = 'Download Clip';
-                            downloadBtn.style.backgroundColor = '#1a202c';
-                            downloadBtn.disabled = false;
-                            isDownloading = false;
-                            eventSource.close();
-                        } else if (data.status === 'in_progress') {
-                            progressFill.classList.remove('connecting');
-                            progressFill.style.width = `${data.progress}%`;
-                            progressValue.textContent = `${Math.round(data.progress)}%`;
-                            progressLabel.textContent = 'Processing Clip';
-                            if (data.progress === 100) {
-                                downloadBtn.style.backgroundColor = '#1a202c';
-                                isDownloading = false;
-                            }
-                        } else if (data.status === 'finished') {
-                            progressFill.classList.remove('connecting');
-                            progressFill.style.width = '100%';
-                            progressLabel.textContent = 'Processing Complete';
-                            progressValue.textContent = 'Download starting...';
-                            eventSource.close();
-                            // Trigger download prompt
-                            const a = document.createElement('a');
-                            a.href = data.downloadUrl;
-                            a.download = '';
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            
-                            // Reset button state after successful download
-                            downloadBtn.style.backgroundColor = '#1a202c';
-                            isDownloading = false;
-                        }
-                    } catch (error) {
-                        console.error('Error parsing SSE message:', error, event.data);
-                    }
-                });
-
-            } catch (error) {
-                progressValue.classList.remove('animated-ellipsis', 'pulse-text');
-                progressLabel.classList.remove('animated-ellipsis', 'pulse-text');
-                alert(error.message);
-                progressFill.classList.remove('connecting');
-                progressFill.style.width = '0%';
-                progressLabel.textContent = 'Error';
-                progressValue.textContent = error.message;
-                progressValue.style.color = '#dc2626';
-                const downloadBtn = document.querySelector('.download-btn');
-                downloadBtn.textContent = 'Download Clip';
-                downloadBtn.style.backgroundColor = '#1a202c';
-                downloadBtn.disabled = false;
-                isDownloading = false;
-            }
+    try {
+        // Submit request
+        const response = await fetch('/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ videoUrl, clipStart, clipEnd, quality })
         });
+
+        const data = await response.json();
+
+        if (data.status === 'error') {
+            throw new Error(data.message || 'Failed to process video');
+        }
+
+        // Connect to SSE endpoint for progress updates
+        const eventSource = new EventSource(`/progress/${data.processId}`);
+
+        let gotTitle = false;
+        let gotProgress = false;
+        let videoTitle = '';
+
+        eventSource.addEventListener('title', (event) => {
+            const eventData = JSON.parse(event.data);
+            videoTitle = eventData.title || '';
+            showSuccess('Video title received');
+            fadeOutText(progressLabel, () => {
+                showLoading('Getting the required clip from:', {
+                    animated: true,
+                    titleLine: videoTitle
+                });
+            });
+        });
+
+        eventSource.addEventListener('progress', (event) => {
+            const eventData = JSON.parse(event.data);
+            if (!gotProgress) {
+                gotProgress = true;
+                showSuccess('Clip is ready to process');
+                fadeOutText(progressLabel, () => {
+                    progressLabel.textContent = 'Processing the required clip';
+                    progressLabel.style.color = '';
+                    progressValue.innerHTML = '';
+                    progressValue.style.color = '';
+                    progressFill.classList.remove('connecting');
+                });
+            }
+            // Update progress bar
+            const percent = parseInt(eventData.progress, 10) || 0;
+            progressFill.style.width = `${percent}%`;
+            progressValue.textContent = `${percent}%`;
+        });
+
+        eventSource.addEventListener('complete', (event) => {
+            const eventData = JSON.parse(event.data);
+            progressFill.style.width = '100%';
+            progressLabel.textContent = 'Processing Complete';
+            progressValue.textContent = 'Download starting...';
+            eventSource.close();
+            // Trigger download prompt
+            const a = document.createElement('a');
+            a.href = eventData.downloadUrl;
+            a.download = '';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            downloadBtn.style.backgroundColor = '#1a202c';
+            isDownloading = false;
+        });
+
+        eventSource.addEventListener('error', (event) => {
+            let msg = 'Failed to process video';
+            try {
+                const eventData = JSON.parse(event.data);
+                msg = eventData.message || msg;
+            } catch {}
+            showError(msg);
+            eventSource.close();
+            downloadBtn.style.backgroundColor = '#1a202c';
+            isDownloading = false;
+        });
+
+    } catch (error) {
+        showError(error.message);
+        downloadBtn.style.backgroundColor = '#1a202c';
+        isDownloading = false;
+    }
+});
+    </script>
+    <script src="/shared.js"></script>
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>VideoClipper</h3>
+                <p>Free online video clipping tool for creating custom video clips from your favorite content.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="/">Home</a>
+                <a href="/contact">Contact</a>
+                <a href="/supported-sites">Supported Sites</a>
+                <a href="/faq">FAQ</a>
+                <a href="/terms">Terms</a>
+                <a href="/privacy">Privacy</a>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <a href="/terms">Terms of Service</a>
+                <a href="/privacy">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+    <button id="floatingContactBtn" class="floating-contact-btn">Contact</button>
+    <div id="contactModal" class="contact-modal">
+        <div class="contact-modal-content">
+            <h2>Contact Us</h2>
+            <form id="miniContactForm">
+                <label for="miniEmail">Email (optional)</label>
+                <input type="email" id="miniEmail" name="miniEmail" placeholder="your@email.com">
+                <label for="miniMessage">Message *</label>
+                <textarea id="miniMessage" name="miniMessage" rows="3" placeholder="Your message..." required></textarea>
+                <button type="submit" class="download-btn">Send</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        // Floating contact button modal logic
+        const floatingBtn = document.getElementById('floatingContactBtn');
+        const contactModal = document.getElementById('contactModal');
+        floatingBtn.onclick = () => contactModal.style.display = 'flex';
+        contactModal.onclick = (e) => { if (e.target === contactModal) contactModal.style.display = 'none'; };
+        document.getElementById('miniContactForm').onsubmit = e => { e.preventDefault(); contactModal.style.display = 'none'; };
     </script>
 </body>
 

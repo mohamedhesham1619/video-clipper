@@ -13,7 +13,7 @@ type sharedData struct {
 	fileIDs map[string]string
 
 	// progressTracker maps process IDs to their progress channels
-	progressTracker map[string]chan models.ProgressResponse
+	progressTracker map[string]chan models.ProgressEvent
 
 	// processes maps process IDs to their ffmpeg *exec.Cmd
 	// it is used to stop the ffmpeg process if the client disconnects
@@ -36,13 +36,13 @@ func (s *sharedData) getFilePath(fileID string) (string, bool) {
 	return filePath, exists
 }
 
-func (s *sharedData) addProgressChannel(fileID string, channel chan models.ProgressResponse) {
+func (s *sharedData) addProgressChannel(fileID string, channel chan models.ProgressEvent) {
 	s.mu.Lock()
 	s.progressTracker[fileID] = channel
 	s.mu.Unlock()
 }
 
-func (s *sharedData) getProgressChannel(fileID string) (chan models.ProgressResponse, bool) {
+func (s *sharedData) getProgressChannel(fileID string) (chan models.ProgressEvent, bool) {
 	s.mu.RLock()
 	channel, exists := s.progressTracker[fileID]
 	s.mu.RUnlock()
@@ -91,7 +91,7 @@ func (s *sharedData) cleanupAll(fileID string) {
 
 var data = &sharedData{
 	fileIDs:         make(map[string]string),
-	progressTracker: make(map[string]chan models.ProgressResponse),
+	progressTracker: make(map[string]chan models.ProgressEvent),
 	processes:       make(map[string]*exec.Cmd),
 	mu:              sync.RWMutex{},
 }

@@ -26,23 +26,29 @@ func ProgressHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	// Stop the ffmpeg process if the client disconnects
+	// If the client disconnects, close the progress channel, stop the download command and clean up.
 	go func() {
 		<-r.Context().Done()
-		if cmd, ok := data.getProcess(processId); ok && cmd.Process != nil {
-			// If the process is still running, kill it and cleanup the resources
-			if cmd.ProcessState == nil || !cmd.ProcessState.Exited() {
-				slog.Warn("Killing ffmpeg process due to client disconnect", "ip", r.RemoteAddr, "processId", processId)
-				_ = cmd.Process.Kill()
-				data.cleanupAll(processId)
-			} 
+		slog.Info("Client disconnected, closing progress channel", "processId", processId)
+		close(progressChannel)
+
+		// Stop the download command if it exists
+		if cmd, exists := data.getProcess(processId); exists {
+			slog.Info("Stopping download command", "processId", processId)
+			if err := cmd.Process.Kill(); err != nil {
+				slog.Error("Failed to kill download command", "error", err)
+			}
 		}
+		data.cleanupAll(processId) // Clean up all resources associated with this process ID
+		slog.Info("Cleaned up resources for process", "processId", processId)
+		
 	}()
 
 	// Stream progress updates
 	for progress := range progressChannel {
-		b, _ := json.Marshal(progress)
-		fmt.Fprintf(w, "data: %s\n\n", b)
+		b, _ := json.Marshal(progress.Data)
+		fmt.Fprintf(w, "event: %s\ndata: %s\n\n", progress.Event, b)
+		slog.Debug("Streaming progress update", "event", progress.Event, "data", progress.Data)
 		w.(http.Flusher).Flush()
 	}
 
