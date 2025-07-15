@@ -3,19 +3,27 @@ FROM golang:1.22-alpine AS builder
 
 WORKDIR /app
 
-COPY . .
+COPY go.mod go.sum ./
 
 RUN go mod download
 
-RUN go build -o bin/clipper ./cmd/clipper
+COPY . .
+
+RUN go build -o build/clipper ./cmd/clipper
 
 # Final stage
 FROM alpine:latest
 
 RUN apk add --no-cache yt-dlp ffmpeg
 
-WORKDIR /clipper
+WORKDIR /app
 
-COPY --from=builder /app/bin/clipper .
+COPY --from=builder /app/internal/web/static ./internal/web/static
+
+COPY --from=builder /app/internal/data ./internal/data
+
+COPY --from=builder /app/build/clipper .
+
+EXPOSE 8080
 
 CMD ["./clipper"]
