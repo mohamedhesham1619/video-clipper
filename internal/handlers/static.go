@@ -1,14 +1,13 @@
 package handlers
 
 import (
-	"clipper/internal/web"
 	"net/http"
 	"path/filepath"
 )
 
 // homeHandler serves the main UI page
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write(web.UI)
+	http.ServeFile(w, r, filepath.Join("internal/web/static", "index.html"))
 }
 
 func ContactPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -40,4 +39,9 @@ func SupportedSitesDataHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "public, max-age=3600") // Cache for 1 hour
 	http.ServeFile(w, r, filepath.Join("internal/data", "supported_sites.json"))
+}
+
+func FaviconHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "image/svg+xml")
+	http.ServeFile(w, r, filepath.Join("internal/web/static", "favicon.svg"))
 }

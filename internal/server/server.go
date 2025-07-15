@@ -27,6 +27,7 @@ func New() *Server {
 	mux.HandleFunc("/faq", handlers.FAQPageHandler)
 	mux.HandleFunc("/shared.js", handlers.SharedJSHandler)
 	mux.HandleFunc("/api/supported-sites", handlers.SupportedSitesDataHandler)
+	mux.HandleFunc("/favicon.svg", handlers.FaviconHandler)
 
 	return &Server{mux: mux}
 }
