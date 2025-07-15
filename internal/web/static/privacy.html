@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,7 +36,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             width: 100%;
             margin: 3rem auto;
             padding: 3rem 2.5rem;
@@ -272,22 +273,27 @@
             font-size: 1.1rem;
             margin: 0 1rem;
         }
+
         @media (max-width: 1100px) {
             .ad-side {
                 display: none;
             }
         }
+
         @media (max-width: 768px) {
             .nav-links {
                 display: none !important;
             }
+
             .hamburger {
                 display: flex !important;
             }
+
             .slideout-menu {
                 display: flex !important;
             }
         }
+
         .hamburger {
             display: none;
             flex-direction: column;
@@ -298,6 +304,7 @@
             margin-left: 1rem;
             z-index: 2001;
         }
+
         .hamburger span {
             height: 4px;
             width: 100%;
@@ -306,6 +313,7 @@
             border-radius: 2px;
             transition: 0.3s;
         }
+
         .slideout-menu {
             display: none;
             flex-direction: column;
@@ -315,19 +323,22 @@
             width: 220px;
             height: 100vh;
             background: white;
-            box-shadow: 2px 0 16px rgba(0,0,0,0.13);
+            box-shadow: 2px 0 16px rgba(0, 0, 0, 0.13);
             padding: 2rem 1.5rem 1.5rem 1.5rem;
             z-index: 2000;
             transform: translateX(-100%);
-            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .slideout-menu.open {
             transform: translateX(0);
         }
+
         .slideout-menu .nav-link {
             margin-bottom: 1.5rem;
             font-size: 1.1rem;
         }
+
         .slideout-menu .close-btn {
             background: none;
             border: none;
@@ -339,6 +350,7 @@
         }
     </style>
 </head>
+
 <body>
     <header class="header">
         <div class="logo" style="cursor:pointer" onclick="window.location.href='/'">
@@ -375,67 +387,36 @@
             <a href="/privacy" class="nav-link">Privacy</a>
         </nav>
     </header>
-    <!-- Side ads wrapper -->
-    <div style="display: flex; justify-content: center; max-width: 1600px; margin: 0 auto;">
-        <!-- Left Ad -->
-        <div class="ad-side">Left Ad</div>
-        <main class="container">
-            <h1>Privacy Policy</h1>
-            <p><strong>Last updated:</strong> December 2024</p>
-            
-            <h2>1. Information We Collect</h2>
-            <p>VideoClipper collects minimal information to provide our service effectively. We may collect:</p>
-            <ul>
-                <li>Video URLs you submit for processing</li>
-                <li>Contact information if you choose to provide it through our contact forms</li>
-                <li>Usage data to improve our service</li>
-                <li>Technical information such as IP addresses and browser type</li>
-            </ul>
-            
-            <h2>2. How We Use Your Information</h2>
-            <p>We use the collected information to:</p>
-            <ul>
-                <li>Process your video clipping requests</li>
-                <li>Respond to your inquiries and provide customer support</li>
-                <li>Improve our service and user experience</li>
-                <li>Ensure the security and integrity of our platform</li>
-            </ul>
-            
-            <h2>3. Information Sharing</h2>
-            <p>We do not sell, trade, or otherwise transfer your personal information to third parties. We may share information only in the following circumstances:</p>
-            <ul>
-                <li>With your explicit consent</li>
-                <li>To comply with legal obligations</li>
-                <li>To protect our rights and safety</li>
-            </ul>
-            
-            <h2>4. Data Security</h2>
-            <p>We implement appropriate security measures to protect your information against unauthorized access, alteration, disclosure, or destruction.</p>
-            
-            <h2>5. Cookies and Tracking</h2>
-            <p>We may use cookies and similar technologies to enhance your experience and analyze usage patterns. You can control cookie settings through your browser preferences.</p>
-            
-            <h2>6. Third-Party Services</h2>
-            <p>Our service may integrate with third-party platforms (like YouTube, Facebook) to process videos. These platforms have their own privacy policies that govern how they handle your data.</p>
-            
-            <h2>7. Your Rights</h2>
-            <p>You have the right to:</p>
-            <ul>
-                <li>Access your personal information</li>
-                <li>Request correction of inaccurate data</li>
-                <li>Request deletion of your data</li>
-                <li>Opt out of certain data collection</li>
-            </ul>
-            
-            <h2>8. Changes to This Policy</h2>
-            <p>We may update this Privacy Policy from time to time. We will notify users of any material changes by posting the new policy on this page.</p>
-            
-            <h2>9. Contact Us</h2>
-            <p>If you have any questions about this Privacy Policy, please contact us through our contact form.</p>
-        </main>
-        <!-- Right Ad -->
-        <div class="ad-side">Right Ad</div>
-    </div>
+    <main class="container">
+        <h1>Privacy Policy</h1>
+        <p><strong>Last updated:</strong> July 2025</p>
+
+        <h2>1. Information We Collect</h2>
+        <p>VideoClipper temporarily logs certain information to monitor the performance of the app and to fix errors. This includes:</p>
+        <ul>
+            <li>Video URLs you submit for processing</li>
+            <li>Clip duration</li>
+            <li>IP address</li>
+            <li>Whether the video processing succeeded or failed</li>
+        </ul>
+        <p>This information is not stored or saved in any database by us. However, temporary logs may be retained by our hosting provider for operational and troubleshooting purposes. We do not use or access these logs beyond what is necessary to operate and maintain the service. We do not use analytics or cookies.</p>
+
+        <h2>2. How We Use Your Information</h2>
+        <p>We use the temporarily logged information solely to operate the service, monitor performance, and fix errors.</p>
+
+        <h2>3. Information Sharing</h2>
+        <p>We do not share, sell, or transfer your information to any third parties.</p>
+
+        <h2>4. Third-Party Services</h2>
+        <p>Our service uses tools like yt-dlp and ffmpeg to process videos from third-party platforms (such as YouTube, Facebook, etc.). These platforms have their own privacy policies that govern how they handle your data. We encourage you to review the privacy policies of any third-party services you interact with through our platform.</p>
+
+        <h2>5. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy from time to time. We will notify users of any material changes by posting
+            the new policy on this page.</p>
+
+        <h2>6. Contact Us</h2>
+        <p>If you have any questions about this Privacy Policy, please contact us through our contact form.</p>
+    </main>
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
@@ -466,49 +447,51 @@
                 <label for="miniEmail">Email (optional)</label>
                 <input type="email" id="miniEmail" name="miniEmail" placeholder="your@email.com">
                 <label for="miniMessage">Message *</label>
-                <textarea id="miniMessage" name="miniMessage" rows="3" placeholder="Your message..." required></textarea>
+                <textarea id="miniMessage" name="miniMessage" rows="3" placeholder="Your message..."
+                    required></textarea>
                 <button type="submit">Send</button>
             </form>
         </div>
     </div>
     <script src="/shared.js"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Hamburger/slideout menu logic
-        const hamburger = document.getElementById('hamburgerMenu');
-        const slideout = document.getElementById('slideoutMenu');
-        const closeSlideout = document.getElementById('closeSlideout');
-        function checkHamburgerDisplay() {
-            if (window.innerWidth <= 768) {
-                hamburger.style.display = 'flex';
-            } else {
-                hamburger.style.display = 'none';
-                slideout.classList.remove('open');
+        document.addEventListener('DOMContentLoaded', function () {
+            // Hamburger/slideout menu logic
+            const hamburger = document.getElementById('hamburgerMenu');
+            const slideout = document.getElementById('slideoutMenu');
+            const closeSlideout = document.getElementById('closeSlideout');
+            function checkHamburgerDisplay() {
+                if (window.innerWidth <= 768) {
+                    hamburger.style.display = 'flex';
+                } else {
+                    hamburger.style.display = 'none';
+                    slideout.classList.remove('open');
+                }
             }
-        }
-        checkHamburgerDisplay();
-        window.addEventListener('resize', checkHamburgerDisplay);
-        hamburger.addEventListener('click', () => {
-            if (slideout.classList.contains('open')) {
+            checkHamburgerDisplay();
+            window.addEventListener('resize', checkHamburgerDisplay);
+            hamburger.addEventListener('click', () => {
+                if (slideout.classList.contains('open')) {
+                    slideout.classList.remove('open');
+                } else {
+                    slideout.classList.add('open');
+                }
+            });
+            closeSlideout.addEventListener('click', () => {
                 slideout.classList.remove('open');
-            } else {
-                slideout.classList.add('open');
-            }
+            });
+            document.addEventListener('click', (e) => {
+                if (slideout.classList.contains('open') && !slideout.contains(e.target) && e.target !== hamburger && !hamburger.contains(e.target)) {
+                    slideout.classList.remove('open');
+                }
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    slideout.classList.remove('open');
+                }
+            });
         });
-        closeSlideout.addEventListener('click', () => {
-            slideout.classList.remove('open');
-        });
-        document.addEventListener('click', (e) => {
-            if (slideout.classList.contains('open') && !slideout.contains(e.target) && e.target !== hamburger && !hamburger.contains(e.target)) {
-                slideout.classList.remove('open');
-            }
-        });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                slideout.classList.remove('open');
-            }
-        });
-    });
     </script>
 </body>
-</html> 
+
+</html>
