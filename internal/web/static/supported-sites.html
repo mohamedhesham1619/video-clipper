@@ -380,6 +380,66 @@
                 display: none;
             }
         }
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none !important;
+            }
+            .hamburger {
+                display: flex !important;
+            }
+            .slideout-menu {
+                display: flex !important;
+            }
+        }
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            margin-left: 1rem;
+            z-index: 2001;
+        }
+        .hamburger span {
+            height: 4px;
+            width: 100%;
+            background: #1a202c;
+            margin: 4px 0;
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+        .slideout-menu {
+            display: none;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 220px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 16px rgba(0,0,0,0.13);
+            padding: 2rem 1.5rem 1.5rem 1.5rem;
+            z-index: 2000;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        .slideout-menu.open {
+            transform: translateX(0);
+        }
+        .slideout-menu .nav-link {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+        .slideout-menu .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #1a202c;
+            align-self: flex-end;
+            cursor: pointer;
+            margin-bottom: 2rem;
+        }
     </style>
 </head>
 <body>
@@ -395,7 +455,21 @@
             </svg>
             VideoClipper
         </div>
+        <div class="hamburger" id="hamburgerMenu" aria-label="Open navigation" tabindex="0" style="display:none;">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
         <nav class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/contact" class="nav-link">Contact</a>
+            <a href="/supported-sites" class="nav-link">Supported Sites</a>
+            <a href="/faq" class="nav-link">FAQ</a>
+            <a href="/terms" class="nav-link">Terms</a>
+            <a href="/privacy" class="nav-link">Privacy</a>
+        </nav>
+        <nav class="slideout-menu" id="slideoutMenu" aria-label="Mobile navigation">
+            <button class="close-btn" id="closeSlideout" aria-label="Close navigation">&times;</button>
             <a href="/" class="nav-link">Home</a>
             <a href="/contact" class="nav-link">Contact</a>
             <a href="/supported-sites" class="nav-link">Supported Sites</a>
@@ -506,5 +580,43 @@
         document.addEventListener('DOMContentLoaded', loadSupportedSites);
     </script>
     <script src="/shared.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Hamburger/slideout menu logic
+        const hamburger = document.getElementById('hamburgerMenu');
+        const slideout = document.getElementById('slideoutMenu');
+        const closeSlideout = document.getElementById('closeSlideout');
+        function checkHamburgerDisplay() {
+            if (window.innerWidth <= 768) {
+                hamburger.style.display = 'flex';
+            } else {
+                hamburger.style.display = 'none';
+                slideout.classList.remove('open');
+            }
+        }
+        checkHamburgerDisplay();
+        window.addEventListener('resize', checkHamburgerDisplay);
+        hamburger.addEventListener('click', () => {
+            if (slideout.classList.contains('open')) {
+                slideout.classList.remove('open');
+            } else {
+                slideout.classList.add('open');
+            }
+        });
+        closeSlideout.addEventListener('click', () => {
+            slideout.classList.remove('open');
+        });
+        document.addEventListener('click', (e) => {
+            if (slideout.classList.contains('open') && !slideout.contains(e.target) && e.target !== hamburger && !hamburger.contains(e.target)) {
+                slideout.classList.remove('open');
+            }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                slideout.classList.remove('open');
+            }
+        });
+    });
+    </script>
 </body>
 </html> 
