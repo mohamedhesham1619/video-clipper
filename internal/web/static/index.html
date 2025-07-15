@@ -733,9 +733,10 @@
             <h1>Create Your Video Clip</h1>
 
             <form id="clipForm">
+                <div id="formError" style="color:#dc2626; margin-bottom:1rem; display:none;"></div>
                 <div class="url-input">
                     <input type="text" placeholder="Paste YouTube, Facebook, or any video URL" id="videoUrl"
-                        name="videoUrl">
+                        name="videoUrl" required>
                     <button type="button" class="paste-btn">
                         <!-- Clipboard with plus (paste) SVG icon -->
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -751,11 +752,11 @@
                 <div class="time-controls">
                     <div class="time-input">
                         <label>Start Time (hh:mm:ss)</label>
-                        <input type="text" value="00:00:00" id="startTime" oninput="updateDuration()">
+                        <input type="text" value="00:00:00" id="startTime" oninput="updateDuration()" required>
                     </div>
                     <div class="time-input">
                         <label>End Time (hh:mm:ss)</label>
-                        <input type="text" value="00:01:00" id="endTime" oninput="updateDuration()">
+                        <input type="text" value="00:01:00" id="endTime" oninput="updateDuration()" required>
                     </div>
                 </div>
                 <div class="duration-display">
@@ -823,6 +824,21 @@
             return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
         }
 
+        function formatDurationShortWords(seconds) {
+            // If over 1 hour, just show total minutes and seconds
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            let result = '';
+            if (mins > 0) {
+                result += mins + ' min';
+            }
+            if (secs > 0 || mins === 0) {
+                if (result) result += ' ';
+                result += secs + ' sec';
+            }
+            return result;
+        }
+
         function updateDuration() {
             const startInput = startTimeInput.value.trim();
             const endInput = endTimeInput.value.trim();
@@ -832,7 +848,7 @@
                 const startSeconds = parseTimeToSeconds(startInput);
                 const endSeconds = parseTimeToSeconds(endInput);
                 const durationSeconds = Math.max(0, endSeconds - startSeconds);
-                document.getElementById('durationTime').textContent = formatTime(durationSeconds);
+                document.getElementById('durationTime').textContent = formatDurationShortWords(durationSeconds);
             }
         }
 
@@ -1009,6 +1025,19 @@ const downloadBtn = document.querySelector('.download-btn');
 document.getElementById('clipForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    // Validate required fields
+    const url = videoUrlInput.value.trim();
+    const start = startTimeInput.value.trim();
+    const end = endTimeInput.value.trim();
+    const formError = document.getElementById('formError');
+    formError.style.display = 'none';
+    formError.textContent = '';
+    if (!url || !start || !end) {
+        formError.textContent = 'Please fill in the video URL, start time, and end time.';
+        formError.style.display = 'block';
+        return;
+    }
+
     if (isDownloading) {
         alert('A download is already in progress. Please wait until it completes.');
         return;
@@ -1022,7 +1051,7 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
     progressBar.style.display = 'block';
     progressFill.classList.add('connecting');
     progressFill.style.width = '0%';
-    showLoading('Getting the video title', { animated: true });
+    showLoading('Fetching video information', { animated: true });
 
     try {
         // Submit request
@@ -1051,7 +1080,7 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
             showSuccess('Video title received');
             fadeOutText(progressLabel, () => {
                 // After fade out, show new text and reset opacity
-                showLoading('Getting the required clip from:', {
+                showLoading('Extracting the required clip from:', {
                     animated: true,
                     titleLine: videoTitle
                 });
