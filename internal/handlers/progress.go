@@ -26,22 +26,19 @@ func ProgressHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	// If the client disconnects, close the progress channel, stop the download command and clean up.
+	// If the client disconnects, stop the download command.
 	go func() {
 		<-r.Context().Done()
-		slog.Info("Client disconnected, closing progress channel", "processId", processId)
-		close(progressChannel)
+		slog.Warn("Client disconnected, closing progress channel", "processId", processId)
 
 		// Stop the download command if it exists
 		if cmd, exists := data.getProcess(processId); exists {
-			slog.Info("Stopping download command", "processId", processId)
+			slog.Warn("Stopping download command", "processId", processId)
 			if err := cmd.Process.Kill(); err != nil {
 				slog.Error("Failed to kill download command", "error", err)
 			}
 		}
-		data.cleanupAll(processId) // Clean up all resources associated with this process ID
-		slog.Info("Cleaned up resources for process", "processId", processId)
-		
+
 	}()
 
 	// Stream progress updates
