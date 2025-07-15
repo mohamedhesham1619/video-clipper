@@ -951,21 +951,28 @@ function showLoading(text, opts = {}) {
     progressValue.style.opacity = 1;
 }
 function showSuccess(text) {
-    progressLabel.textContent = text;
-    progressLabel.style.color = '#16a34a'; // green
-    progressLabel.style.opacity = 1;
-    progressValue.innerHTML = `<span class="success-check">&#10003;</span>`;
+    // Only replace the loader with the green check, keep the text as is
+    // If progressValue contains the loader, replace it with the check
+    if (progressValue.querySelector('.loader')) {
+        progressValue.innerHTML = `<span class="success-check">&#10003;</span>`;
+    }
     progressValue.style.color = '#16a34a';
     progressValue.style.opacity = 1;
     progressFill.classList.remove('connecting');
+    // Only update the text if provided
+    if (text !== undefined && text !== null) {
+        progressLabel.textContent = text;
+        progressLabel.style.color = '#16a34a'; // green
+        progressLabel.style.opacity = 1;
+    }
 }
 function fadeOutText(element, callback) {
-    element.style.transition = 'opacity 0.7s';
+    element.style.transition = 'opacity 3s';
     element.style.opacity = 0;
     setTimeout(() => {
         element.style.transition = '';
         if (callback) callback();
-    }, 700);
+    }, 3000);
 }
 function showError(text) {
     progressLabel.textContent = 'Error';
@@ -1044,10 +1051,12 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
             videoTitle = eventData.title || '';
             showSuccess('Video title received');
             fadeOutText(progressLabel, () => {
+                // After fade out, show new text and reset opacity
                 showLoading('Getting the required clip from:', {
                     animated: true,
                     titleLine: videoTitle
                 });
+                progressLabel.style.opacity = 1;
             });
         });
 
@@ -1057,11 +1066,18 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
                 gotProgress = true;
                 showSuccess('Clip is ready to process');
                 fadeOutText(progressLabel, () => {
-                    progressLabel.textContent = 'Processing the required clip';
+                    // Animate the text with pulse and animated-ellipsis
+                    progressLabel.innerHTML = '';
+                    progressLabel.classList.remove('pulse-text', 'animated-ellipsis', 'truncate');
+                    const mainLine = document.createElement('span');
+                    mainLine.textContent = 'Processing the required clip';
+                    mainLine.classList.add('pulse-text', 'animated-ellipsis');
+                    progressLabel.appendChild(mainLine);
                     progressLabel.style.color = '';
                     progressValue.innerHTML = '';
                     progressValue.style.color = '';
                     progressFill.classList.remove('connecting');
+                    progressLabel.style.opacity = 1;
                 });
             }
             // Update progress bar

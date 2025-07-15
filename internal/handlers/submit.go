@@ -24,7 +24,7 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 	// Log the request details
 	clipDuration, _ := utils.ParseClipDuration(videoRequest.ClipStart, videoRequest.ClipEnd)
 	clipDurationFormatted := utils.FormatSecondsToMMSS(clipDuration)
-	slog.Info("Received download request",
+	slog.Info("Received clip request",
 		"ip", r.RemoteAddr,
 		"url", videoRequest.VideoURL,
 		"quality", videoRequest.Quality,
