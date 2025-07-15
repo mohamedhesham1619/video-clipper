@@ -474,7 +474,7 @@
                 categorySection.innerHTML = `
                     <div class="sites-grid">
                         ${data.sites.map(site => `
-                            <div class="site-card">
+                            <div class="site-card" style="cursor:pointer" onclick="window.location.href='/'">
                                 <img src="${site.logo}" alt="${site.name} logo" class="site-logo" 
                                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
                                      onload="this.style.opacity='1';">

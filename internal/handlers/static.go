@@ -37,7 +37,6 @@ func SharedJSHandler(w http.ResponseWriter, r *http.Request) {
 
 func SupportedSitesDataHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "public, max-age=3600") // Cache for 1 hour
 	http.ServeFile(w, r, filepath.Join("internal/data", "supported_sites.json"))
 }
 
