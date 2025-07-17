@@ -32,6 +32,10 @@ func New() *Server {
 	mux.HandleFunc("/shared.js", handlers.SharedJSHandler)
 	mux.HandleFunc("/favicon.svg", handlers.FaviconHandler)
 
+	// SEO/static root files
+	mux.HandleFunc("/robots.txt", handlers.RobotsTxtHandler)
+	mux.HandleFunc("/sitemap.xml", handlers.SitemapXMLHandler)
+
 	// API endpoints
 	mux.HandleFunc("/api/supported-sites", handlers.SupportedSitesDataHandler)
 

@@ -6,6 +6,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <title>Free Video Clipper - Download Clips Online</title>
+    <meta name="description" content="Free online video clipper. Easily create and download custom video clips from YouTube, Facebook, and more. No signup required.">
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Free Video Clipper - Download Clips Online">
+    <meta property="og:description" content="Create and download custom video clips from your favorite videos online.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourdomain.com/">
+    <meta property="og:image" content="https://yourdomain.com/og-image.png">
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Video Clipper - Download Clips Online">
+    <meta name="twitter:description" content="Create and download custom video clips from your favorite videos online.">
+    <meta name="twitter:image" content="https://yourdomain.com/og-image.png">
+    <link rel="canonical" href="https://yourdomain.com/">
+    <meta name="robots" content="index, follow">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "VideoClipper",
+      "url": "https://yourdomain.com/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://yourdomain.com/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is VideoClipper free to use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, VideoClipper is completely free to use with no signup required."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What sites are supported?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We support YouTube, Facebook, and many other popular video platforms. See the full list on our <a href='/supported-sites'>Supported Sites</a> page."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the maximum clip length?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The maximum allowed clip length is 15 minutes per request."
+          }
+        }
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "VideoClipper",
+      "url": "https://yourdomain.com/",
+      "logo": "https://yourdomain.com/favicon.svg"
+    }
+    </script>
     <style>
         * {
             margin: 0;
@@ -783,14 +851,26 @@
         .progress-value {
             color: #1a202c !important;
         }
+        .visually-hidden {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
     </style>
 </head>
 
 <body>
-    <header class="header">
+    <a href="#mainContent" class="skip-link" style="position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden;background:#fff;color:#1a202c;z-index:1000;">Skip to main content</a>
+    <header class="header" role="banner">
         <div class="logo" style="cursor:pointer" onclick="window.location.href='/'">
             <!-- Scissors SVG icon -->
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" aria-label="Scissors logo">
                 <circle cx="6" cy="6" r="3"></circle>
                 <circle cx="6" cy="18" r="3"></circle>
                 <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
@@ -799,20 +879,20 @@
             </svg>
             VideoClipper
         </div>
-        <div class="hamburger" id="hamburgerMenu" aria-label="Open navigation" tabindex="0" style="display:none;">
+        <div class="hamburger" id="hamburgerMenu" aria-label="Open navigation" tabindex="0" style="display:none;" aria-controls="slideoutMenu" aria-expanded="false">
             <span></span>
             <span></span>
             <span></span>
         </div>
-        <nav class="nav-links">
-            <a href="/" class="nav-link">Home</a>
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="/" class="nav-link" aria-current="page">Home</a>
             <a href="/contact" class="nav-link">Contact</a>
             <a href="/supported-sites" class="nav-link">Supported Sites</a>
             <a href="/faq" class="nav-link">FAQ</a>
             <a href="/terms" class="nav-link">Terms</a>
             <a href="/privacy" class="nav-link">Privacy</a>
         </nav>
-        <nav class="slideout-menu" id="slideoutMenu" aria-label="Mobile navigation">
+        <nav class="slideout-menu" id="slideoutMenu" aria-label="Mobile navigation" aria-hidden="true">
             <button class="close-btn" id="closeSlideout" aria-label="Close navigation">&times;</button>
             <a href="/" class="nav-link">Home</a>
             <a href="/contact" class="nav-link">Contact</a>
@@ -829,8 +909,31 @@
         <!-- Left Ad -->
         <div class="ad-side">Left Ad</div>
         <div class="page-wrapper" style="flex:1; min-width:0;">
-        <main class="container">
+        <main class="container" id="mainContent">
             <h1>Create Your Video Clip</h1>
+            <div class="visually-hidden">
+                <h2 id="how-it-works">How It Works</h2>
+                <p>Paste a video URL, select your desired start and end times, choose the quality, and download your custom video clip instantly. No signup required.</p>
+                <h2 id="why-use-videoclipper">Why Use VideoClipper?</h2>
+                <ul>
+                    <li>100% free and no registration required</li>
+                    <li>Supports YouTube, Facebook, and more</li>
+                    <li>Fast, secure, and privacy-friendly</li>
+                    <li>Download clips in multiple qualities (360p, 480p, 720p, 1080p)</li>
+                    <li>Works on desktop and mobile devices</li>
+                </ul>
+                <h2 id="supported-sites">Supported Sites</h2>
+                <p>We support YouTube, Facebook, and many other popular video platforms. <a href="/supported-sites">See the full list</a>.</p>
+                <h2 id="faq">Frequently Asked Questions</h2>
+                <dl>
+                    <dt>Is VideoClipper free to use?</dt>
+                    <dd>Yes, VideoClipper is completely free to use with no signup required.</dd>
+                    <dt>What sites are supported?</dt>
+                    <dd>We support YouTube, Facebook, and many other popular video platforms. See the full list on our <a href="/supported-sites">Supported Sites</a> page.</dd>
+                    <dt>What is the maximum clip length?</dt>
+                    <dd>The maximum allowed clip length is 15 minutes per request.</dd>
+                </dl>
+            </div>
 
             <form id="clipForm">
                 <div id="formError" style="color:#dc2626; margin-bottom:1rem; display:none;"></div>
@@ -1302,13 +1405,14 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
                 <h3>Legal</h3>
                 <a href="/terms">Terms of Service</a>
                 <a href="/privacy">Privacy Policy</a>
+                <p class="visually-hidden">All trademarks and copyrights belong to their respective owners. VideoClipper does not host any copyrighted content.</p>
             </div>
         </div>
     </footer>
-    <button id="floatingContactBtn" class="floating-contact-btn">Contact</button>
-    <div id="contactModal" class="contact-modal">
+    <button id="floatingContactBtn" class="floating-contact-btn" aria-label="Contact us">Contact</button>
+    <div id="contactModal" class="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
         <div class="contact-modal-content">
-            <h2>Contact Us</h2>
+            <h2 id="contactModalTitle">Contact Us</h2>
             <form id="miniContactForm">
                 <label for="miniEmail">Email (optional)</label>
                 <input type="email" id="miniEmail" name="miniEmail" placeholder="your@email.com">

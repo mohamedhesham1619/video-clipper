@@ -44,3 +44,13 @@ func FaviconHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "image/svg+xml")
 	http.ServeFile(w, r, filepath.Join("internal/web/static", "favicon.svg"))
 }
+
+func RobotsTxtHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	http.ServeFile(w, r, filepath.Join("internal/web/static", "robots.txt"))
+}
+
+func SitemapXMLHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
+	http.ServeFile(w, r, filepath.Join("internal/web/static", "sitemap.xml"))
+}
