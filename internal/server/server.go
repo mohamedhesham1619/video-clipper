@@ -5,6 +5,11 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
+
+	"github.com/ulule/limiter/v3"
+	limiterMiddleware "github.com/ulule/limiter/v3/drivers/middleware/stdlib"
+	memoryStore "github.com/ulule/limiter/v3/drivers/store/memory"
 )
 
 type Server struct {
@@ -14,9 +19,18 @@ type Server struct {
 func New() *Server {
 	mux := http.NewServeMux()
 
+	// Rate limiter: 3 requests per 20 minutes per IP for /submit
+	limiterStore := memoryStore.NewStore()
+	rate := limiter.Rate{
+		Limit:  3,
+		Period: 20 * time.Minute,
+	}
+	limiterInstance := limiter.New(limiterStore, rate)
+	limiterMw := limiterMiddleware.NewMiddleware(limiterInstance)
+
 	// Main app routes
 	mux.HandleFunc("/", handlers.HomeHandler)
-	mux.HandleFunc("/submit", handlers.SubmitHandler)
+	mux.Handle("/submit", limiterMw.Handler(http.HandlerFunc(handlers.SubmitHandler)))
 	mux.HandleFunc("/progress/", handlers.ProgressHandler)
 	mux.HandleFunc("/download/", handlers.DownloadHandler)
 	mux.HandleFunc("/feedback", handlers.FeedbackHandler)

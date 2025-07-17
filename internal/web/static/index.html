@@ -1299,6 +1299,13 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
             body: JSON.stringify({ videoUrl, clipStart, clipEnd, quality })
         });
 
+        if (response.status === 429) {
+            showError('You have reached the maximum number of requests. Please try again later.');
+            downloadBtn.style.backgroundColor = '#1a202c';
+            isDownloading = false;
+            return;
+        }
+
         const data = await response.json();
 
         if (data.status === 'error') {
