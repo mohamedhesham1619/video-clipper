@@ -780,6 +780,9 @@
   text-overflow: ellipsis;
   vertical-align: bottom;
 }
+        .progress-value {
+            color: #1a202c !important;
+        }
     </style>
 </head>
 
@@ -860,6 +863,9 @@
                     <span>Duration:</span>
                     <span id="durationTime">00:01:00</span>
                 </div>
+                <div id="durationNote" style="color:#4a5568; font-size:0.95rem; margin-top:0.5rem; margin-bottom:1rem;">
+                    <strong>Note:</strong> The maximum allowed clip length is 15 minutes per request. If you need a longer clip, please <a href="/contact">let us know</a>
+                </div>
 
                 <div class="actions">
                     <button type="submit" class="download-btn">
@@ -908,6 +914,7 @@
         let isDragging = false;
         let currentHandle = null;
         const TOTAL_SECONDS = 300; // 5 minutes in seconds
+        const MAX_CLIP_DURATION = 900; // 15 minutes in seconds
 
         function parseTimeToSeconds(timeStr) {
             const [hours, minutes, seconds] = timeStr.split(':').map(Number);
@@ -946,6 +953,14 @@
                 const endSeconds = parseTimeToSeconds(endInput);
                 const durationSeconds = Math.max(0, endSeconds - startSeconds);
                 document.getElementById('durationTime').textContent = formatDurationShortWords(durationSeconds);
+                // Show warning if over max duration
+                const formError = document.getElementById('formError');
+                if (durationSeconds > MAX_CLIP_DURATION) {
+                    formError.textContent = 'Maximum allowed clip length is 15 minutes.';
+                    formError.style.display = 'block';
+                } else {
+                    formError.style.display = 'none';
+                }
             }
         }
 
@@ -1146,6 +1161,15 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
         return;
     }
 
+    const startSeconds = parseTimeToSeconds(start);
+    const endSeconds = parseTimeToSeconds(end);
+    const durationSeconds = Math.max(0, endSeconds - startSeconds);
+    if (durationSeconds > MAX_CLIP_DURATION) {
+        formError.textContent = 'Maximum allowed clip length is 15 minutes.';
+        formError.style.display = 'block';
+        return;
+    }
+
     if (isDownloading) {
         alert('A download is already in progress. Please wait until it completes.');
         return;
@@ -1185,7 +1209,7 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
         eventSource.addEventListener('title', (event) => {
             const eventData = JSON.parse(event.data);
             videoTitle = eventData.title || '';
-            showSuccess('Video title received');
+            showSuccess('Fetching video information');
             fadeOutText(progressLabel, () => {
                 // After fade out, show new text and reset opacity
                 showLoading('Extracting the required clip from:', {

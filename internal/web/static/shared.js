@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Here you would typically send the data to your backend
                 // For now, we'll just close the modal and show a success message
-                alert('Thank you for your message! We\'ll get back to you soon.');
+                alert('Thank you for your message!');
                 contactModal.style.display = 'none';
                 
                 // Reset form
