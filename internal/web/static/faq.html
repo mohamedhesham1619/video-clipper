@@ -375,6 +375,10 @@
             cursor: pointer;
             margin-bottom: 2rem;
         }
+        /* Hide ad banners on all pages */
+        .ad-top, .ad-bottom, .ad-side {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -416,7 +420,7 @@
     <!-- Side ads wrapper -->
     <div style="display: flex; justify-content: center; max-width: 1600px; margin: 0 auto;">
         <!-- Left Ad -->
-        <div class="ad-side">Left Ad</div>
+        <div class="ad-side" style="display: none !important;">Left Ad</div>
         <main class="container">
             <h1>Frequently Asked Questions</h1>
             
@@ -521,7 +525,7 @@
             </div>
         </main>
         <!-- Right Ad -->
-        <div class="ad-side">Right Ad</div>
+        <div class="ad-side" style="display: none !important;">Right Ad</div>
     </div>
     <footer class="footer">
         <div class="footer-content">
