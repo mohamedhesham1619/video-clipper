@@ -36,6 +36,9 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 	progressChan := make(chan models.ProgressEvent)
 	data.addProgressChannel(fileId, progressChan)
 
+	// Add a watcher for this process ID to track client connection status
+	data.addWatcher(fileId)
+
 	// Start a goroutine to handle the download process
 	go func() {
 
@@ -57,7 +60,7 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 		// Start the download process
 		filePath, cmd, err := utils.DownloadVideo(videoRequest, videoTitle, progressChan)
 
-		// If there was an error during the download, close the goroutine
+		// If there was an error during the download, send an error message on the channel and clean up.
 		if err != nil {
 			slog.Error("Error downloading video", "error", err, "request", videoRequest)
 			progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Failed to download video"}}
@@ -67,13 +70,13 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Store the file path and the download command in the shared data
-		data.addProcess(fileId, cmd)
+		data.addDownloadProcess(fileId, cmd)
 		data.addFileID(fileId, filePath)
 
 		// If the download fails, send an error message on the channel and clean up.
 		if err := cmd.Wait(); err != nil {
 
-			slog.Error("ffmpeg process failed", "error", err,)
+			slog.Error("ffmpeg process failed", "error", err)
 
 			// Send a failure message on the channel before closing it.
 			progressChan <- models.ProgressEvent{
@@ -103,6 +106,21 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 		data.cleanupAll(fileId)
 		slog.Info("cleanup completed for process", "processId", fileId)
 	}()
+
+	// If the client didn't request the progress handler within 5 seconds, we assume that the client disconnected and stop the download process.
+	// This will not block the submit handler, as it runs in a separate goroutine.
+	time.AfterFunc(5*time.Second, func() {
+		watcher, exist := data.getWatcher(fileId)
+		if exist {
+			select {
+			case <-watcher:
+				slog.Debug("Client is still connected", "processId", fileId)
+			default:
+				slog.Warn("Client disconnected before download started", "processId", fileId)
+				data.stopDownloadProcessAndCleanUp(fileId) // Stop the download process and clean up resources
+			}
+		}
+	})
 
 	// Respond with the process ID
 	json.NewEncoder(w).Encode(response{Status: "started", ProcessId: fileId})

@@ -13,6 +13,9 @@ func ProgressHandler(w http.ResponseWriter, r *http.Request) {
 	// Get the process ID from the URL
 	processId := strings.TrimPrefix(r.URL.Path, "/progress/")
 
+	// Notify the watcher that the client is still connected
+	data.notifyWatcher(processId)
+
 	// Get the progress channel
 	progressChannel, exists := data.getProgressChannel(processId)
 
@@ -29,16 +32,7 @@ func ProgressHandler(w http.ResponseWriter, r *http.Request) {
 	// If the client disconnects, stop the download command if it is still running.
 	go func() {
 		<-r.Context().Done()
-
-		if cmd, exists := data.getProcess(processId); exists {
-			if cmd.ProcessState == nil || !cmd.ProcessState.Exited() {
-				slog.Warn("Stopping download command due to client disconnect", "ip", r.RemoteAddr)
-				if err := cmd.Process.Kill(); err != nil {
-					slog.Error("Failed to kill download command", "error", err)
-				}
-			}
-		}
-
+		data.stopDownloadProcessAndCleanUp(processId)
 	}()
 
 	// Stream progress updates
