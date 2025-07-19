@@ -470,6 +470,40 @@
     <script src="/shared.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Main contact form AJAX submission
+        const mainForm = document.querySelector('.contact-form');
+        if (mainForm) {
+            mainForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const email = document.getElementById('contactEmail').value.trim();
+                const message = document.getElementById('contactMessage').value.trim();
+                if (!message) {
+                    alert('Please enter a message.');
+                    return;
+                }
+                try {
+                    const res = await fetch('/feedback', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, message })
+                    });
+                    const data = await res.json();
+                    if (data.status === 'success') {
+                        alert('Thank you for your feedback!');
+                        mainForm.reset();
+                    } else {
+                        alert('Failed to send feedback. Please try again.');
+                    }
+                } catch (err) {
+                    alert('Failed to send feedback. Please try again.');
+                }
+            });
+        }
+        // Floating contact button modal logic
+        const floatingBtn = document.getElementById('floatingContactBtn');
+        const contactModal = document.getElementById('contactModal');
+        floatingBtn.onclick = () => contactModal.style.display = 'flex';
+        contactModal.onclick = (e) => { if (e.target === contactModal) contactModal.style.display = 'none'; };
         // Hamburger/slideout menu logic
         const hamburger = document.getElementById('hamburgerMenu');
         const slideout = document.getElementById('slideoutMenu');

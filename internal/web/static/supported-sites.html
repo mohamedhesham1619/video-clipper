@@ -630,6 +630,12 @@
                 slideout.classList.remove('open');
             }
         });
+
+        // Floating contact button modal logic
+        const floatingBtn = document.getElementById('floatingContactBtn');
+        const contactModal = document.getElementById('contactModal');
+        floatingBtn.onclick = () => contactModal.style.display = 'flex';
+        contactModal.onclick = (e) => { if (e.target === contactModal) contactModal.style.display = 'none'; };
     });
     </script>
 </body>

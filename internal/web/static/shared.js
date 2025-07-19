@@ -17,27 +17,35 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Handle form submission with validation
         if (miniContactForm) {
-            miniContactForm.onsubmit = function(e) {
+            miniContactForm.onsubmit = async function(e) {
                 e.preventDefault();
-                
                 const messageField = document.getElementById('miniMessage');
                 const emailField = document.getElementById('miniEmail');
-                
+                const message = messageField.value.trim();
+                const email = emailField.value.trim();
                 // Check if message is empty
-                if (!messageField.value.trim()) {
+                if (!message) {
                     alert('Please enter a message before sending.');
                     messageField.focus();
                     return false;
                 }
-                
-                // Here you would typically send the data to your backend
-                // For now, we'll just close the modal and show a success message
-                alert('Thank you for your message!');
-                contactModal.style.display = 'none';
-                
-                // Reset form
-                miniContactForm.reset();
-                
+                try {
+                    const res = await fetch('/feedback', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, message })
+                    });
+                    const data = await res.json();
+                    if (data.status === 'success') {
+                        alert('Thank you for your feedback!');
+                        contactModal.style.display = 'none';
+                        miniContactForm.reset();
+                    } else {
+                        alert('Failed to send feedback. Please try again.');
+                    }
+                } catch (err) {
+                    alert('Failed to send feedback. Please try again.');
+                }
                 return false;
             };
         }

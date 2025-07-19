@@ -1456,44 +1456,6 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
         const contactModal = document.getElementById('contactModal');
         floatingBtn.onclick = () => contactModal.style.display = 'flex';
         contactModal.onclick = (e) => { if (e.target === contactModal) contactModal.style.display = 'none'; };
-        document.getElementById('miniContactForm').onsubmit = e => { e.preventDefault(); contactModal.style.display = 'none'; };
-
-        // Hamburger/slideout menu logic
-        const hamburger = document.getElementById('hamburgerMenu');
-        const slideout = document.getElementById('slideoutMenu');
-        const closeSlideout = document.getElementById('closeSlideout');
-        function checkHamburgerDisplay() {
-            if (window.innerWidth <= 768) {
-                hamburger.style.display = 'flex';
-            } else {
-                hamburger.style.display = 'none';
-                slideout.classList.remove('open');
-            }
-        }
-        checkHamburgerDisplay();
-        window.addEventListener('resize', checkHamburgerDisplay);
-        hamburger.addEventListener('click', () => {
-            if (slideout.classList.contains('open')) {
-                slideout.classList.remove('open');
-            } else {
-                slideout.classList.add('open');
-            }
-        });
-        closeSlideout.addEventListener('click', () => {
-            slideout.classList.remove('open');
-        });
-        // Optional: close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (slideout.classList.contains('open') && !slideout.contains(e.target) && e.target !== hamburger && !hamburger.contains(e.target)) {
-                slideout.classList.remove('open');
-            }
-        });
-        // Optional: close menu on Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                slideout.classList.remove('open');
-            }
-        });
     });
     </script>
 </body>
