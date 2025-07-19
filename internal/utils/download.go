@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -16,12 +15,8 @@ import (
 // DownloadVideo downloads the video and returns the output file path, a progress channel, and the ffmpeg command.
 func DownloadVideo(videoRequest models.VideoRequest, videoTitle string, progressChan chan models.ProgressEvent) (string, *exec.Cmd, error) {
 
-	// Create a temp directory if it doesn't exist.
-	// This is where the video will be saved.
-	if err := os.MkdirAll("temp", os.ModePerm); err != nil {
-		return "", nil, fmt.Errorf("failed to create temp directory: %w", err)
-	}
-	downloadPath := filepath.Join("temp", videoTitle)
+	// Use /tmp as the temp directory (Cloud Run writable directory)
+	downloadPath := filepath.Join("/tmp", videoTitle)
 
 	// Create the yt-dlp and ffmpeg commands.
 	ytdlpCmd := prepareYtDlpCommand(videoRequest)
@@ -142,7 +137,7 @@ func GetVideoTitle(videoRequest models.VideoRequest) (string, error) {
 	slog.Debug("yt-dlp video title", "title", string(infoOutput))
 
 	// Sanitize the video title to create a valid filename.
-	videoTitle := strings.TrimSpace(string(infoOutput))
+	videoTitle := SanitizeFilename(strings.TrimSpace(string(infoOutput)))
 	return videoTitle, nil
 }
 

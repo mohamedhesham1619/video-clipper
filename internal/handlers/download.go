@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"mime"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -15,7 +16,6 @@ import (
 func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	// Get the file ID from the URL
 	fileId := strings.TrimPrefix(r.URL.Path, "/download/")
-	slog.Info("Received download request", "ip", r.RemoteAddr, "fileId", fileId)
 
 	// Get the file name from the map if it exists
 	filePath, exists := data.getFilePath(fileId)
@@ -24,6 +24,8 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "File not found", http.StatusNotFound)
 		return
 	}
+
+	slog.Info("DownloadHandler: fileId", "fileId", fileId, "filePath", filePath)
 
 	// Get file info to set Content-Length and check for existence
 	fileInfo, err := os.Stat(filePath)
@@ -55,8 +57,7 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	// Add Content-Length for better client experience (e.g., download progress bar)
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", fileInfo.Size()))
 	w.Header().Set("Content-Type", contentType)
-	// Quote the filename to handle spaces and special characters correctly.
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", fileInfo.Name()))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"; filename*=UTF-8''%s", fileInfo.Name(), url.QueryEscape(fileInfo.Name())))
 
 	// Copy the file to the response writer
 	_, err = io.Copy(w, file)

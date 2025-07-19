@@ -93,7 +93,7 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// This block runs only if ffmpeg succeeds.
-		slog.Info("ffmpeg process finished successfully", "processId", fileId)
+		slog.Info("ffmpeg process finished successfully", "processId", fileId, "filePath", filePath)
 
 		// Send the final success message on the channel before closing it.
 		progressChan <- models.ProgressEvent{

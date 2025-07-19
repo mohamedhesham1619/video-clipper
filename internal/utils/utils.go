@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"math/rand/v2"
 	"strconv"
+	"strings"
 	"time"
-	"unicode"
 )
 
 func GenerateID() string {
@@ -14,9 +14,8 @@ func GenerateID() string {
 	return fmt.Sprintf("%d%d", time.Now().UnixNano(), randNum)
 }
 
-// sanitize the filename to remove or replace characters that are problematic in filenames
+// sanitize the filename to remove or replace characters that are problematic in filenames and HTTP headers
 func SanitizeFilename(filename string) string {
-
 	replacements := map[rune]rune{
 		'/':  '-',
 		'\\': '-',
@@ -31,16 +30,37 @@ func SanitizeFilename(filename string) string {
 
 	sanitized := []rune{}
 
-	// Replace problematic characters with a hyphen and remove non-printable characters
 	for _, r := range filename {
 		if replaced, exists := replacements[r]; exists {
 			sanitized = append(sanitized, replaced)
-		} else if unicode.IsPrint(r) {
+		} else if r >= 32 && r < 127 { // printable ASCII only
 			sanitized = append(sanitized, r)
+		} else {
+			sanitized = append(sanitized, '_')
 		}
 	}
 
-	return string(sanitized)
+	result := strings.Trim(string(sanitized), " .")
+	if result == "" {
+		return "clip.mp4"
+	}
+	return result
+}
+
+// SanitizeFilenameForHeader returns a strictly ASCII, safe filename for HTTP headers.
+func SanitizeFilenameForHeader(filename string) string {
+	sanitized := SanitizeFilename(filename)
+	ascii := make([]rune, 0, len(sanitized))
+	for _, r := range sanitized {
+		if r >= 32 && r < 127 { // printable ASCII only
+			ascii = append(ascii, r)
+		}
+	}
+	result := string(ascii)
+	if result == "" {
+		return "clip.mp4"
+	}
+	return result
 }
 
 // calculate the clip duration in microseconds

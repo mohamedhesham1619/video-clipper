@@ -22,13 +22,13 @@
     <meta name="robots" content="index, follow">
     
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BJZQK7P92Z"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3TYZ3E3FGY"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', 'G-BJZQK7P92Z');
+      gtag('config', 'G-3TYZ3E3FGY');
     </script>
     <script type="application/ld+json">
     {
@@ -1384,6 +1384,13 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
             document.body.removeChild(a);
             downloadBtn.style.backgroundColor = '#1a202c';
             isDownloading = false;
+            // Wait a few seconds, then clear the progress bar and show finished message
+            setTimeout(() => {
+                progressBar.style.display = 'none';
+                progressLabel.textContent = 'Process finished!';
+                progressValue.textContent = '';
+                progressFill.style.width = '0%';
+            }, 3000);
         });
 
         eventSource.addEventListener('error', (event) => {
