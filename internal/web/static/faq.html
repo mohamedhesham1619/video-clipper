@@ -560,18 +560,6 @@
         </div>
     </footer>
     <button id="floatingContactBtn" class="floating-contact-btn">Contact</button>
-    <div id="contactModal" class="contact-modal">
-        <div class="contact-modal-content">
-            <h2>Quick Contact</h2>
-            <form id="miniContactForm">
-                <label for="miniEmail">Email (optional)</label>
-                <input type="email" id="miniEmail" name="miniEmail" placeholder="your@email.com">
-                <label for="miniMessage">Message *</label>
-                <textarea id="miniMessage" name="miniMessage" rows="3" placeholder="Your message..." required></textarea>
-                <button type="submit">Send</button>
-            </form>
-        </div>
-    </div>
     <script src="/shared.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -609,12 +597,6 @@
                 slideout.classList.remove('open');
             }
         });
-
-        // Floating contact button modal logic
-        const floatingBtn = document.getElementById('floatingContactBtn');
-        const contactModal = document.getElementById('contactModal');
-        floatingBtn.onclick = () => contactModal.style.display = 'flex';
-        contactModal.onclick = (e) => { if (e.target === contactModal) contactModal.style.display = 'none'; };
     });
     </script>
     <style>

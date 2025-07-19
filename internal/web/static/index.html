@@ -1449,15 +1449,6 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
             </form>
         </div>
     </div>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Floating contact button modal logic
-        const floatingBtn = document.getElementById('floatingContactBtn');
-        const contactModal = document.getElementById('contactModal');
-        floatingBtn.onclick = () => contactModal.style.display = 'flex';
-        contactModal.onclick = (e) => { if (e.target === contactModal) contactModal.style.display = 'none'; };
-    });
-    </script>
 </body>
 
 </html>
