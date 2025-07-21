@@ -5,18 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <title>Free Video Clipper - Download Clips Online</title>
-    <meta name="description" content="Free online video clipper. Easily create and download custom video clips from YouTube, Facebook, and more. No signup required.">
+    <title>Video Clipper – Trim & Download Video Clips Online</title>
+    <meta name="description" content="Need to trim a video online? Paste a URL, set times, and download it directly. Fast, free, and supports YouTube, Facebook, and more.">
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Free Video Clipper - Download Clips Online">
-    <meta property="og:description" content="Create and download custom video clips from your favorite videos online.">
+    <meta property="og:title" content="Video Clipper – Trim & Download Video Clips Online">
+    <meta property="og:description" content="Need to trim a video online? Paste a URL, set times, and download it directly.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://videoclipper.online/">
     <meta property="og:image" content="https://videoclipper.online/favicon.svg">
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Free Video Clipper - Download Clips Online">
-    <meta name="twitter:description" content="Create and download custom video clips from your favorite videos online.">
+    <meta name="twitter:title" content="Video Clipper – Trim & Download Video Clips Online">
+    <meta name="twitter:description" content="Need to trim a video online? Paste a URL, set times, and download it directly.">
     <meta name="twitter:image" content="https://videoclipper.online/favicon.svg">
     <link rel="canonical" href="https://videoclipper.online/">
     <meta name="robots" content="index, follow">
@@ -105,12 +105,82 @@
             border-bottom: 1px solid #eee;
         }
 
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .header-description {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            text-align: center;
+        }
+
+        .header-description-main {
+            color: #1a202c;
+            font-weight: 500;
+            font-size: 1.15rem;
+        }
+
+        .header-description-sub {
+            color: #4a5568;
+            font-size: 0.95rem;
+        }
+
+        .just-text {
+            margin-right: 0.5rem;
+        }
+
+        .step {
+            display: inline-block;
+            margin: 0 0.25rem;
+        }
+
+        .step-icon {
+            margin-right: 0.25rem;
+        }
+
+        .step-separator {
+            color: #94a3b8;
+            margin: 0 0.25rem;
+        }
+
+        .step-text {
+            color: #1a202c;
+            font-weight: 500;
+        }
+
+        .step-separator {
+            color: #94a3b8;
+            margin: 0 0.75rem;
+            font-weight: normal;
+        }
+
+        .step-icon {
+            font-size: 1.1rem;
+            margin-right: 0.25rem;
+            vertical-align: -1px;
+        }
+
         .logo {
             display: flex;
             align-items: center;
             gap: 0.5rem;
             font-weight: bold;
             font-size: 1.2rem;
+            white-space: nowrap;
+            color: #1a202c;
+        }
+
+        @media (max-width: 768px) {
+            .header-description {
+                display: none;
+            }
+            .logo-section {
+                gap: 0.5rem;
+            }
         }
 
         .container {
@@ -118,7 +188,7 @@
             /* Increased width for better spacing */
             width: 100%;
             margin: 3rem auto;
-            padding: 3rem 2.5rem;
+            padding: 2rem 2.5rem 3rem;
             /* More vertical padding */
             background: white;
             border-radius: 16px;
@@ -881,16 +951,18 @@
 <body>
     <a href="#mainContent" class="skip-link" style="position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden;background:#fff;color:#1a202c;z-index:1000;">Skip to main content</a>
     <header class="header" role="banner">
-        <div class="logo" style="cursor:pointer" onclick="window.location.href='/'">
-            <!-- Scissors SVG icon -->
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" aria-label="Scissors logo">
-                <circle cx="6" cy="6" r="3"></circle>
-                <circle cx="6" cy="18" r="3"></circle>
-                <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
-                <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
-                <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
-            </svg>
-            VideoClipper
+        <div class="logo-section">
+            <div class="logo" style="cursor:pointer" onclick="window.location.href='/'">
+                <!-- Scissors SVG icon -->
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" aria-label="Scissors logo">
+                    <circle cx="6" cy="6" r="3"></circle>
+                    <circle cx="6" cy="18" r="3"></circle>
+                    <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
+                    <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+                    <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
+                </svg>
+                VideoClipper
+            </div>
         </div>
         <div class="hamburger" id="hamburgerMenu" aria-label="Open navigation" tabindex="0" style="display:none;" aria-controls="slideoutMenu" aria-expanded="false">
             <span></span>
@@ -923,31 +995,12 @@
         <div class="ad-side">Left Ad</div>
         <div class="page-wrapper" style="flex:1; min-width:0;">
         <main class="container" id="mainContent">
-            <h1>Create Your Video Clip</h1>
-            <div class="visually-hidden">
-                <h2 id="how-it-works">How It Works</h2>
-                <p>Paste a video URL, select your desired start and end times, choose the quality, and download your custom video clip instantly. No signup required.</p>
-                <h2 id="why-use-videoclipper">Why Use VideoClipper?</h2>
-                <ul>
-                    <li>100% free and no registration required</li>
-                    <li>Supports YouTube, Facebook, and more</li>
-                    <li>Fast, secure, and privacy-friendly</li>
-                    <li>Download clips in multiple qualities (360p, 480p, 720p, 1080p)</li>
-                    <li>Works on desktop and mobile devices</li>
-                </ul>
-                <h2 id="supported-sites">Supported Sites</h2>
-                <p>We support YouTube, Facebook, and many other popular video platforms. <a href="/supported-sites">See the full list</a>.</p>
-                <h2 id="faq">Frequently Asked Questions</h2>
-                <dl>
-                    <dt>Is VideoClipper free to use?</dt>
-                    <dd>Yes, VideoClipper is completely free to use with no signup required.</dd>
-                    <dt>What sites are supported?</dt>
-                    <dd>We support YouTube, Facebook, and many other popular video platforms. See the full list on our <a href="/supported-sites">Supported Sites</a> page.</dd>
-                    <dt>What is the maximum clip length?</dt>
-                    <dd>The maximum allowed clip length is 15 minutes per request.</dd>
-                </dl>
+            <div class="header-description" style="margin-bottom: 2rem;">
+                <span class="header-description-main">Need to trim a video?</span>
+                <span class="header-description-sub">
+                    <strong class="just-text">Just</strong> 📋 Paste URL <span class="step-separator">•</span> ⏱️ Set Times <span class="step-separator">•</span> ⬇️ Download
+                </span>
             </div>
-
             <form id="clipForm">
                 <div id="formError" style="color:#dc2626; margin-bottom:1rem; display:none;"></div>
                 <div class="url-input">

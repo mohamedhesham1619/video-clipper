@@ -64,14 +64,23 @@ func DownloadVideo(videoRequest models.VideoRequest, videoTitle string, progress
 	return downloadPath, ffmpegCmd, nil
 }
 
+// isYouTubeURL returns true if the URL is a YouTube link.
+func isYouTubeURL(url string) bool {
+	return strings.Contains(url, "youtube.com") || strings.Contains(url, "youtu.be")
+}
+
 func prepareYtDlpCommand(videoRequest models.VideoRequest) *exec.Cmd {
-	return exec.Command("yt-dlp",
+	args := []string{
 		"-f", fmt.Sprintf("bv*[height<=%[1]v]+ba/b[height<=%[1]v]/best", videoRequest.Quality),
 		"--download-sections", fmt.Sprintf("*%s-%s", videoRequest.ClipStart, videoRequest.ClipEnd),
 		"--no-warnings",
 		"-o", "-", // Output to stdout
-		videoRequest.VideoURL,
-	)
+	}
+	if isYouTubeURL(videoRequest.VideoURL) {
+		args = append(args, "--cookies", "cookie.txt")
+	}
+	args = append(args, videoRequest.VideoURL)
+	return exec.Command("yt-dlp", args...)
 }
 
 func prepareFfmpegCommand(downloadPath string) *exec.Cmd {
@@ -115,14 +124,18 @@ func preparePipes(ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd) error {
 
 // getVideoTitle retrieves the video title using yt-dlp.
 func GetVideoTitle(videoRequest models.VideoRequest) (string, error) {
-	infoCmd := exec.Command("yt-dlp",
+	args := []string{
 		"-f", fmt.Sprintf("bv*[height<=%[1]v]+ba/b[height<=%[1]v]/best", videoRequest.Quality),
 		"--print", "%(title)s-%(height)sp.%(ext)s",
 		"--no-playlist",
 		"--no-download",
 		"--no-warnings",
-		videoRequest.VideoURL,
-	)
+	}
+	if isYouTubeURL(videoRequest.VideoURL) {
+		args = append(args, "--cookies", "cookie.txt")
+	}
+	args = append(args, videoRequest.VideoURL)
+	infoCmd := exec.Command("yt-dlp", args...)
 
 	infoOutput, err := infoCmd.CombinedOutput()
 
