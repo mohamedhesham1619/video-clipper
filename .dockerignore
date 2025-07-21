@@ -1,7 +1,7 @@
 *.exe
 .gitattributes
 .gitignore
-*.PNG
+ui.PNG
 Dockerfile
 .dockerignore
 *.tar

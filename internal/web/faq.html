@@ -4,19 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <title>Terms of Service - VideoClipper</title>
-    <meta name="description" content="VideoClipper Terms & Conditions: Understand the rules and guidelines for using our service legally and responsibly. Read the full terms before using the tool.">
+    <link rel="icon" type="image/png" href="/favicon.png" sizes="48x48">
+    <title>FAQ - VideoClipper</title>
+    <meta name="description" content="Have questions about trimming videos online? Our FAQ page covers everything from how to use VideoClipper to our policies on privacy and supported platforms.">
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Terms of Service - VideoClipper">
-    <meta property="og:description" content="VideoClipper Terms & Conditions: Understand the rules and guidelines for using our service legally and responsibly. Read the full terms before using the tool.">
+    <meta property="og:title" content="FAQ - VideoClipper">
+    <meta property="og:description" content="Have questions about trimming videos online? Our FAQ page covers everything from how to use VideoClipper to our policies on privacy and supported platforms.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://videoclipper.online/terms">
-    <meta property="og:image" content="https://videoclipper.online/favicon.svg">
+    <meta property="og:url" content="https://videoclipper.online/faq">
+    <meta property="og:image" content="https://videoclipper.online/favicon.png">
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Terms of Service - VideoClipper">
-    <meta name="twitter:description" content="VideoClipper Terms & Conditions: Understand the rules and guidelines for using our service legally and responsibly. Read the full terms before using the tool.">
-    <meta name="twitter:image" content="https://videoclipper.online/favicon.svg">
+    <meta name="twitter:title" content="FAQ - VideoClipper">
+    <meta name="twitter:description" content="Have questions about trimming videos online? Our FAQ page covers everything from how to use VideoClipper to our policies on privacy and supported platforms.">
+    <meta name="twitter:image" content="https://videoclipper.online/favicon.png">
     
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-3TYZ3E3FGY"></script>
@@ -57,7 +58,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 800px;
             width: 100%;
             margin: 3rem auto;
             padding: 3rem 2.5rem;
@@ -87,15 +88,53 @@
             margin-bottom: 1rem;
         }
 
-        ul {
-            color: #4a5568;
-            line-height: 1.6;
-            margin-bottom: 1rem;
-            padding-left: 2rem;
+        .faq-item {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 1.5rem;
         }
 
-        li {
-            margin-bottom: 0.5rem;
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-question {
+            color: #1a202c;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.2s ease;
+        }
+
+        .faq-question:hover {
+            color: #2d3748;
+        }
+
+        .faq-answer {
+            color: #4a5568;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .faq-answer.active {
+            display: block;
+        }
+
+        .faq-toggle {
+            background: none;
+            border: none;
+            color: #4a5568;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .faq-toggle.active {
+            transform: rotate(180deg);
         }
 
         /* Navigation styles */
@@ -277,9 +316,6 @@
                 gap: 2rem;
                 text-align: center;
             }
-            .hamburger {
-                display: flex !important;
-            }
         }
 
         /* Side ad container styles */
@@ -300,6 +336,17 @@
         @media (max-width: 1100px) {
             .ad-side {
                 display: none;
+            }
+        }
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none !important;
+            }
+            .hamburger {
+                display: flex !important;
+            }
+            .slideout-menu {
+                display: flex !important;
             }
         }
         .hamburger {
@@ -351,22 +398,6 @@
             cursor: pointer;
             margin-bottom: 2rem;
         }
-        .paste-btn {
-            height: 52px;
-            width: 52px;
-            min-width: 52px;
-            min-height: 52px;
-            border-radius: 8px !important;
-            padding: 0 1.2rem;
-            box-sizing: border-box;
-            border: 1.5px solid #e2e8f0;
-            background: #f8f9fa;
-            color: #4a5568;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
         /* Hide ad banners on all pages */
         .ad-top, .ad-bottom, .ad-side {
             display: none !important;
@@ -386,7 +417,7 @@
             </svg>
             VideoClipper
         </div>
-        <div class="hamburger" id="hamburgerMenu" aria-label="Open navigation" tabindex="0">
+        <div class="hamburger" id="hamburgerMenu" aria-label="Open navigation" tabindex="0" style="display:none;">
             <span></span>
             <span></span>
             <span></span>
@@ -409,41 +440,116 @@
             <a href="/privacy" class="nav-link">Privacy</a>
         </nav>
     </header>
-    <main class="container">
-        <h1>Terms of Service</h1>
-        <p><strong>Last updated:</strong> July 2025</p>
-        
-        <h2>1. Acceptance of Terms</h2>
-        <p>By accessing and using VideoClipper, you accept and agree to be bound by the terms and provision of this agreement.</p>
-        
-        <h2>2. Description of Service</h2>
-        <p>VideoClipper is a free online tool that allows users to create custom video clips from various video platforms. Our service supports clipping videos from multiple sources including but not limited to YouTube, Facebook, and other supported platforms.</p>
-        
-        <h2>3. User Responsibilities</h2>
-        <ul>
-            <li>You are responsible for ensuring you have the right to use any content you process through our service</li>
-            <li>You agree not to use our service for any illegal or unauthorized purpose</li>
-            <li>You must not violate any laws in your jurisdiction through the use of our service</li>
-        </ul>
-        
-        <h2>4. Intellectual Property</h2>
-        <p>VideoClipper respects intellectual property rights. Users are responsible for ensuring they have the necessary rights to modify and download any content processed through our service.</p>
-        
-        <h2>5. Privacy</h2>
-        <p>Your privacy is important to us. Please review our Privacy Policy, which also governs your use of the service, to understand our practices.</p>
-        
-        <h2>6. Disclaimers</h2>
-        <p>VideoClipper is provided "as is" without any warranties. We do not guarantee that the service will be uninterrupted or error-free.</p>
-        
-        <h2>7. Limitation of Liability</h2>
-        <p>VideoClipper shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of the service.</p>
-        
-        <h2>8. Changes to Terms</h2>
-        <p>We reserve the right to modify these terms at any time. We will notify users of any material changes by posting the new terms on this page.</p>
-        
-        <h2>9. Contact Information</h2>
-        <p>If you have any questions about these Terms of Service, please contact us through our contact form.</p>
-    </main>
+    <!-- Side ads wrapper -->
+    <div style="display: flex; justify-content: center; max-width: 1600px; margin: 0 auto;">
+        <!-- Left Ad -->
+        <div class="ad-side" style="display: none !important;">Left Ad</div>
+        <main class="container">
+            <h1>Frequently Asked Questions</h1>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    How does VideoClipper work?
+                    <button class="faq-toggle">▼</button>
+                </div>
+                <div class="faq-answer">
+                    VideoClipper is a free online tool that allows you to create custom video clips from various platforms. Simply paste a video URL, set your start and end times, choose your preferred quality, and download your clip instantly.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    Which video platforms are supported?
+                    <button class="faq-toggle">▼</button>
+                </div>
+                <div class="faq-answer">
+                Please check our <a href="/supported-sites">Supported Sites</a> page for the most up-to-date list of platforms. We support all the most popular video sites!
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    Is VideoClipper free to use?
+                    <button class="faq-toggle">▼</button>
+                </div>
+                <div class="faq-answer">
+                    Yes! VideoClipper is completely free to use. There are no hidden fees, subscriptions, or premium features. All functionality is available to everyone at no cost.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    What video qualities are available?
+                    <button class="faq-toggle">▼</button>
+                </div>
+                <div class="faq-answer">
+                    We support multiple quality options including 360p, 480p, 720p, and 1080p. The available qualities depend on the original video's resolution and the platform's restrictions.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    How long can my clips be?
+                    <button class="faq-toggle">▼</button>
+                </div>
+                <div class="faq-answer">
+                    The maximum allowed clip length is <strong>15 minutes</strong> per request. If you need to create a longer clip, please <a href="/contact">let us know</a>, and we can consider increasing this limit in the future.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    Is it legal to use VideoClipper?
+                    <button class="faq-toggle">▼</button>
+                </div>
+                <div class="faq-answer">
+                    VideoClipper is a tool for creating clips from publicly available content. Users are responsible for ensuring they have the right to use and modify any content they process. Please respect copyright laws and platform terms of service.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    Do you store my videos?
+                    <button class="faq-toggle">▼</button>
+                </div>
+                <div class="faq-answer">
+                    No, we do not store your videos permanently. Videos are processed temporarily to create your clips and are automatically deleted after processing is complete.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    What if my clip fails to process?
+                    <button class="faq-toggle">▼</button>
+                </div>
+                <div class="faq-answer">
+                    If your clip fails to process, it could be due to platform restrictions, video availability, or technical issues. Try again with a different time range or contact us for support.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    Can I use VideoClipper on mobile devices?
+                    <button class="faq-toggle">▼</button>
+                </div>
+                <div class="faq-answer">
+                    Yes! VideoClipper is fully responsive and works on all devices including smartphones and tablets. The interface automatically adjusts to provide the best experience on your screen size.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    How can I contact support?
+                    <button class="faq-toggle">▼</button>
+                </div>
+                <div class="faq-answer">
+                    You can contact us through our <a href="/contact">Contact page</a> or use the floating contact button on any page.
+                </div>
+            </div>
+        </main>
+        <!-- Right Ad -->
+        <div class="ad-side" style="display: none !important;">Right Ad</div>
+    </div>
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
@@ -466,6 +572,8 @@
             </div>
         </div>
     </footer>
+    <button id="floatingContactBtn" class="floating-contact-btn">Contact</button>
+    <script src="/shared.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Hamburger/slideout menu logic
@@ -477,36 +585,34 @@
                 hamburger.style.display = 'flex';
             } else {
                 hamburger.style.display = 'none';
-                if (slideout) slideout.classList.remove('open');
+                slideout.classList.remove('open');
             }
         }
         checkHamburgerDisplay();
         window.addEventListener('resize', checkHamburgerDisplay);
         hamburger.addEventListener('click', () => {
-            if (!slideout) return;
             if (slideout.classList.contains('open')) {
                 slideout.classList.remove('open');
             } else {
                 slideout.classList.add('open');
             }
         });
-        if (closeSlideout && slideout) {
-            closeSlideout.addEventListener('click', () => {
-                slideout.classList.remove('open');
-            });
-        }
+        closeSlideout.addEventListener('click', () => {
+            slideout.classList.remove('open');
+        });
         document.addEventListener('click', (e) => {
-            if (slideout && slideout.classList.contains('open') && !slideout.contains(e.target) && e.target !== hamburger && !hamburger.contains(e.target)) {
+            if (slideout.classList.contains('open') && !slideout.contains(e.target) && e.target !== hamburger && !hamburger.contains(e.target)) {
                 slideout.classList.remove('open');
             }
         });
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && slideout) {
+            if (e.key === 'Escape') {
                 slideout.classList.remove('open');
             }
         });
     });
     </script>
-    <script src="/shared.js"></script>
+    <style>
+    </style>
 </body>
 </html> 

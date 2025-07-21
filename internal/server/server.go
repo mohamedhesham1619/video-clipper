@@ -45,6 +45,7 @@ func New() *Server {
 	// Static asset routes
 	mux.HandleFunc("/shared.js", handlers.SharedJSHandler)
 	mux.HandleFunc("/favicon.svg", handlers.FaviconHandler)
+	mux.HandleFunc("/favicon.png", handlers.FaviconPNGHandler)
 
 	// SEO/static root files
 	mux.HandleFunc("/robots.txt", handlers.RobotsTxtHandler)

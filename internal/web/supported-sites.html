@@ -4,19 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <title>Contact - VideoClipper</title>
-    <meta name="description" content="Contact the VideoClipper team. Have a question, suggestion, or need support? Send us a message, and we'll get back to you as soon as possible.">
+    <link rel="icon" type="image/png" href="/favicon.png" sizes="48x48">
+    <title>Supported Sites - VideoClipper</title>
+    <meta name="description" content="See the full list of platforms supported by VideoClipper. Clip videos from YouTube, Facebook, TikTok, Twitch, and hundreds of other sites instantly.">
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Contact - VideoClipper">
-    <meta property="og:description" content="Contact the VideoClipper team. Have a question, suggestion, or need support? Send us a message, and we'll get back to you as soon as possible.">
+    <meta property="og:title" content="Supported Sites - VideoClipper">
+    <meta property="og:description" content="See the full list of platforms supported by VideoClipper. Clip videos from YouTube, Facebook, TikTok, Twitch, and hundreds of other sites instantly.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://videoclipper.online/contact">
-    <meta property="og:image" content="https://videoclipper.online/favicon.svg">
+    <meta property="og:url" content="https://videoclipper.online/supported-sites">
+    <meta property="og:image" content="https://videoclipper.online/favicon.png">
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Contact - VideoClipper">
-    <meta name="twitter:description" content="Contact the VideoClipper team. Have a question, suggestion, or need support? Send us a message, and we'll get back to you as soon as possible.">
-    <meta name="twitter:image" content="https://videoclipper.online/favicon.svg">
+    <meta name="twitter:title" content="Supported Sites - VideoClipper">
+    <meta name="twitter:description" content="See the full list of platforms supported by VideoClipper. Clip videos from YouTube, Facebook, TikTok, Twitch, and hundreds of other sites instantly.">
+    <meta name="twitter:image" content="https://videoclipper.online/favicon.png">
     
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-3TYZ3E3FGY"></script>
@@ -57,7 +58,7 @@
         }
 
         .container {
-            max-width: 600px;
+            max-width: 1000px;
             width: 100%;
             margin: 3rem auto;
             padding: 3rem 2.5rem;
@@ -74,50 +75,117 @@
             letter-spacing: -0.5px;
         }
 
-        .contact-info {
-            margin-bottom: 2rem;
+        h2 {
+            color: #1a202c;
+            margin: 2rem 0 1rem 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        p {
             color: #4a5568;
             line-height: 1.6;
-        }
-
-        .contact-form label {
-            display: block;
-            font-weight: 500;
-            color: #4a5568;
-            margin-bottom: 0.5rem;
-        }
-
-        .contact-form input,
-        .contact-form textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 6px;
-            font-size: 1rem;
             margin-bottom: 1rem;
-            font-family: inherit;
         }
 
-        .contact-form input:focus,
-        .contact-form textarea:focus {
-            outline: none;
+        .sites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .site-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .site-card:hover {
             border-color: #1a202c;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
         }
 
-        .contact-form button {
-            background: #1a202c;
+        .site-logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            object-fit: cover;
+            background: #f8f9fa;
+            border: 1px solid #e2e8f0;
+            padding: 6px;
+            transition: transform 0.2s ease;
+            opacity: 0;
+        }
+
+        .site-card:hover .site-logo {
+            transform: scale(1.05);
+        }
+
+        .site-logo-placeholder {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
             color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s ease;
+            transition: transform 0.2s ease;
         }
 
-        .contact-form button:hover {
-            background: #2d3748;
+        .site-card:hover .site-logo-placeholder {
+            transform: scale(1.05);
+        }
+
+        .site-card h3 {
+            color: #1a202c;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .site-card p {
+            color: #4a5568;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-working {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-limited {
+            background: #fff3cd;
+            color: #856404;
         }
 
         /* Navigation styles */
@@ -286,6 +354,20 @@
                 margin-bottom: 2rem;
             }
 
+            .sites-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .site-card {
+                padding: 1.5rem;
+            }
+
+            .site-logo {
+                width: 48px;
+                height: 48px;
+            }
+
             .nav-links {
                 display: none;
             }
@@ -428,18 +510,15 @@
         <!-- Left Ad -->
         <div class="ad-side" style="display: none !important;">Left Ad</div>
         <main class="container">
-            <h1>Contact Us</h1>
-            <div class="contact-info">
-                <p>Have a question, suggestion, or need help? </p>
-                <p>Feel free to reach out to us using the form below.</p>
+            <h1>Supported Sites</h1>
+            <p>Download and clip videos from these popular platforms.</p>
+            
+            <div id="sites-content">
+                <!-- Content will be loaded dynamically -->
+                <div style="text-align: center; padding: 2rem;">
+                    <p>Loading supported sites...</p>
+                </div>
             </div>
-                    <form class="contact-form">
-            <label for="contactEmail">Email (optional)</label>
-            <input type="email" id="contactEmail" name="contactEmail" placeholder="your@email.com">
-            <label for="contactMessage">Message *</label>
-            <textarea id="contactMessage" name="contactMessage" rows="4" placeholder="Type your message here..." required></textarea>
-            <button type="submit">Send Message</button>
-        </form>
         </main>
         <!-- Right Ad -->
         <div class="ad-side" style="display: none !important;">Right Ad</div>
@@ -479,38 +558,57 @@
             </form>
         </div>
     </div>
+    <script>
+        // Load supported sites data dynamically
+        async function loadSupportedSites() {
+            try {
+                const response = await fetch('/api/supported-sites');
+                const data = await response.json();
+                
+                const container = document.getElementById('sites-content');
+                
+                // Clear loading message
+                container.innerHTML = '';
+                
+                // Add dynamic content for current JSON structure
+                const categorySection = document.createElement('div');
+                categorySection.innerHTML = `
+                    <div class="sites-grid">
+                        ${data.sites.map(site => `
+                            <div class="site-card" style="cursor:pointer" onclick="window.location.href='/'">
+                                <img src="${site.logo}" alt="${site.name} logo" class="site-logo" 
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                                     onload="this.style.opacity='1';">
+                                <div class="site-logo-placeholder" style="display: none;">${site.name.charAt(0)}</div>
+                                <h3>${site.name}</h3>
+                                <p>${site.description}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(categorySection);
+                
+
+                
+            } catch (error) {
+                console.error('Error loading supported sites:', error);
+                // Fallback to static content if API fails
+                const container = document.getElementById('sites-content');
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem;">
+                        <p>Unable to load supported sites. Please try again later.</p>
+                        <button onclick="loadSupportedSites()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #1a202c; color: white; border: none; border-radius: 6px; cursor: pointer;">Retry</button>
+                    </div>
+                `;
+            }
+        }
+        
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadSupportedSites);
+    </script>
     <script src="/shared.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Main contact form AJAX submission
-        const mainForm = document.querySelector('.contact-form');
-        if (mainForm) {
-            mainForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const email = document.getElementById('contactEmail').value.trim();
-                const message = document.getElementById('contactMessage').value.trim();
-                if (!message) {
-                    alert('Please enter a message.');
-                    return;
-                }
-                try {
-                    const res = await fetch('/feedback', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, message })
-                    });
-                    const data = await res.json();
-                    if (data.status === 'success') {
-                        alert('Thank you for your feedback!');
-                        mainForm.reset();
-                    } else {
-                        alert('Failed to send feedback. Please try again.');
-                    }
-                } catch (err) {
-                    alert('Failed to send feedback. Please try again.');
-                }
-            });
-        }
         // Hamburger/slideout menu logic
         const hamburger = document.getElementById('hamburgerMenu');
         const slideout = document.getElementById('slideoutMenu');
@@ -547,10 +645,5 @@
         });
     });
     </script>
-    <style>
-    .paste-btn {
-        border-radius: 8px !important;
-    }
-    </style>
 </body>
 </html> 

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" href="/favicon.png" sizes="48x48">
     <title>Video Clipper – Trim & Download Video Clips Online</title>
     <meta name="description" content="Need to trim a video online? Paste a URL, set times, and download it directly. No sign-up required.">
     <!-- Open Graph Meta Tags -->
@@ -12,12 +13,12 @@
     <meta property="og:description" content="Need to trim a video online? Paste a URL, set times, and download it directly.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://videoclipper.online/">
-    <meta property="og:image" content="https://videoclipper.online/favicon.svg">
+    <meta property="og:image" content="https://videoclipper.online/favicon.png">
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Video Clipper – Trim & Download Video Clips Online">
     <meta name="twitter:description" content="Need to trim a video online? Paste a URL, set times, and download it directly.">
-    <meta name="twitter:image" content="https://videoclipper.online/favicon.svg">
+    <meta name="twitter:image" content="https://videoclipper.online/favicon.png">
     <link rel="canonical" href="https://videoclipper.online/">
     <meta name="robots" content="index, follow">
     
@@ -1066,7 +1067,7 @@
                         <div class="progress-fill"></div>
                     </div>
                 </div>
-
+                <div id="progressCompleteMsg" style="display:none; text-align:center; font-size:1.08rem; font-weight:500; color:#16a34a; margin-top:0.5rem; opacity:0; transition:opacity 0.7s;">Your clip is ready! Download starting...</div>
             </form>
         </main>
     </div>
@@ -1224,6 +1225,8 @@
 
         let isDownloading = false;
         let errorActive = false;
+        let processCompleted = false;
+        let fadeOutTimeoutId = null;
 
 function showLoading(text, opts = {}) {
     if (errorActive) return;
@@ -1279,8 +1282,10 @@ function showSuccess(text) {
 function fadeOutText(element, callback) {
     element.style.transition = 'opacity 3s';
     element.style.opacity = 0;
-    setTimeout(() => {
+    if (fadeOutTimeoutId) clearTimeout(fadeOutTimeoutId);
+    fadeOutTimeoutId = setTimeout(() => {
         element.style.transition = '';
+        if (processCompleted) return;
         if (!errorActive && callback) callback();
     }, 3000);
 }
@@ -1355,6 +1360,7 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
     const clipEnd = document.getElementById('endTime').value;
     const quality = document.getElementById('videoQuality').value;
     isDownloading = true;
+    processCompleted = false;
     progressBar.style.display = 'block';
     progressFill.classList.add('connecting');
     progressFill.style.width = '0%';
@@ -1418,6 +1424,7 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
                 gotProgress = true;
                 showSuccess('Clip is ready to process');
                 fadeOutText(progressLabel, () => {
+                    if (processCompleted) return;
                     // Animate the text with pulse and animated-ellipsis
                     progressLabel.innerHTML = '';
                     progressLabel.classList.remove('pulse-text', 'animated-ellipsis', 'truncate');
@@ -1433,16 +1440,25 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
                 });
             }
             // Update progress bar
+            if (processCompleted) return;
             const percent = parseInt(eventData.progress, 10) || 0;
             progressFill.style.width = `${percent}%`;
             progressValue.textContent = `${percent}%`;
         });
 
         eventSource.addEventListener('complete', (event) => {
+            processCompleted = true;
+            if (fadeOutTimeoutId) clearTimeout(fadeOutTimeoutId);
             const eventData = JSON.parse(event.data);
             progressFill.style.width = '100%';
-            progressLabel.textContent = 'Processing Complete';
-            progressValue.textContent = 'Download starting...';
+            progressLabel.textContent = 'Process complete';
+            progressValue.innerHTML = '<span class="pulse-text animated-ellipsis">Download starting</span>';
+            // Show animated message above the progress bar
+            const completeMsg = document.getElementById('progressCompleteMsg');
+            completeMsg.style.display = 'block';
+            setTimeout(() => { completeMsg.style.opacity = 1; }, 10);
+            setTimeout(() => { completeMsg.style.opacity = 0; }, 3500);
+            setTimeout(() => { completeMsg.style.display = 'none'; }, 4200);
             eventSource.close();
             // Trigger download prompt
             const a = document.createElement('a');
