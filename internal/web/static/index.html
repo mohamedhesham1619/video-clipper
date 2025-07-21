@@ -1437,12 +1437,10 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
             document.body.removeChild(a);
             downloadBtn.style.backgroundColor = '#1a202c';
             isDownloading = false;
-            // Wait a few seconds, then clear the progress bar and show finished message
+            // Only reset the progress fill, keep the label and value visible
             setTimeout(() => {
-                progressBar.style.display = 'none';
-                progressLabel.textContent = 'Process finished!';
-                progressValue.textContent = '';
                 progressFill.style.width = '0%';
+                // Do NOT hide the progress bar or clear the label/value
             }, 3000);
         });
 
@@ -1456,6 +1454,13 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
             eventSource.close();
             downloadBtn.style.backgroundColor = '#1a202c';
             isDownloading = false;
+            // Immediately stop any loading or progress state
+            progressFill.classList.remove('connecting');
+            progressFill.style.width = '0%';
+            // Optionally, hide the progress bar after a delay
+            setTimeout(() => {
+                progressBar.style.display = 'none';
+            }, 4000);
         });
 
     } catch (error) {

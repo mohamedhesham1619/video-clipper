@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"mime"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -57,7 +56,7 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	// Add Content-Length for better client experience (e.g., download progress bar)
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", fileInfo.Size()))
 	w.Header().Set("Content-Type", contentType)
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"; filename*=UTF-8''%s", fileInfo.Name(), url.QueryEscape(fileInfo.Name())))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", fileInfo.Name()))
 
 	// Copy the file to the response writer
 	_, err = io.Copy(w, file)

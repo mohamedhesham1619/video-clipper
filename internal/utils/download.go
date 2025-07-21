@@ -126,7 +126,7 @@ func preparePipes(ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd) error {
 func GetVideoTitle(videoRequest models.VideoRequest) (string, error) {
 	args := []string{
 		"-f", fmt.Sprintf("bv*[height<=%[1]v]+ba/b[height<=%[1]v]/best", videoRequest.Quality),
-		"--print", "%(title)s-%(height)sp.%(ext)s",
+		"--print", "%(title).244s-%(height)sp.%(ext)s",
 		"--no-playlist",
 		"--no-download",
 		"--no-warnings",
@@ -150,7 +150,7 @@ func GetVideoTitle(videoRequest models.VideoRequest) (string, error) {
 	slog.Debug("yt-dlp video title", "title", string(infoOutput))
 
 	// Sanitize the video title to create a valid filename.
-	videoTitle := SanitizeFilename(strings.TrimSpace(string(infoOutput)))
+	videoTitle := SanitizeName(strings.TrimSpace(string(infoOutput)), nil)
 	return videoTitle, nil
 }
 

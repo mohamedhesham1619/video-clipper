@@ -3,9 +3,11 @@ package utils
 import (
 	"fmt"
 	"math/rand/v2"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 )
 
 func GenerateID() string {
@@ -14,53 +16,71 @@ func GenerateID() string {
 	return fmt.Sprintf("%d%d", time.Now().UnixNano(), randNum)
 }
 
-// sanitize the filename to remove or replace characters that are problematic in filenames and HTTP headers
-func SanitizeFilename(filename string) string {
-	replacements := map[rune]rune{
-		'/':  '-',
-		'\\': '-',
-		':':  '-',
-		'*':  '-',
-		'?':  '-',
-		'"':  '-',
-		'<':  '-',
-		'>':  '-',
-		'|':  '-',
-	}
-
-	sanitized := []rune{}
-
-	for _, r := range filename {
-		if replaced, exists := replacements[r]; exists {
-			sanitized = append(sanitized, replaced)
-		} else if r >= 32 && r < 127 { // printable ASCII only
-			sanitized = append(sanitized, r)
-		} else {
-			sanitized = append(sanitized, '_')
-		}
-	}
-
-	result := strings.Trim(string(sanitized), " .")
-	if result == "" {
-		return "clip.mp4"
-	}
-	return result
+// SanitizeOptions holds configuration for name sanitization
+type SanitizeOptions struct {
+	Replacement   string
+	PreserveCase  bool
+	ReplaceSpaces bool
 }
 
-// SanitizeFilenameForHeader returns a strictly ASCII, safe filename for HTTP headers.
-func SanitizeFilenameForHeader(filename string) string {
-	sanitized := SanitizeFilename(filename)
-	ascii := make([]rune, 0, len(sanitized))
-	for _, r := range sanitized {
-		if r >= 32 && r < 127 { // printable ASCII only
-			ascii = append(ascii, r)
+// SanitizeName sanitizes a name to be safe for filenames and HTTP headers
+func SanitizeName(name string, opts *SanitizeOptions) string {
+	// Default options
+	if opts == nil {
+		opts = &SanitizeOptions{
+			Replacement:   "_",
+			PreserveCase:  false,
+			ReplaceSpaces: false, // Default to preserving spaces
 		}
 	}
-	result := string(ascii)
-	if result == "" {
-		return "clip.mp4"
+
+	if name == "" {
+		return "unnamed"
 	}
-	return result
+
+	// Remove or replace characters unsafe for filenames and HTTP headers
+	unsafeChars := regexp.MustCompile(`[<>:"/\\|?*\x00-\x1f\x7f-\x9f]`)
+	sanitized := unsafeChars.ReplaceAllString(name, opts.Replacement)
+
+	// Replace whitespace with replacement character (optional)
+	if opts.ReplaceSpaces {
+		whitespace := regexp.MustCompile(`\s+`)
+		sanitized = whitespace.ReplaceAllString(sanitized, opts.Replacement)
+	} else {
+		// Just normalize multiple spaces to single spaces
+		multiSpace := regexp.MustCompile(`\s+`)
+		sanitized = multiSpace.ReplaceAllString(sanitized, " ")
+	}
+
+	// Remove Unicode control characters
+	sanitized = strings.Map(func(r rune) rune {
+		if unicode.IsControl(r) {
+			return -1 // Remove the character
+		}
+		return r
+	}, sanitized)
+
+	// Replace multiple consecutive replacement chars with single one
+	if opts.Replacement != "" {
+		multiRepl := regexp.MustCompile(regexp.QuoteMeta(opts.Replacement) + `+`)
+		sanitized = multiRepl.ReplaceAllString(sanitized, opts.Replacement)
+	}
+
+	// Remove leading/trailing replacement characters and dots
+	trimChars := opts.Replacement + "."
+	sanitized = strings.Trim(sanitized, trimChars)
+
+	// Handle case conversion
+	if !opts.PreserveCase {
+		sanitized = strings.ToLower(sanitized)
+	}
+
+	// Final fallback
+	if sanitized == "" {
+		return "unnamed"
+	}
+
+	return sanitized
 }
 
 // calculate the clip duration in microseconds
