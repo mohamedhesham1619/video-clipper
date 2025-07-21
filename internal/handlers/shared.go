@@ -118,6 +118,7 @@ func (s *sharedData) stopDownloadProcessAndCleanUp(fileID string) error {
 	s.mu.RUnlock()
 	if exists {
 		if cmd.ProcessState == nil || !cmd.ProcessState.Exited() {
+			slog.Info("Stopping download process due to client disconnect", "fileID", fileID)
 			if err := cmd.Process.Kill(); err != nil {
 				return fmt.Errorf("failed to kill process for fileID %s: %w", fileID, err)
 			}

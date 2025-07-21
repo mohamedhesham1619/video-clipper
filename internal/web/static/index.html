@@ -1059,7 +1059,8 @@
                 <div class="progress-bar">
                     <div class="progress-bar-label">
                         <span>Processing Clip</span>
-                        <span class="progress-value">0%</span>
+                        <div id="progressError" style="color:#dc2626; margin:0 0 0.25rem 0; display:none; font-weight:500; font-size:1.05rem; text-align:left; width:100%; display:block; order:0;"></div>
+                        <span class="progress-value" style="order:1;">0%</span>
                     </div>
                     <div class="progress-track">
                         <div class="progress-fill"></div>
@@ -1222,8 +1223,10 @@
         }
 
         let isDownloading = false;
+        let errorActive = false;
 
 function showLoading(text, opts = {}) {
+    if (errorActive) return;
     progressLabel.innerHTML = '';
     progressLabel.classList.remove('pulse-text', 'animated-ellipsis', 'truncate');
     progressLabel.style.color = '';
@@ -1278,11 +1281,11 @@ function fadeOutText(element, callback) {
     element.style.opacity = 0;
     setTimeout(() => {
         element.style.transition = '';
-        if (callback) callback();
+        if (!errorActive && callback) callback();
     }, 3000);
 }
 function showError(text) {
-    progressLabel.textContent = 'Error';
+    progressLabel.textContent = text; // Show the error message itself
     progressLabel.style.color = '#dc2626';
     progressValue.textContent = text;
     progressValue.style.color = '#dc2626';
@@ -1344,6 +1347,9 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
         return;
     }
 
+    document.getElementById('progressError').style.display = 'none';
+    document.getElementById('progressError').textContent = '';
+
     const videoUrl = document.getElementById('videoUrl').value.trim();
     const clipStart = document.getElementById('startTime').value;
     const clipEnd = document.getElementById('endTime').value;
@@ -1363,9 +1369,19 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
         });
 
         if (response.status === 429) {
-            showError('You have reached the maximum number of requests. Please try again later.');
+            // Show error only once on the left (progress bar label)
+            progressLabel.textContent = 'You have reached the maximum number of requests. Please try again later.';
+            progressLabel.style.color = '#dc2626';
+            progressValue.textContent = '';
+            progressValue.style.color = '';
+            progressFill.classList.remove('connecting');
+            progressFill.style.width = '0%';
+            progressBar.style.display = 'block';
+            document.getElementById('progressError').style.display = 'none';
+            document.getElementById('progressError').textContent = '';
             downloadBtn.style.backgroundColor = '#1a202c';
             isDownloading = false;
+            alert('You have reached the maximum number of requests. Please try again later.');
             return;
         }
 
@@ -1450,17 +1466,22 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
                 const eventData = JSON.parse(event.data);
                 msg = eventData.message || msg;
             } catch {}
-            showError(msg);
+            errorActive = true;
+            // Show error only above the progress bar
+            document.getElementById('progressError').textContent = msg;
+            document.getElementById('progressError').style.display = 'block';
+            // Keep the progress bar label as 'Processing Clip' (or leave unchanged)
+            progressLabel.textContent = 'Processing Clip';
+            progressLabel.style.color = '';
+            progressValue.textContent = '';
+            progressValue.style.color = '';
+            progressFill.classList.remove('connecting');
+            progressFill.style.width = '0%';
+            progressBar.style.display = 'block';
             eventSource.close();
             downloadBtn.style.backgroundColor = '#1a202c';
             isDownloading = false;
-            // Immediately stop any loading or progress state
-            progressFill.classList.remove('connecting');
-            progressFill.style.width = '0%';
-            // Optionally, hide the progress bar after a delay
-            setTimeout(() => {
-                progressBar.style.display = 'none';
-            }, 4000);
+            alert(msg);
         });
 
     } catch (error) {
