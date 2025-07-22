@@ -117,8 +117,9 @@
         .header-description {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
+            gap: 0.1rem;
             text-align: center;
+            margin-bottom: 0.25rem;
         }
 
         .header-description-main {
@@ -998,11 +999,13 @@
         <div class="ad-side">Left Ad</div>
         <div class="page-wrapper" style="flex:1; min-width:0;">
         <main class="container" id="mainContent">
-            <div class="header-description" style="margin-bottom: 2rem;">
-                <span class="header-description-main">Need to trim a video?</span>
-                <span class="header-description-sub">
-                    <strong class="just-text">Just</strong> 📋 Paste URL <span class="step-separator">•</span> ⏱️ Set Times <span class="step-separator">•</span> ⬇️ Download
-                </span>
+            <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 2rem;">
+                <h1 class="header-description-main" style="text-align: center;">Need to trim a video?</h1>
+                <div class="header-description">
+                    <span class="header-description-sub">
+                        <strong class="just-text">Just</strong> 📋 Paste Video URL <span class="step-separator">•</span> ⏱️ Set Times <span class="step-separator">•</span> ⬇️ Download
+                    </span>
+                </div>
             </div>
             <form id="clipForm">
                 <div id="formError" style="color:#dc2626; margin-bottom:1rem; display:none;"></div>
