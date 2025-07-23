@@ -5,3 +5,4 @@ temp/*
 build/
 *.mp4
 .env
+affiliate.txt
