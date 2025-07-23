@@ -47,6 +47,9 @@ func New() *Server {
 	mux.HandleFunc("/favicon.svg", handlers.FaviconHandler)
 	mux.HandleFunc("/favicon.png", handlers.FaviconPNGHandler)
 
+	// Serve all files under /static/ from internal/web/static
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("internal/web/static"))))
+
 	// SEO/static root files
 	mux.HandleFunc("/robots.txt", handlers.RobotsTxtHandler)
 	mux.HandleFunc("/sitemap.xml", handlers.SitemapXMLHandler)

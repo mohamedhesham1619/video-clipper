@@ -115,9 +115,8 @@
         .header-description {
             display: flex;
             flex-direction: column;
-            gap: 0.1rem;
+            gap: 0.75rem;
             text-align: center;
-            margin-bottom: 0.25rem;
         }
 
         .header-description-main {
@@ -474,6 +473,197 @@
             margin-bottom: 1.25rem;
         }
 
+        /* Ad Container Styles */
+        .side-container {
+            width: 280px;
+            background: #ffffff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .side-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 0.5rem;
+        }
+        
+        .ad-banner {
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .ad-banner:hover {
+            transform: translateY(-2px);
+        }
+        
+        .ad-banner a {
+            display: block;
+            text-decoration: none;
+        }
+        
+        .ad-placeholder, .ad-error {
+            background: #f8fafc;
+            border: 1px dashed #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .ad-error {
+            border-color: #fc8181;
+            background-color: #fff5f5;
+            color: #e53e3e;
+        }
+        
+        /* Debug styles */
+        .ad-side::after {
+            content: 'AD SPACE';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #cbd5e0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Add a visual indicator for debugging */
+        .ad-side::before {
+            content: 'Ad Space';
+            display: block;
+            color: #6b7280;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .ad-bottom {
+            width: 100%;
+            min-height: 150px;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        /* Debug styles */
+        .ad-bottom::after {
+            content: 'ADVERTISEMENT';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #cbd5e0;
+            font-size: 1rem;
+            font-weight: 600;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Add a visual indicator for debugging */
+        .ad-bottom::before {
+            content: 'Advertisement';
+            display: block;
+            color: #6b7280;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .ad-container {
+            width: 100%;
+            min-height: 100px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 0.5rem;
+            background: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .ad-container a {
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .ad-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .ad-error {
+            color: #e53e3e;
+            font-weight: 500;
+            text-align: center;
+            padding: 1rem;
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 4px;
+        }
+
+        .ad-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        @media screen and (max-width: 1024px) {
+            .ad-side {
+                width: 160px;
+                padding: 0.75rem;
+            }
+        }
+
+        @media screen and (max-width: 1280px) {
+            .side-container {
+                width: 240px;
+            }
+        }
+        
+        @media screen and (max-width: 1024px) {
+            .side-container {
+                display: none;
+            }
+            .page-wrapper {
+                width: 100%;
+                padding: 0 1.5rem;
+            }
+        }
+        
         @media screen and (max-width: 768px) {
             .actions {
                 flex-direction: row;
@@ -519,6 +709,35 @@
                 margin-top: 0;
                 padding: 0.25rem;
             }
+        }
+        
+        /* Ad Container Styles */
+        .ad-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+            margin: 2rem auto;
+            max-width: 1600px;
+        }
+        
+        .ad-left, .ad-right {
+            width: 300px;
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+        
+        .ad-bottom {
+            width: 100%;
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .ad-left img, .ad-right img, .ad-bottom img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .hamburger {
             display: none;
@@ -944,8 +1163,8 @@
             white-space: nowrap !important;
             border: 0 !important;
         }
-        .ad-top, .ad-bottom, .ad-side {
-            display: none !important;
+        .ad-top {
+            display: none !important; /* Keep top ad hidden as we're using sidebars */
         }
     </style>
 </head>
@@ -990,12 +1209,19 @@
         </nav>
     </header>
 
-    <!-- Top Ad -->
-    <div class="ad-top">Top Ad Space</div>
-    <div style="display: flex; justify-content: center; max-width: 1600px; margin: 0 auto;">
-        <!-- Left Ad -->
-        <div class="ad-side">Left Ad</div>
-        <div class="page-wrapper" style="flex:1; min-width:0;">
+    <!-- Top Ad (hidden) -->
+    <div class="ad-top" style="display:none !important;">Top Ad Space</div>
+    <div class="main-layout" style="display: flex; max-width: 1600px; margin: 0 auto; min-height: 100vh; position: relative;">
+        <!-- Left Sidebar -->
+        <div class="side-container left-side">
+            <div class="side-content">
+                <!-- Left Ad - Video Editors -->
+                <div id="adLeft" class="ad-side" style="display: block !important;"></div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="page-wrapper">
         <main class="container" id="mainContent">
             <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 2rem;">
                 <h1 class="header-description-main" style="text-align: center;">Need to trim a video?</h1>
@@ -1073,12 +1299,18 @@
                 <div id="progressCompleteMsg" style="display:none; text-align:center; font-size:1.08rem; font-weight:500; color:#16a34a; margin-top:0.5rem; opacity:0; transition:opacity 0.7s;">Your clip is ready! Download starting...</div>
             </form>
         </main>
+        </div>
+        
+        <!-- Right Sidebar -->
+        <div class="side-container right-side">
+            <div class="side-content">
+                <!-- Right Ad - VPNs -->
+                <div id="adRight" class="ad-side" style="display: block !important;"></div>
+            </div>
+        </div>
     </div>
-        <!-- Right Ad -->
-        <div class="ad-side">Right Ad</div>
-    </div>
-    <!-- Bottom Ad -->
-    <div class="ad-bottom">Bottom Ad Space</div>
+    <!-- Bottom Ad - Cloud Storage -->
+    <div id="adBottom" class="ad-bottom" style="display: block !important;"></div>
 
     <script>
 
@@ -1510,7 +1742,9 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
     }
 });
     </script>
-    <script src="/shared.js"></script>
+    <!-- Load ads script at the end of body -->
+    <script src="/static/ads.js"></script>
+    </script>
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
