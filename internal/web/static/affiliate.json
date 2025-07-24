@@ -65,8 +65,8 @@
       "banner_type": "html",
       "banners": [
         {
-          "size": "728*90",
-          "html": "<a href=\"https://partner.pcloud.com/r/146969\" title=\"pCloud Premium\" target=\"_blank\"><img src=\"https://partner.pcloud.com/media/banners/personal/personal01432050.png\" alt=\"pCloud Premium\"/></a>"
+          "size": "1200*628",
+          "html": "<a href=\"https://partner.pcloud.com/r/146969\" title=\"pCloud Premium\" target=\"_blank\"><img src=\"https://partner.pcloud.com/media/banners/lifetime/lifetime0111200628.jpg\" alt=\"pCloud Premium\"/></a>"
         }
       ]
     }

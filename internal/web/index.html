@@ -86,6 +86,12 @@
     }
     </script>
     <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden;
+        }
         * {
             margin: 0;
             padding: 0;
@@ -478,17 +484,6 @@
         }
 
         /* Ad Container Styles */
-        .side-container {
-            width: 280px;
-            background: #ffffff;
-            box-shadow: 0 0 10px rgba(0,0,0,0.05);
-            padding: 1rem;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            overflow-y: auto;
-        }
-        
         .side-content {
             display: flex;
             flex-direction: column;
@@ -604,11 +599,6 @@
 
         .ad-container {
             width: 100%;
-            min-height: 100px;
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
-            padding: 0.5rem;
-            background: #f8fafc;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -645,10 +635,11 @@
             border-radius: 4px;
         }
 
-        @media screen and (max-width: 1024px) {
-            .ad-side {
-                width: 160px;
-                padding: 0.75rem;
+        @media screen and (max-width: 1400px) {
+            .side-container {
+                width: 360px;
+                min-width: 360px;
+                padding: 1rem;
             }
         }
 
@@ -868,31 +859,85 @@
         }
 
         .page-wrapper {
-            width: 900px;
-            min-width: 900px;
-            flex: 0 0 900px;
+            width: 600px;
+            min-width: 600px;
+            flex: 0 0 600px;
             margin: 0;
             padding: 0 2rem;
+            box-sizing: border-box;
         }
 
         .side-container {
-            flex: 1;
-            min-width: 0;
-            padding: 1.5rem;
+            width: calc((100vw - 600px) / 2);
+            min-width: 300px;
+            padding: 0.5rem;
             min-height: calc(100vh - 64px);
             background: white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            margin: 0;
+            border: none;
+            box-sizing: border-box;
         }
 
         .horizontal-container {
-            width: 600px;
+            width: 536px; /* 600px - (2rem * 2) to account for page-wrapper padding */
+            height: 200px;
             margin: 2rem auto;
-            padding: 1.5rem;
-            background: rgb(80, 80, 80);
-            border-radius: 16px;
-            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.13);
+            padding: 0;
+            background: white;
+            border-radius: 4px;
+            box-shadow: none;
             flex-shrink: 0;
-            min-height: 100px;
+            overflow: hidden;
+        }
+
+        /* General ad container styles */
+        .ad-container {
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        
+        /* Specific styles for bottom ad container */
+        .horizontal-container .ad-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            overflow: hidden;
+        }
+        
+        .horizontal-container .ad-container a {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .horizontal-container .ad-container img {
+            width: auto;
+            height: auto;
+            max-width: 200%;
+            max-height: 200%;
+            min-width: 100%;
+            min-height: 100%;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .ad-container iframe,
+        .ad-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
         }
 
         /* Responsive styles */
@@ -1204,10 +1249,10 @@
         </nav>
     </header>
 
-    <div style="display: flex; width: 100%; margin: 0; padding: 0;">
+    <div style="display: flex; width: 100vw; margin: 0; padding: 0; max-width: 100%; overflow-x: hidden;">
         <!-- Left Side Container -->
-        <div class="side-container" style="flex: 1;">
-            Left Side Content
+        <div class="side-container" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+            <!-- Video editor ads will be loaded here -->
         </div>
 
         <!-- Main Content -->
@@ -1292,16 +1337,118 @@
         
         <!-- Horizontal Container -->
         <div class="horizontal-container">
+            <!-- Cloud storage ads will be loaded here -->
         </div>
         </div>
 
         <!-- Right Side Container -->
-        <div class="side-container">
-            Right Side Content
+        <div class="side-container" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+            <!-- VPN ads will be loaded here -->
         </div>
     </div>
 
     <script>
+        // Load and render ads from affiliate.json
+        async function loadAds() {
+            try {
+                const response = await fetch('/static/affiliate.json');
+                const data = await response.json();
+                
+                // Get container widths
+                const leftContainer = document.querySelector('.side-container:first-of-type');
+                const rightContainer = document.querySelector('.side-container:last-of-type');
+                const containerWidth = leftContainer.clientWidth;
+
+                // Function to find best banner size - prefers width >= targetWidth, falls back to closest
+                function findClosestBanner(banners, targetWidth) {
+                    // First try to find a banner with width >= targetWidth
+                    const suitableBanner = banners.reduce((best, banner) => {
+                        const [width] = banner.size.split('*').map(Number);
+                        if (width >= targetWidth) {
+                            if (!best || width < Number(best.size.split('*')[0])) {
+                                return banner; // Prefer the smallest width that's >= target
+                            }
+                        }
+                        return best;
+                    }, null);
+                    
+                    // If no banner is wide enough, find the closest one
+                    if (!suitableBanner) {
+                        return banners.reduce((closest, banner) => {
+                            const [width] = banner.size.split('*').map(Number);
+                            const closestWidth = closest ? Number(closest.size.split('*')[0]) : 0;
+                            return Math.abs(width - targetWidth) < Math.abs(closestWidth - targetWidth) ? banner : closest;
+                        }, null);
+                    }
+                    
+                    return suitableBanner;
+                }
+
+                // Function to create ad container
+                function createAdContainer(banner) {
+                    const adContainer = document.createElement('div');
+                    adContainer.className = 'ad-container';
+                    adContainer.style.width = '100%';
+                    adContainer.style.margin = '0';
+                    adContainer.style.padding = '0';
+                    adContainer.style.border = 'none';
+                    adContainer.style.borderRadius = '0';
+                    adContainer.style.background = 'none';
+                    // Replace any fixed widths in the banner HTML with 100%
+                    let html = banner.html.replace(/width=["\']\d+["\']/g, 'width="100%"');
+                    html = html.replace(/width:\s*\d+px/g, 'width:100%');
+                    adContainer.innerHTML = html;
+                    return adContainer;
+                }
+
+                // Render all video editor ads on the left
+                leftContainer.innerHTML = ''; // Clear container
+                if (data.video_editors && data.video_editors.length > 0) {
+                    data.video_editors.forEach(editor => {
+                        const banner = findClosestBanner(editor.banners, containerWidth);
+                        if (banner) {
+                            leftContainer.appendChild(createAdContainer(banner));
+                        }
+                    });
+                }
+
+                // Render all VPN ads on the right
+                rightContainer.innerHTML = ''; // Clear container
+                if (data.vpn && data.vpn.length > 0) {
+                    data.vpn.forEach(vpn => {
+                        const banner = findClosestBanner(vpn.banners, containerWidth);
+                        if (banner) {
+                            rightContainer.appendChild(createAdContainer(banner));
+                        }
+                    });
+                }
+
+                // Render cloud storage ad at the bottom
+                const horizontalContainer = document.querySelector('.horizontal-container');
+                if (data.cloud_storage && data.cloud_storage.length > 0) {
+                    const storage = data.cloud_storage[0];
+                    if (storage.banners && storage.banners.length > 0) {
+                        // Find the best banner size for the container (600px width)
+                        const banner = findClosestBanner(storage.banners, 600);
+                        if (banner) {
+                            const adContainer = document.createElement('div');
+                            adContainer.className = 'ad-container';
+                            // Replace any fixed widths in the banner HTML with 100%
+                            let html = banner.html.replace(/width=["']\d+["']/g, 'width="100%"');
+                            html = html.replace(/width:\s*\d+px/g, 'width:100%');
+                            adContainer.innerHTML = html;
+                            horizontalContainer.innerHTML = '';
+                            horizontalContainer.appendChild(adContainer);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading ads:', error);
+            }
+        }
+
+        // Load ads when the page loads
+        window.addEventListener('load', loadAds);
 
         const startTimeInput = document.getElementById('startTime');
         const endTimeInput = document.getElementById('endTime');
