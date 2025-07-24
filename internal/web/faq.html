@@ -573,47 +573,75 @@
             </div>
         </div>
     </footer>
-    <button id="floatingContactBtn" class="floating-contact-btn">Contact</button>
-    <script src="/shared.js"></script>
+
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Hamburger/slideout menu logic
         const hamburger = document.getElementById('hamburgerMenu');
         const slideout = document.getElementById('slideoutMenu');
         const closeSlideout = document.getElementById('closeSlideout');
-        function checkHamburgerDisplay() {
-            if (window.innerWidth <= 768) {
-                hamburger.style.display = 'flex';
-            } else {
-                hamburger.style.display = 'none';
-                slideout.classList.remove('open');
+        
+        if (hamburger && slideout && closeSlideout) {
+            function checkHamburgerDisplay() {
+                if (window.innerWidth <= 768) {
+                    hamburger.style.display = 'flex';
+                } else {
+                    hamburger.style.display = 'none';
+                    slideout.classList.remove('open');
+                }
             }
+            
+            checkHamburgerDisplay();
+            window.addEventListener('resize', checkHamburgerDisplay);
+            
+            hamburger.addEventListener('click', () => {
+                if (slideout.classList.contains('open')) {
+                    slideout.classList.remove('open');
+                } else {
+                    slideout.classList.add('open');
+                }
+            });
+            
+            closeSlideout.addEventListener('click', () => {
+                slideout.classList.remove('open');
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (slideout.classList.contains('open') && 
+                    !slideout.contains(e.target) && 
+                    e.target !== hamburger && 
+                    !hamburger.contains(e.target)) {
+                    slideout.classList.remove('open');
+                }
+            });
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && slideout.classList.contains('open')) {
+                    slideout.classList.remove('open');
+                }
+            });
         }
-        checkHamburgerDisplay();
-        window.addEventListener('resize', checkHamburgerDisplay);
-        hamburger.addEventListener('click', () => {
-            if (slideout.classList.contains('open')) {
-                slideout.classList.remove('open');
-            } else {
-                slideout.classList.add('open');
-            }
-        });
-        closeSlideout.addEventListener('click', () => {
-            slideout.classList.remove('open');
-        });
-        document.addEventListener('click', (e) => {
-            if (slideout.classList.contains('open') && !slideout.contains(e.target) && e.target !== hamburger && !hamburger.contains(e.target)) {
-                slideout.classList.remove('open');
-            }
-        });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                slideout.classList.remove('open');
-            }
-        });
     });
     </script>
-    <style>
-    </style>
+    
+    <!-- Floating Contact Button -->
+    <button id="floatingContactBtn" class="floating-contact-btn">Contact</button>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="contact-modal">
+        <div class="contact-modal-content">
+            <h2>Quick Contact</h2>
+            <form id="miniContactForm">
+                <label for="miniEmail">Email (optional)</label>
+                <input type="email" id="miniEmail" name="miniEmail" placeholder="your@email.com">
+                <label for="miniMessage">Message *</label>
+                <textarea id="miniMessage" name="miniMessage" rows="3" placeholder="Your message..." required></textarea>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Include shared.js for contact button functionality -->
+    <script src="/static/shared.js"></script>
 </body>
-</html> 
+</html>

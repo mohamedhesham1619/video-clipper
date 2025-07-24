@@ -6,3 +6,4 @@ Dockerfile
 .dockerignore
 *.tar
 /build
+/web/static/ads/

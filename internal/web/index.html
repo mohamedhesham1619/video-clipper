@@ -88,6 +88,12 @@
     }
     </script>
     <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden;
+        }
         * {
             margin: 0;
             padding: 0;
@@ -97,6 +103,10 @@
 
         body {
             background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            width: 100vw;
         }
 
         .header {
@@ -117,9 +127,8 @@
         .header-description {
             display: flex;
             flex-direction: column;
-            gap: 0.1rem;
+            gap: 0.75rem;
             text-align: center;
-            margin-bottom: 0.25rem;
         }
 
         .header-description-main {
@@ -191,9 +200,8 @@
             max-width: 600px;
             /* Increased width for better spacing */
             width: 100%;
-            margin: 3rem auto;
-            padding: 2rem 2.5rem 3rem;
-            /* More vertical padding */
+            margin: 1.5rem auto 2rem auto;
+            padding: 2rem 2.5rem 1.5rem;
             background: white;
             border-radius: 16px;
             box-shadow: 0 2px 16px rgba(0, 0, 0, 0.13);
@@ -327,14 +335,15 @@
         }
 
         .progress-bar {
+            margin: 0.5rem 0 0 0;
+            width: 100%;
             display: none;
             /* Initially hidden */
-            margin: 1.5rem 0 0.25rem 0; /* Less space after the bar, more above */
         }
 
         .progress-bar-label {
             font-size: 1rem;
-            margin-bottom: 0.5rem;
+            margin: 1rem 0 0.25rem 0;
             display: flex;
             flex-direction: row;
             justify-content: space-between;
@@ -476,6 +485,190 @@
             margin-bottom: 1.25rem;
         }
 
+        /* Ad Container Styles */
+        .side-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 0.5rem;
+        }
+        
+        .ad-banner {
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .ad-banner:hover {
+            transform: translateY(-2px);
+        }
+        
+        .ad-banner a {
+            display: block;
+            text-decoration: none;
+        }
+        
+        .ad-placeholder, .ad-error {
+            background: #f8fafc;
+            border: 1px dashed #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .ad-error {
+            border-color: #fc8181;
+            background-color: #fff5f5;
+            color: #e53e3e;
+        }
+        
+        /* Debug styles */
+        .ad-side::after {
+            content: 'AD SPACE';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #cbd5e0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Add a visual indicator for debugging */
+        .ad-side::before {
+            content: 'Ad Space';
+            display: block;
+            color: #6b7280;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .ad-bottom {
+            width: 100%;
+            min-height: 150px;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        /* Debug styles */
+        .ad-bottom::after {
+            content: 'ADVERTISEMENT';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #cbd5e0;
+            font-size: 1rem;
+            font-weight: 600;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Add a visual indicator for debugging */
+        .ad-bottom::before {
+            content: 'Advertisement';
+            display: block;
+            color: #6b7280;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .ad-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .ad-container a {
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .ad-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .ad-error {
+            color: #e53e3e;
+            font-weight: 500;
+            text-align: center;
+            padding: 1rem;
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 4px;
+        }
+
+        .ad-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        @media screen and (max-width: 1400px) {
+            .side-container {
+                width: 360px;
+                min-width: 360px;
+                padding: 1rem;
+            }
+        }
+
+        @media screen and (max-width: 1600px) {
+            .page-wrapper {
+                width: 800px;
+                min-width: 800px;
+                flex: 0 0 800px;
+                margin: 0;
+            }
+        }
+        
+        @media screen and (max-width: 1024px) {
+            .side-container {
+                display: none;
+            }
+            .page-wrapper {
+                width: 100%;
+                padding: 0 1.5rem;
+            }
+            .horizontal-container {
+                width: 100%;
+                margin: 1.5rem 1rem;
+                border-radius: 8px;
+            }
+        }
+        
         @media screen and (max-width: 768px) {
             .actions {
                 flex-direction: row;
@@ -521,6 +714,35 @@
                 margin-top: 0;
                 padding: 0.25rem;
             }
+        }
+        
+        /* Ad Container Styles */
+        .ad-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+            margin: 2rem auto;
+            max-width: 1600px;
+        }
+        
+        .ad-left, .ad-right {
+            width: 300px;
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+        
+        .ad-bottom {
+            width: 100%;
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .ad-left img, .ad-right img, .ad-bottom img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .hamburger {
             display: none;
@@ -639,11 +861,84 @@
         }
 
         .page-wrapper {
+            width: 600px;
+            min-width: 600px;
+            flex: 0 0 600px;
+            margin: 0;
+            padding: 0 2rem;
+            box-sizing: border-box;
+        }
+
+        .side-container {
+            width: calc((100vw - 600px) / 2);
+            min-width: 300px;
+            padding: 0.5rem;
+            min-height: calc(100vh - 64px);
+            background: white;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            margin: 0;
+            border: none;
+            box-sizing: border-box;
+        }
+
+        .horizontal-container {
+            width: 536px; /* 600px - (2rem * 2) to account for page-wrapper padding */
+            height: 200px;
+            margin: 2rem auto;
+            padding: 0;
+            background: white;
+            border-radius: 4px;
+            box-shadow: none;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        /* General ad container styles */
+        .ad-container {
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        
+        /* Specific styles for bottom ad container */
+        .horizontal-container .ad-container {
+            width: 100%;
+            height: 100%;
             display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 2rem;
-            padding: 0 1rem;
-            max-width: 1600px;
+            background: white;
+            overflow: hidden;
+        }
+        
+        .horizontal-container .ad-container a {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .horizontal-container .ad-container img {
+            width: auto;
+            height: auto;
+            max-width: 200%;
+            max-height: 200%;
+            min-width: 100%;
+            min-height: 100%;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .ad-container iframe,
+        .ad-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
             margin: 0 auto;
         }
 
@@ -865,41 +1160,7 @@
         .contact-modal-content button:hover {
             background: #2d3748;
         }
-        /* Ad container styles */
-        .ad-top, .ad-bottom {
-            width: 100%;
-            min-height: 90px;
-            background: #f3f4f6;
-            border: 1.5px dashed #cbd5e0;
-            color: #4a5568;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 2rem auto;
-            font-size: 1.1rem;
-        }
-        .ad-bottom {
-            margin: 2rem auto 0 auto;
-        }
-        .ad-side {
-            position: sticky;
-            top: 2rem;
-            width: 160px;
-            min-height: 600px;
-            background: #f3f4f6;
-            border: 1.5px dashed #cbd5e0;
-            color: #4a5568;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            margin: 0 1rem;
-        }
-        @media (max-width: 1100px) {
-            .ad-side {
-                display: none;
-            }
-        }
+
         .loader {
   border: 3px solid #e2e8f0;
   border-top: 3px solid #4a5568;
@@ -946,9 +1207,7 @@
             white-space: nowrap !important;
             border: 0 !important;
         }
-        .ad-top, .ad-bottom, .ad-side {
-            display: none !important;
-        }
+
     </style>
 </head>
 
@@ -992,12 +1251,14 @@
         </nav>
     </header>
 
-    <!-- Top Ad -->
-    <div class="ad-top">Top Ad Space</div>
-    <div style="display: flex; justify-content: center; max-width: 1600px; margin: 0 auto;">
-        <!-- Left Ad -->
-        <div class="ad-side">Left Ad</div>
-        <div class="page-wrapper" style="flex:1; min-width:0;">
+    <div style="display: flex; width: 100vw; margin: 0; padding: 0; max-width: 100%; overflow-x: hidden; background-color: #f8f9fa;">
+        <!-- Left Side Container -->
+        <div class="side-container" style="flex: 1; display: flex; flex-direction: column; align-items: center; background-color: #f8f9fa;">
+            <!-- Video editor ads will be loaded here -->
+        </div>
+
+        <!-- Main Content -->
+        <div class="page-wrapper">
         <main class="container" id="mainContent">
             <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 2rem;">
                 <h1 class="header-description-main" style="text-align: center;">Need to trim a video?</h1>
@@ -1075,14 +1336,145 @@
                 <div id="progressCompleteMsg" style="display:none; text-align:center; font-size:1.08rem; font-weight:500; color:#16a34a; margin-top:0.5rem; opacity:0; transition:opacity 0.7s;">Your clip is ready! Download starting...</div>
             </form>
         </main>
+        
+        <!-- Horizontal Container -->
+        <div class="horizontal-container">
+            <!-- Cloud storage ads will be loaded here -->
+        </div>
+        </div>
+
+        <!-- Right Side Container -->
+        <div class="side-container" style="flex: 1; display: flex; flex-direction: column; align-items: center; overflow: hidden; background-color: #f8f9fa;">
+            <!-- VPN ads will be loaded here -->
+        </div>
     </div>
-        <!-- Right Ad -->
-        <div class="ad-side">Right Ad</div>
-    </div>
-    <!-- Bottom Ad -->
-    <div class="ad-bottom">Bottom Ad Space</div>
 
     <script>
+        // Load and render ads from affiliate.json
+        async function loadAds() {
+            try {
+                const response = await fetch('/static/affiliate.json');
+                const data = await response.json();
+                
+                // Get container widths
+                const leftContainer = document.querySelector('.side-container:first-of-type');
+                const rightContainer = document.querySelector('.side-container:last-of-type');
+                const containerWidth = leftContainer.clientWidth;
+
+                // Function to find best banner size - prefers width >= targetWidth, falls back to closest
+                function findClosestBanner(banners, targetWidth) {
+                    // First try to find a banner with width >= targetWidth
+                    const suitableBanner = banners.reduce((best, banner) => {
+                        const [width] = banner.size.split('*').map(Number);
+                        if (width >= targetWidth) {
+                            if (!best || width < Number(best.size.split('*')[0])) {
+                                return banner; // Prefer the smallest width that's >= target
+                            }
+                        }
+                        return best;
+                    }, null);
+                    
+                    // If no banner is wide enough, find the closest one
+                    if (!suitableBanner) {
+                        return banners.reduce((closest, banner) => {
+                            const [width] = banner.size.split('*').map(Number);
+                            const closestWidth = closest ? Number(closest.size.split('*')[0]) : 0;
+                            return Math.abs(width - targetWidth) < Math.abs(closestWidth - targetWidth) ? banner : closest;
+                        }, null);
+                    }
+                    
+                    return suitableBanner;
+                }
+
+                // Function to create ad container
+                function createAdContainer(banner) {
+                    const adContainer = document.createElement('div');
+                    adContainer.className = 'ad-container';
+                    adContainer.style.width = '100%';
+                    adContainer.style.margin = '0';
+                    adContainer.style.padding = '0';
+                    adContainer.style.border = 'none';
+                    adContainer.style.borderRadius = '0';
+                    adContainer.style.background = 'none';
+                    // Replace any fixed widths in the banner HTML with 100%
+                    let html = banner.html.replace(/width=["\']\d+["\']/g, 'width="100%"');
+                    html = html.replace(/width:\s*\d+px/g, 'width:100%');
+                    adContainer.innerHTML = html;
+                    return adContainer;
+                }
+
+                // Clear containers
+                leftContainer.innerHTML = '';
+                rightContainer.innerHTML = '';
+                
+                // Get all ad types
+                const videoEditors = data.video_editors || [];
+                const vpns = data.vpn || [];
+                
+                // Render 3 video editor ads on the left
+                if (videoEditors.length > 0) {
+                    // Take first 3 video editors or duplicate if needed
+                    const editorsToShow = [];
+                    for (let i = 0; i < 3; i++) {
+                        const editor = videoEditors[i % videoEditors.length];
+                        if (editor) editorsToShow.push(editor);
+                    }
+                    
+                    editorsToShow.forEach(editor => {
+                        const banner = findClosestBanner(editor.banners, containerWidth);
+                        if (banner) {
+                            leftContainer.appendChild(createAdContainer(banner));
+                        }
+                    });
+                }
+                
+                // Render Renderforest and VPN ads on the right
+                // First add Renderforest if available
+                const renderforest = videoEditors.find(editor => editor.name === 'Renderforest');
+                if (renderforest) {
+                    const banner = findClosestBanner(renderforest.banners, containerWidth);
+                    if (banner) {
+                        rightContainer.appendChild(createAdContainer(banner));
+                    }
+                }
+                
+                // Then add up to 2 VPN ads
+                if (vpns.length > 0) {
+                    const vpnsToShow = vpns.slice(0, 2); // Get first 2 VPNs
+                    vpnsToShow.forEach(vpn => {
+                        const banner = findClosestBanner(vpn.banners, containerWidth);
+                        if (banner) {
+                            rightContainer.appendChild(createAdContainer(banner));
+                        }
+                    });
+                }
+
+                // Render cloud storage ad at the bottom
+                const horizontalContainer = document.querySelector('.horizontal-container');
+                if (data.cloud_storage && data.cloud_storage.length > 0) {
+                    const storage = data.cloud_storage[0];
+                    if (storage.banners && storage.banners.length > 0) {
+                        // Find the best banner size for the container (600px width)
+                        const banner = findClosestBanner(storage.banners, 600);
+                        if (banner) {
+                            const adContainer = document.createElement('div');
+                            adContainer.className = 'ad-container';
+                            // Replace any fixed widths in the banner HTML with 100%
+                            let html = banner.html.replace(/width=["']\d+["']/g, 'width="100%"');
+                            html = html.replace(/width:\s*\d+px/g, 'width:100%');
+                            adContainer.innerHTML = html;
+                            horizontalContainer.innerHTML = '';
+                            horizontalContainer.appendChild(adContainer);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading ads:', error);
+            }
+        }
+
+        // Load ads when the page loads
+        window.addEventListener('load', loadAds);
 
         const startTimeInput = document.getElementById('startTime');
         const endTimeInput = document.getElementById('endTime');
@@ -1512,7 +1904,7 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
     }
 });
     </script>
-    <script src="/shared.js"></script>
+
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
@@ -1536,19 +1928,26 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
             </div>
         </div>
     </footer>
-    <button id="floatingContactBtn" class="floating-contact-btn" aria-label="Contact us">Contact</button>
-    <div id="contactModal" class="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
+    <!-- Floating Contact Button -->
+    <button id="floatingContactBtn" class="floating-contact-btn">Contact</button>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="contact-modal">
         <div class="contact-modal-content">
-            <h2 id="contactModalTitle">Contact Us</h2>
+            <h2>Quick Contact</h2>
             <form id="miniContactForm">
                 <label for="miniEmail">Email (optional)</label>
                 <input type="email" id="miniEmail" name="miniEmail" placeholder="your@email.com">
                 <label for="miniMessage">Message *</label>
                 <textarea id="miniMessage" name="miniMessage" rows="3" placeholder="Your message..." required></textarea>
-                <button type="submit" class="download-btn">Send</button>
+                <button type="submit">Send</button>
             </form>
         </div>
     </div>
+    <!-- Include shared.js for common functionality including the floating contact button -->
+    <script src="/static/shared.js"></script>
+    
+    
 </body>
 
 </html>
