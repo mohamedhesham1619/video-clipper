@@ -95,6 +95,10 @@
 
         body {
             background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            width: 100vw;
         }
 
         .header {
@@ -648,9 +652,12 @@
             }
         }
 
-        @media screen and (max-width: 1280px) {
-            .side-container {
-                width: 240px;
+        @media screen and (max-width: 1600px) {
+            .page-wrapper {
+                width: 800px;
+                min-width: 800px;
+                flex: 0 0 800px;
+                margin: 0;
             }
         }
         
@@ -661,6 +668,11 @@
             .page-wrapper {
                 width: 100%;
                 padding: 0 1.5rem;
+            }
+            .horizontal-container {
+                width: 100%;
+                margin: 1.5rem 1rem;
+                border-radius: 8px;
             }
         }
         
@@ -856,12 +868,31 @@
         }
 
         .page-wrapper {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            padding: 0 1rem;
-            max-width: 1600px;
-            margin: 0 auto;
+            width: 900px;
+            min-width: 900px;
+            flex: 0 0 900px;
+            margin: 0;
+            padding: 0 2rem;
+        }
+
+        .side-container {
+            flex: 1;
+            min-width: 0;
+            padding: 1.5rem;
+            min-height: calc(100vh - 64px);
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .horizontal-container {
+            width: 600px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: rgb(80, 80, 80);
+            border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.13);
+            flex-shrink: 0;
+            min-height: 100px;
         }
 
         /* Responsive styles */
@@ -1173,7 +1204,11 @@
         </nav>
     </header>
 
-    <div class="main-layout" style="display: flex; max-width: 1600px; margin: 0 auto; min-height: auto; position: relative; padding: 1rem 0;">
+    <div style="display: flex; width: 100%; margin: 0; padding: 0;">
+        <!-- Left Side Container -->
+        <div class="side-container" style="flex: 1;">
+            Left Side Content
+        </div>
 
         <!-- Main Content -->
         <div class="page-wrapper">
@@ -1254,8 +1289,16 @@
                 <div id="progressCompleteMsg" style="display:none; text-align:center; font-size:1.08rem; font-weight:500; color:#16a34a; margin-top:0.5rem; opacity:0; transition:opacity 0.7s;">Your clip is ready! Download starting...</div>
             </form>
         </main>
+        
+        <!-- Horizontal Container -->
+        <div class="horizontal-container">
+        </div>
         </div>
 
+        <!-- Right Side Container -->
+        <div class="side-container">
+            Right Side Content
+        </div>
     </div>
 
     <script>
