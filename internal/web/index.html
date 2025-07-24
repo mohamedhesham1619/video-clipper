@@ -1926,19 +1926,24 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
             </div>
         </div>
     </footer>
-    <button id="floatingContactBtn" class="floating-contact-btn" aria-label="Contact us">Contact</button>
-    <div id="contactModal" class="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
+    <!-- Floating Contact Button -->
+    <button id="floatingContactBtn" class="floating-contact-btn">Contact</button>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="contact-modal">
         <div class="contact-modal-content">
-            <h2 id="contactModalTitle">Contact Us</h2>
+            <h2>Quick Contact</h2>
             <form id="miniContactForm">
                 <label for="miniEmail">Email (optional)</label>
                 <input type="email" id="miniEmail" name="miniEmail" placeholder="your@email.com">
                 <label for="miniMessage">Message *</label>
                 <textarea id="miniMessage" name="miniMessage" rows="3" placeholder="Your message..." required></textarea>
-                <button type="submit" class="download-btn">Send</button>
+                <button type="submit">Send</button>
             </form>
         </div>
     </div>
+    <!-- Include shared.js for common functionality including the floating contact button -->
+    <script src="/static/shared.js"></script>
 </body>
 
 </html>
