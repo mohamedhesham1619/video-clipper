@@ -188,9 +188,8 @@
             max-width: 600px;
             /* Increased width for better spacing */
             width: 100%;
-            margin: 3rem auto;
-            padding: 2rem 2.5rem 3rem;
-            /* More vertical padding */
+            margin: 1.5rem auto 2rem auto;
+            padding: 2rem 2.5rem 1.5rem;
             background: white;
             border-radius: 16px;
             box-shadow: 0 2px 16px rgba(0, 0, 0, 0.13);
@@ -324,14 +323,15 @@
         }
 
         .progress-bar {
+            margin: 0.5rem 0 0 0;
+            width: 100%;
             display: none;
             /* Initially hidden */
-            margin: 1.5rem 0 0.25rem 0; /* Less space after the bar, more above */
         }
 
         .progress-bar-label {
             font-size: 1rem;
-            margin-bottom: 0.5rem;
+            margin: 1rem 0 0.25rem 0;
             display: flex;
             flex-direction: row;
             justify-content: space-between;
@@ -1082,41 +1082,7 @@
         .contact-modal-content button:hover {
             background: #2d3748;
         }
-        /* Ad container styles */
-        .ad-top, .ad-bottom {
-            width: 100%;
-            min-height: 90px;
-            background: #f3f4f6;
-            border: 1.5px dashed #cbd5e0;
-            color: #4a5568;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 2rem auto;
-            font-size: 1.1rem;
-        }
-        .ad-bottom {
-            margin: 2rem auto 0 auto;
-        }
-        .ad-side {
-            position: sticky;
-            top: 2rem;
-            width: 160px;
-            min-height: 600px;
-            background: #f3f4f6;
-            border: 1.5px dashed #cbd5e0;
-            color: #4a5568;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            margin: 0 1rem;
-        }
-        @media (max-width: 1100px) {
-            .ad-side {
-                display: none;
-            }
-        }
+
         .loader {
   border: 3px solid #e2e8f0;
   border-top: 3px solid #4a5568;
@@ -1163,9 +1129,7 @@
             white-space: nowrap !important;
             border: 0 !important;
         }
-        .ad-top {
-            display: none !important; /* Keep top ad hidden as we're using sidebars */
-        }
+
     </style>
 </head>
 
@@ -1209,17 +1173,8 @@
         </nav>
     </header>
 
-    <!-- Top Ad (hidden) -->
-    <div class="ad-top" style="display:none !important;">Top Ad Space</div>
-    <div class="main-layout" style="display: flex; max-width: 1600px; margin: 0 auto; min-height: 100vh; position: relative;">
-        <!-- Left Sidebar -->
-        <div class="side-container left-side">
-            <div class="side-content">
-                <!-- Left Ad - Video Editors -->
-                <div id="adLeft" class="ad-side" style="display: block !important;"></div>
-            </div>
-        </div>
-        
+    <div class="main-layout" style="display: flex; max-width: 1600px; margin: 0 auto; min-height: auto; position: relative; padding: 1rem 0;">
+
         <!-- Main Content -->
         <div class="page-wrapper">
         <main class="container" id="mainContent">
@@ -1300,17 +1255,8 @@
             </form>
         </main>
         </div>
-        
-        <!-- Right Sidebar -->
-        <div class="side-container right-side">
-            <div class="side-content">
-                <!-- Right Ad - VPNs -->
-                <div id="adRight" class="ad-side" style="display: block !important;"></div>
-            </div>
-        </div>
+
     </div>
-    <!-- Bottom Ad - Cloud Storage -->
-    <div id="adBottom" class="ad-bottom" style="display: block !important;"></div>
 
     <script>
 
@@ -1742,9 +1688,7 @@ document.getElementById('clipForm').addEventListener('submit', async (e) => {
     }
 });
     </script>
-    <!-- Load ads script at the end of body -->
-    <script src="/static/ads.js"></script>
-    </script>
+
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
