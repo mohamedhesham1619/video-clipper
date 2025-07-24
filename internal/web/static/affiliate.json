@@ -52,7 +52,17 @@
       "banners": [
         {
           "size": "720*300",
-          "html": "<a href=\"https://flixier.com?fpr=mh1619\" target=\"_blank\"><img src=\"https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24602/720x300px.png\" alt=\"Flixier Promo\" width=\"720\" height=\"300\"></a>"
+          "html": "<a href=\"https://flixier.com?fpr=mh1619\" target=\"_blank\"><img src=\"https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24602/720x300px.png\" alt=\"Flixier Promo\" ></a>"
+        }
+      ]
+    },
+    {
+      "name": "Renderforest",
+      "banner_type": "html",
+      "banners": [
+        {
+          "size": "1080*1080",
+          "html": "<a rel=\"sponsored\" href=\"https://renderforest.pxf.io/c/6416428/1957253/14885\" target=\"_top\" id=\"1957253\"><img src=\"//a.impactradius-go.com/display-ad/14885-1957253\" border=\"0\" alt=\"\" width=\"1080\" height=\"1080\"/></a><img height=\"0\" width=\"0\" src=\"https://imp.pxf.io/i/6416428/1957253/14885\" style=\"position:absolute;visibility:hidden;\" border=\"0\" />"
         }
       ]
     }
@@ -79,12 +89,9 @@
       "banner_type": "html",
       "banners": [
         {
-          "size": "300*600",
-          "html": "<a href=\"https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753303315/300x600_f2lovv.png\" width=\"300\" height=\"600\" alt=\"NordVPN Banner\"></a>"
-        },
-        {
-          "size": "300*250",
-          "html": "<a href=\"https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753303315/300x250_krlpqk.png\" width=\"300\" height=\"250\" alt=\"NordVPN Banner\"></a>"
+          "size": "728*90",
+          "html": "<a href=\"https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902\" target=\"_blank\" rel=\"sponsored\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753394990/728x90_baajhd.png\" alt=\"NordVPN Ad\" /></a>"
+
         }
       ]
     },

@@ -1249,9 +1249,9 @@
         </nav>
     </header>
 
-    <div style="display: flex; width: 100vw; margin: 0; padding: 0; max-width: 100%; overflow-x: hidden;">
+    <div style="display: flex; width: 100vw; margin: 0; padding: 0; max-width: 100%; overflow-x: hidden; background-color: #f8f9fa;">
         <!-- Left Side Container -->
-        <div class="side-container" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+        <div class="side-container" style="flex: 1; display: flex; flex-direction: column; align-items: center; background-color: #f8f9fa;">
             <!-- Video editor ads will be loaded here -->
         </div>
 
@@ -1342,7 +1342,7 @@
         </div>
 
         <!-- Right Side Container -->
-        <div class="side-container" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+        <div class="side-container" style="flex: 1; display: flex; flex-direction: column; align-items: center; overflow: hidden; background-color: #f8f9fa;">
             <!-- VPN ads will be loaded here -->
         </div>
     </div>
@@ -1401,21 +1401,45 @@
                     return adContainer;
                 }
 
-                // Render all video editor ads on the left
-                leftContainer.innerHTML = ''; // Clear container
-                if (data.video_editors && data.video_editors.length > 0) {
-                    data.video_editors.forEach(editor => {
+                // Clear containers
+                leftContainer.innerHTML = '';
+                rightContainer.innerHTML = '';
+                
+                // Get all ad types
+                const videoEditors = data.video_editors || [];
+                const vpns = data.vpn || [];
+                
+                // Render 3 video editor ads on the left
+                if (videoEditors.length > 0) {
+                    // Take first 3 video editors or duplicate if needed
+                    const editorsToShow = [];
+                    for (let i = 0; i < 3; i++) {
+                        const editor = videoEditors[i % videoEditors.length];
+                        if (editor) editorsToShow.push(editor);
+                    }
+                    
+                    editorsToShow.forEach(editor => {
                         const banner = findClosestBanner(editor.banners, containerWidth);
                         if (banner) {
                             leftContainer.appendChild(createAdContainer(banner));
                         }
                     });
                 }
-
-                // Render all VPN ads on the right
-                rightContainer.innerHTML = ''; // Clear container
-                if (data.vpn && data.vpn.length > 0) {
-                    data.vpn.forEach(vpn => {
+                
+                // Render Renderforest and VPN ads on the right
+                // First add Renderforest if available
+                const renderforest = videoEditors.find(editor => editor.name === 'Renderforest');
+                if (renderforest) {
+                    const banner = findClosestBanner(renderforest.banners, containerWidth);
+                    if (banner) {
+                        rightContainer.appendChild(createAdContainer(banner));
+                    }
+                }
+                
+                // Then add up to 2 VPN ads
+                if (vpns.length > 0) {
+                    const vpnsToShow = vpns.slice(0, 2); // Get first 2 VPNs
+                    vpnsToShow.forEach(vpn => {
                         const banner = findClosestBanner(vpn.banners, containerWidth);
                         if (banner) {
                             rightContainer.appendChild(createAdContainer(banner));
