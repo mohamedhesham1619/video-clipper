@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supported Sites - Hosted Clipper</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <a href="../index.html">
+                    <img src="../images/scissors.svg" alt="VideoClipper Logo">
+                    <span>VideoClipper</span>
+                </a>
+            </div>
+            <nav class="main-nav">
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <ul class="nav-links">
+                    <li><a href="../index.html" class="nav-link">Home</a></li>
+                    <li><a href="supported-sites.html" class="nav-link active">Supported Sites</a></li>
+                    <li><a href="faq.html" class="nav-link">FAQ</a></li>
+                    <li><a href="contact.html" class="nav-link">Contact</a></li>
+                    <li class="nav-divider">|</li>
+                    <li><a href="terms.html" class="nav-link">Terms</a></li>
+                    <li><a href="privacy.html" class="nav-link">Privacy</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>Supported Sites</h1>
+                <p>We support clipping from hundreds of popular websites</p>
+            </div>
+        </section>
+        
+        <section class="content-section">
+            <div class="container">
+                <div class="search-container">
+                    <input type="text" id="site-search" placeholder="Search supported sites...">
+                    <i class="fas fa-search"></i>
+                </div>
+                
+                <div class="sites-grid" id="sites-container">
+                    <!-- Sites will be loaded dynamically -->
+                </div>
+                
+                <div class="cta-section text-center">
+                    <h3>Don't see your favorite site?</h3>
+                    <p>We're constantly adding new sites. Let us know which ones you'd like us to support!</p>
+                    <a href="contact.html" class="cta-button">Request a Site</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-brand">
+                    <img src="../images/scissors.svg" alt="VideoClipper Logo" class="footer-logo">
+                    <h3 class="footer-title">VideoClipper</h3>
+                    <span class="tagline">Online tool to cut and download clips from any video link</span>
+                </div>
+                <nav class="footer-nav">
+                    <a href="../index.html">Home</a>
+                    <a href="supported-sites.html" class="active">Supported Sites</a>
+                    <a href="faq.html">FAQ</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="terms.html">Terms</a>
+                    <a href="privacy.html">Privacy</a>
+                </nav>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 VideoClipper.online</p>
+                <p class="developer-credits">
+                    Developed and maintained by Mohamed Hesham.
+                    <a href="https://www.linkedin.com/in/mohamed-hesham11/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://github.com/mohamedhesham1619" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating contact button -->
+    <button id="contact-float" class="floating-button">
+        <i class="fas fa-comment"></i>
+    </button>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/supported-sites.js"></script>
+</body>
+</html>
