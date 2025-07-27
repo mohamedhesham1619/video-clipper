@@ -1,16 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
     const faqItems = document.querySelectorAll('.faq-item');
     
+    // Close all answers by default
+    faqItems.forEach(item => {
+        const answer = item.querySelector('.faq-answer');
+        answer.style.maxHeight = '0';
+    });
+
+    // Add click event to each FAQ question
     faqItems.forEach(item => {
         const question = item.querySelector('.faq-question');
         const answer = item.querySelector('.faq-answer');
         const icon = item.querySelector('.faq-question i');
         
-        // Close all answers by default
-        answer.style.maxHeight = '0';
-        
         question.addEventListener('click', function() {
-            // Toggle the active class on the clicked item
             const isActive = item.classList.contains('active');
             
             // Close all other items
@@ -38,14 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Open the first item by default
-    if (faqItems.length > 0) {
-        const firstItem = faqItems[0];
-        firstItem.classList.add('active');
-        const firstAnswer = firstItem.querySelector('.faq-answer');
-        const firstIcon = firstItem.querySelector('.faq-question i');
-        firstAnswer.style.maxHeight = firstAnswer.scrollHeight + 'px';
-        firstIcon.classList.remove('fa-chevron-down');
-        firstIcon.classList.add('fa-chevron-up');
-    }
+    // All items start collapsed by default
+    // No need to open the first item anymore
 });
