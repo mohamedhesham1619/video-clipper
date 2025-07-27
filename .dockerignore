@@ -7,3 +7,5 @@ Dockerfile
 *.tar
 /build
 /web/static/ads/
+old-web/
+internal/data/

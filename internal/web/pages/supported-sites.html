@@ -35,29 +35,65 @@
         </div>
     </header>
 
-    <main>
-        <section class="page-header">
+    <main style="margin-top: 3rem;">
+        <section class="page-header" style="margin-bottom: 3rem; padding-bottom: 2rem;">
             <div class="container">
-                <h1>Supported Sites</h1>
-                <p>We support clipping from hundreds of popular websites</p>
+                <h1>Top Supported Sites</h1>
+                <p style="font-size: 1.2rem; line-height: 1.6; max-width: 800px; margin: 0 auto;">
+                    VideoClipper supports over 1000 video platforms. These are just the most popular ones.
+                    <br>
+                    <span style="font-size: 1rem; color: #4b5563; display: block; margin-top: 0.5rem;">
+                        Don't see your favorite? It might still be supported — try pasting the URL to check if it works.
+                    </span>
+                </p>
             </div>
         </section>
         
-        <section class="content-section">
+        <section class="content-section supported-sites-content">
             <div class="container">
-                <div class="search-container">
-                    <input type="text" id="site-search" placeholder="Search supported sites...">
-                    <i class="fas fa-search"></i>
-                </div>
-                
                 <div class="sites-grid" id="sites-container">
-                    <!-- Sites will be loaded dynamically -->
-                </div>
-                
-                <div class="cta-section text-center">
-                    <h3>Don't see your favorite site?</h3>
-                    <p>We're constantly adding new sites. Let us know which ones you'd like us to support!</p>
-                    <a href="contact.html" class="cta-button">Request a Site</a>
+                    <div class="site-card">
+                        <div class="site-logo">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                        <h3>YouTube</h3>
+                        <p class="site-description">Supports all YouTube video formats</p>
+                    </div>
+                    <div class="site-card">
+                        <div class="site-logo">
+                            <i class="fab fa-vimeo-v"></i>
+                        </div>
+                        <h3>Vimeo</h3>
+                        <p class="site-description">HD and 4K video support</p>
+                    </div>
+                    <div class="site-card">
+                        <div class="site-logo">
+                            <i class="fas fa-film"></i>
+                        </div>
+                        <h3>Dailymotion</h3>
+                        <p class="site-description">All public videos supported</p>
+                    </div>
+                    <div class="site-card">
+                        <div class="site-logo">
+                            <i class="fab fa-facebook"></i>
+                        </div>
+                        <h3>Facebook</h3>
+                        <p class="site-description">Public and group videos</p>
+                    </div>
+                    <div class="site-card">
+                        <div class="site-logo">
+                            <i class="fab fa-twitter"></i>
+                        </div>
+                        <h3>Twitter</h3>
+                        <p class="site-description">Video tweets and media</p>
+                    </div>
+                    <div class="site-card">
+                        <div class="site-logo">
+                            <i class="fab fa-instagram"></i>
+                        </div>
+                        <h3>Instagram</h3>
+                        <p class="site-description">Posts, Reels, and IGTV</p>
+                    </div>
                 </div>
             </div>
         </section>

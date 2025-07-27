@@ -22,6 +22,11 @@ func PrivacyPageHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, filepath.Join("internal/web", "privacy.html"))
 }
 
+func SupportedSitesDataHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	http.ServeFile(w, r, filepath.Join("internal/data", "supported_sites.json"))
+}
+
 func SupportedSitesPageHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, filepath.Join("internal/web", "supported-sites.html"))
 }
@@ -55,7 +60,4 @@ func SharedJSHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, filepath.Join("internal/web/static", "shared.js"))
 }
 
-func SupportedSitesDataHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	http.ServeFile(w, r, filepath.Join("internal/data", "supported_sites.json"))
-}
+

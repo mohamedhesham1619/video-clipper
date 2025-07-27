@@ -6,3 +6,4 @@ build/
 *.mp4
 .env
 affiliate.txt
+old-web/
