@@ -54,9 +54,6 @@ func New() *Server {
 	mux.HandleFunc("/robots.txt", handlers.RobotsTxtHandler)
 	mux.HandleFunc("/sitemap.xml", handlers.SitemapXMLHandler)
 
-	// API endpoints
-	mux.HandleFunc("/api/supported-sites", handlers.SupportedSitesDataHandler)
-
 	return &Server{mux: mux}
 }
 

@@ -176,99 +176,111 @@
         </div>
     </header>
 
-    <main>
-        <section class="page-header">
-            <div class="container">
+    <main style="padding: 6rem 0 4rem;">
+        <div class="container">
+            <div class="contact-form-container">
                 <h1>Contact Us</h1>
-                <p>We'd love to hear from you. Get in touch with our team.</p>
-            </div>
-        </section>
-        
-        <section class="content-section">
-            <div class="container">
-                <div class="contact-container">
-                    <div class="contact-info">
-                        <h2>Get in Touch</h2>
-                        <p>Have questions or feedback? We're here to help! Reach out to us through any of the following methods.</p>
-                        
-                        <div class="contact-method">
-                            <div class="contact-icon">
-                                <i class="fas fa-envelope"></i>
-                            </div>
-                            <div class="contact-details">
-                                <h3>Email Us</h3>
-                                <a href="mailto:support@hostedclipper.com">support@hostedclipper.com</a>
-                                <p>We typically respond within 24 hours</p>
-                            </div>
-                        </div>
-                        
-                        <div class="contact-method">
-                            <div class="contact-icon">
-                                <i class="fas fa-phone-alt"></i>
-                            </div>
-                            <div class="contact-details">
-                                <h3>Call Us</h3>
-                                <a href="tel:+11234567890">+1 (123) 456-7890</a>
-                                <p>Monday - Friday, 9am - 5pm EST</p>
-                            </div>
-                        </div>
-                        
-                        <div class="contact-method">
-                            <div class="contact-icon">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </div>
-                            <div class="contact-details">
-                                <h3>Visit Us</h3>
-                                <p>123 Web Street<br>San Francisco, CA 94107<br>United States</p>
-                            </div>
-                        </div>
-                        
-                        <h3>Follow Us</h3>
-                        <div class="social-links-contact">
-                            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                            <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                            <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
-                        </div>
+                <p class="subtitle">Have a question, suggestion, or need help?<br>Feel free to reach out to us using the form below.</p>
+                
+                <form id="contactForm" class="minimal-contact-form">
+                    <div class="form-group">
+                        <label for="email">Email (optional)</label>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="your@email.com">
                     </div>
                     
-                    <div class="contact-form">
-                        <h2>Send Us a Message</h2>
-                        <form id="contactForm" novalidate>
-                            <div class="form-group">
-                                <label for="name">Full Name</label>
-                                <input type="text" id="name" name="name" class="form-control" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="email">Email Address</label>
-                                <input type="email" id="email" name="email" class="form-control" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="subject">Subject</label>
-                                <input type="text" id="subject" name="subject" class="form-control" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="message">Your Message</label>
-                                <textarea id="message" name="message" class="form-control" required></textarea>
-                            </div>
-                            
-                            <button type="submit" class="btn-submit">Send Message</button>
-                        </form>
+                    <div class="form-group">
+                        <label for="message">Your Message <span class="required">*</span></label>
+                        <textarea id="message" name="message" class="form-control" rows="5" placeholder="How can we help you?" required></textarea>
                     </div>
-                </div>
-                
-                <div class="map-container">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.140905014661!2d-122.40135468468225!3d37.79003597975798!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80858062a3e6f6e5%3A0x2f7a2acf7e0a1a4b!2s123%20Web%20St%2C%20San%20Francisco%2C%20CA%2094107%2C%20USA!5e0!3m2!1sen!2s!4v1623456789012!5m2!1sen!2s" 
-                            allowfullscreen="" 
-                            loading="lazy">
-                    </iframe>
-                </div>
+                    
+                    <button type="submit" class="btn-send-message">
+                        Send Message
+                    </button>
+                </form>
             </div>
-        </section>
+        </div>
     </main>
+    
+    <style>
+        .contact-form-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .contact-form-container h1 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .minimal-contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .form-group label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        .required {
+            color: #e53e3e;
+        }
+        
+        .form-control {
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 1px var(--primary-color);
+        }
+        
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .btn-send-message {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 0.5rem;
+        }
+        
+        .btn-send-message:hover {
+            background-color: #3a56d4;
+        }
+    </style>
 
     <!-- Footer -->
     <footer class="main-footer">
@@ -299,11 +311,7 @@
         </div>
     </footer>
 
-    <!-- Floating contact button -->
-    <button id="contact-float" class="floating-button">
-        <i class="fas fa-comment"></i>
-    </button>
-
+    <!-- Floating button will be added here by main.js -->
     <script src="../js/main.js"></script>
     <script src="../js/contact.js"></script>
 </body>

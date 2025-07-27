@@ -1,0 +1,187 @@
+<!-- Floating contact button -->
+<button id="contact-float" class="floating-button" aria-label="Contact Us">
+    <i class="fas fa-envelope"></i>
+    <span>Contact Us</span>
+</button>
+
+<!-- Contact Form Modal -->
+<div id="contact-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Contact Us</h2>
+        <p class="subtitle">Have a question or need help? Send us a message.</p>
+        
+        <form id="modal-contact-form" class="minimal-contact-form">
+            <div class="form-group">
+                <label for="modal-email">Email (optional)</label>
+                <input type="email" id="modal-email" name="email" class="form-control" placeholder="your@email.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="modal-message">Your Message <span class="required">*</span></label>
+                <textarea id="modal-message" name="message" class="form-control" rows="4" placeholder="How can we help you?" required></textarea>
+            </div>
+            
+            <button type="submit" class="btn-send-message">
+                Send Message
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Floating Button Styles */
+    .floating-button {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.25rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+        z-index: 999;
+    }
+
+    .floating-button:hover {
+        background-color: #3a56d4;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .floating-button i {
+        font-size: 1.1rem;
+    }
+
+    .floating-button span {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .modal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .close-modal {
+        position: absolute;
+        top: 1rem;
+        right: 1.5rem;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+    }
+
+    .close-modal:hover {
+        color: #333;
+    }
+
+    /* Form Styles */
+    .minimal-contact-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-group label {
+        font-weight: 500;
+        color: var(--text-color);
+    }
+
+    .required {
+        color: #e53e3e;
+    }
+
+    .form-control {
+        padding: 0.75rem 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 1px var(--primary-color);
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .btn-send-message {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        margin-top: 0.5rem;
+        width: 100%;
+    }
+
+    .btn-send-message:hover {
+        background-color: #3a56d4;
+    }
+
+    @media (max-width: 480px) {
+        .floating-button {
+            bottom: 1.5rem;
+            right: 1.5rem;
+            padding: 0.75rem 1rem;
+        }
+        
+        .floating-button span {
+            display: none;
+        }
+        
+        .modal-content {
+            padding: 1.5rem 1rem;
+        }
+    }
+</style>
