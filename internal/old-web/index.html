@@ -1,0 +1,1953 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name='impact-site-verification' value='ffa87c5c-94a6-4d6f-9e9d-0632dad50b35'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" href="/favicon.png" sizes="48x48">
+    <title>Video Clipper – Trim & Download Video Clips Online</title>
+    <meta name="description" content="Need to trim a video online? Paste a URL, set times, and download it directly. No sign-up required.">
+    <meta name="keywords" content="video clip downloader, video clipper, download video clip, cut video online, trim video from url, youtube clip downloader, online video trimmer, extract video segment, yt-dlp web app, download part of video, clip video from link, mp4 clip downloader, online video cutter">
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Video Clipper – Trim & Download Video Clips Online">
+    <meta property="og:description" content="Need to trim a video online? Paste a URL, set times, and download it directly.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://videoclipper.online/">
+    <meta property="og:image" content="https://videoclipper.online/favicon.png">
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Video Clipper – Trim & Download Video Clips Online">
+    <meta name="twitter:description" content="Need to trim a video online? Paste a URL, set times, and download it directly.">
+    <meta name="twitter:image" content="https://videoclipper.online/favicon.png">
+    <link rel="canonical" href="https://videoclipper.online/">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3TYZ3E3FGY"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3TYZ3E3FGY');
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "VideoClipper",
+      "url": "https://videoclipper.online/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://videoclipper.online/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is VideoClipper free to use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, VideoClipper is completely free to use with no signup required."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What sites are supported?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We support YouTube, Facebook, and many other popular video platforms. See the full list on our <a href='/supported-sites'>Supported Sites</a> page."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the maximum clip length?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The maximum allowed clip length is 15 minutes per request."
+          }
+        }
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "VideoClipper",
+      "url": "https://videoclipper.online/",
+      "logo": "https://videoclipper.online/favicon.svg"
+    }
+    </script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            width: 100vw;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: white;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .header-description {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            text-align: center;
+        }
+
+        .header-description-main {
+            color: #1a202c;
+            font-weight: 500;
+            font-size: 1.15rem;
+        }
+
+        .header-description-sub {
+            color: #4a5568;
+            font-size: 0.95rem;
+        }
+
+        .just-text {
+            margin-right: 0.5rem;
+        }
+
+        .step {
+            display: inline-block;
+            margin: 0 0.25rem;
+        }
+
+        .step-icon {
+            margin-right: 0.25rem;
+        }
+
+        .step-separator {
+            color: #94a3b8;
+            margin: 0 0.25rem;
+        }
+
+        .step-text {
+            color: #1a202c;
+            font-weight: 500;
+        }
+
+        .step-separator {
+            color: #94a3b8;
+            margin: 0 0.75rem;
+            font-weight: normal;
+        }
+
+        .step-icon {
+            font-size: 1.1rem;
+            margin-right: 0.25rem;
+            vertical-align: -1px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+            white-space: nowrap;
+            color: #1a202c;
+        }
+
+        @media (max-width: 768px) {
+            .header-description {
+                display: none;
+            }
+            .logo-section {
+                gap: 0.5rem;
+            }
+        }
+
+        .container {
+            max-width: 600px;
+            /* Increased width for better spacing */
+            width: 100%;
+            margin: 1.5rem auto 2rem auto;
+            padding: 2rem 2.5rem 1.5rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.13);
+            flex-shrink: 0;
+        }
+
+        h1 {
+            color: #1a202c;
+            margin-bottom: 2.5rem;
+            font-size: 2.25rem;
+            /* Slightly smaller for better proportion */
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        label,
+        .quality-label,
+        .duration-display,
+        .progress-bar-label span {
+            font-size: 1rem;
+            /* Consistent base font size */
+        }
+
+        input[type="text"],
+        .url-input input {
+            flex: 1;
+            padding: 1rem 1.2rem;
+            /* Consistent padding */
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            /* Consistent font size */
+            height: 52px;
+            /* Consistent height */
+        }
+
+        .paste-btn {
+            height: 52px;
+            width: 52px;
+            min-width: 52px;
+            min-height: 52px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0;
+            box-sizing: border-box;
+            background: #f8f9fa;
+            color: #4a5568;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .paste-btn:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e0;
+        }
+        .paste-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+        @media screen and (max-width: 768px) {
+            .paste-btn {
+                height: 36px;
+                width: 36px;
+                min-width: 36px;
+                min-height: 36px;
+                padding: 0;
+            }
+        }
+
+        .time-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            align-items: flex-start;
+            /* Ensure top alignment */
+            gap: 1rem;
+            /* Add consistent gap */
+        }
+
+        .time-input {
+            width: 48%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .time-input label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .time-input input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+            height: 44px;
+            /* Consistent but slightly smaller than main input */
+        }
+
+        .timeline {
+            position: relative;
+            height: 4px;
+            background: #e2e8f0;
+            margin: 2rem 0;
+            border-radius: 2px;
+        }
+
+        .timeline-progress {
+            position: absolute;
+            height: 100%;
+            background: #2d3748;
+            border-radius: 2px;
+        }
+
+        .handle {
+            position: absolute;
+            top: 50%;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border: 2px solid #4a5568;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            margin: 0.5rem 0 0 0;
+            width: 100%;
+            display: none;
+            /* Initially hidden */
+        }
+
+        .progress-bar-label {
+            font-size: 1rem;
+            margin: 1rem 0 0.25rem 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            min-height: 2.6em;
+            height: 2.6em;
+        }
+        .progress-bar-label .label-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 2.6em;
+            height: 2.6em;
+            gap: 0.1rem;
+        }
+        .progress-bar-label .truncate-title {
+            max-width: 340px;
+            display: inline-block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: bottom;
+            color: #1a202c;
+            font-weight: 500;
+        }
+
+        .progress-track {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+        }
+
+        .progress-fill {
+            width: 0;
+            height: 100%;
+            background: #4a5568;
+            border-radius: 3px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Improved animated stripes for loading */
+        .progress-fill.connecting {
+            width: 100%;
+            background: repeating-linear-gradient(135deg,
+                    #718096 0px,
+                    #718096 10px,
+                    #a0aec0 10px,
+                    #a0aec0 20px);
+            animation: progress-stripes 1s linear infinite;
+        }
+
+        @keyframes progress-stripes {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 40px 0;
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .actions {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            /* Align items to bottom */
+        }
+
+        .download-btn {
+            height: 52px;
+            font-size: 1rem;
+            padding: 0 2rem;
+            flex: 1;
+            background: #1a202c;
+            /* Darker black */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            line-height: 1.2;
+            transition: all 0.2s ease;
+        }
+
+        .download-btn:hover {
+            background: #2d3748;
+            transform: translateY(-1px);
+        }
+
+        .quality-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .quality-label {
+            color: #4a5568;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .quality-select {
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            height: 52px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .url-input {
+            display: flex;
+            flex-direction: row;
+            gap: 0.25rem;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Ad Container Styles */
+        .side-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 0.5rem;
+        }
+        
+        .ad-banner {
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .ad-banner:hover {
+            transform: translateY(-2px);
+        }
+        
+        .ad-banner a {
+            display: block;
+            text-decoration: none;
+        }
+        
+        .ad-placeholder, .ad-error {
+            background: #f8fafc;
+            border: 1px dashed #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .ad-error {
+            border-color: #fc8181;
+            background-color: #fff5f5;
+            color: #e53e3e;
+        }
+        
+        /* Debug styles */
+        .ad-side::after {
+            content: 'AD SPACE';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #cbd5e0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Add a visual indicator for debugging */
+        .ad-side::before {
+            content: 'Ad Space';
+            display: block;
+            color: #6b7280;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .ad-bottom {
+            width: 100%;
+            min-height: 150px;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        /* Debug styles */
+        .ad-bottom::after {
+            content: 'ADVERTISEMENT';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #cbd5e0;
+            font-size: 1rem;
+            font-weight: 600;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Add a visual indicator for debugging */
+        .ad-bottom::before {
+            content: 'Advertisement';
+            display: block;
+            color: #6b7280;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .ad-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .ad-container a {
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .ad-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .ad-error {
+            color: #e53e3e;
+            font-weight: 500;
+            text-align: center;
+            padding: 1rem;
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 4px;
+        }
+
+        .ad-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        @media screen and (max-width: 1400px) {
+            .side-container {
+                width: 360px;
+                min-width: 360px;
+                padding: 1rem;
+            }
+        }
+
+        @media screen and (max-width: 1600px) {
+            .page-wrapper {
+                width: 800px;
+                min-width: 800px;
+                flex: 0 0 800px;
+                margin: 0;
+            }
+        }
+        
+        @media screen and (max-width: 1024px) {
+            .side-container {
+                display: none;
+            }
+            .page-wrapper {
+                width: 100%;
+                padding: 0 1.5rem;
+            }
+            .horizontal-container {
+                width: 100%;
+                margin: 1.5rem 1rem;
+                border-radius: 8px;
+            }
+        }
+        
+        @media screen and (max-width: 768px) {
+            .actions {
+                flex-direction: row;
+                align-items: flex-end;
+                gap: 1rem;
+            }
+            .quality-wrapper {
+                width: auto;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+                flex: 1;
+            }
+            .quality-label {
+                margin-bottom: 0.25rem;
+                font-size: 0.95rem;
+            }
+            .download-btn, .quality-select {
+                flex: 1 1 0;
+                min-width: 0;
+            }
+            .nav-links {
+                display: none !important;
+            }
+            .hamburger {
+                display: flex !important;
+            }
+            .slideout-menu {
+                display: flex !important;
+            }
+            /* FIX: Always keep url-input row and paste-btn beside input */
+            .url-input {
+                flex-direction: row !important;
+                gap: 0.25rem;
+                align-items: center;
+                margin-bottom: 1rem;
+            }
+            .paste-btn {
+                width: 36px;
+                height: 36px;
+                min-width: 36px;
+                min-height: 36px;
+                margin-top: 0;
+                padding: 0.25rem;
+            }
+        }
+        
+        /* Ad Container Styles */
+        .ad-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+            margin: 2rem auto;
+            max-width: 1600px;
+        }
+        
+        .ad-left, .ad-right {
+            width: 300px;
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+        
+        .ad-bottom {
+            width: 100%;
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .ad-left img, .ad-right img, .ad-bottom img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            margin-left: 1rem;
+            z-index: 2001;
+        }
+        .hamburger span {
+            height: 4px;
+            width: 100%;
+            background: #1a202c;
+            margin: 4px 0;
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+        .slideout-menu {
+            display: none;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 220px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 16px rgba(0,0,0,0.13);
+            padding: 2rem 1.5rem 1.5rem 1.5rem;
+            z-index: 2000;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        .slideout-menu.open {
+            transform: translateX(0);
+        }
+        .slideout-menu .nav-link {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+        .slideout-menu .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #1a202c;
+            align-self: flex-end;
+            cursor: pointer;
+            margin-bottom: 2rem;
+        }
+
+        .duration-display {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .duration-display span:first-child {
+            margin-right: 0.5rem;
+        }
+
+        #durationTime {
+            font-weight: 600;
+        }
+
+        /* Animated ellipsis for progress text */
+        @keyframes ellipsis {
+            0% {
+                content: '';
+            }
+
+            25% {
+                content: '.';
+            }
+
+            50% {
+                content: '..';
+            }
+
+            75% {
+                content: '...';
+            }
+
+            100% {
+                content: '';
+            }
+        }
+
+        .animated-ellipsis::after {
+            display: inline-block;
+            animation: ellipsis 1.2s steps(4, end) infinite;
+            content: '';
+            vertical-align: baseline;
+        }
+
+        /* Pulse effect for progress text */
+        @keyframes pulseText {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .pulse-text {
+            animation: pulseText 1.2s infinite;
+        }
+
+        .page-wrapper {
+            width: 600px;
+            min-width: 600px;
+            flex: 0 0 600px;
+            margin: 0;
+            padding: 0 2rem;
+            box-sizing: border-box;
+        }
+
+        .side-container {
+            width: calc((100vw - 600px) / 2);
+            min-width: 300px;
+            padding: 0.5rem;
+            min-height: calc(100vh - 64px);
+            background: white;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            margin: 0;
+            border: none;
+            box-sizing: border-box;
+        }
+
+        .horizontal-container {
+            width: 536px; /* 600px - (2rem * 2) to account for page-wrapper padding */
+            height: 200px;
+            margin: 2rem auto;
+            padding: 0;
+            background: white;
+            border-radius: 4px;
+            box-shadow: none;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        /* General ad container styles */
+        .ad-container {
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        
+        /* Specific styles for bottom ad container */
+        .horizontal-container .ad-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            overflow: hidden;
+        }
+        
+        .horizontal-container .ad-container a {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .horizontal-container .ad-container img {
+            width: auto;
+            height: auto;
+            max-width: 200%;
+            max-height: 200%;
+            min-width: 100%;
+            min-height: 100%;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .ad-container iframe,
+        .ad-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Responsive styles */
+        @media screen and (min-width: 1200px) {
+            .ad-container {
+                display: block;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+                padding: 1rem;
+            }
+
+            .time-controls {
+                gap: 1.5rem;
+                /* Add space between time inputs on mobile */
+            }
+
+            .time-input {
+                width: 47%;
+                /* Slightly reduce width to prevent wrapping */
+                margin: 0;
+                /* Remove any default margins */
+                padding: 0;
+                /* Remove any default padding */
+            }
+
+            .url-input {
+                flex-direction: column;
+            }
+
+            .paste-btn {
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .header {
+                padding: 1rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 2rem;
+                text-align: center;
+            }
+            .ad-side {
+                display: none !important;
+            }
+            .page-wrapper {
+                display: block !important;
+                padding: 0 !important;
+                gap: 0 !important;
+                max-width: 100vw !important;
+                margin: 0 !important;
+            }
+            body, html {
+                overflow-x: hidden;
+            }
+        }
+
+        /* Navigation styles */
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: #1a202c;
+        }
+
+        /* Footer styles */
+        .footer {
+            background: white;
+            border-top: 1px solid #eee;
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            gap: 3rem;
+        }
+
+        .footer-section h3 {
+            color: #1a202c;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .footer-section p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section a {
+            display: block;
+            color: #4a5568;
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+            transition: color 0.2s ease;
+        }
+
+        .footer-section a:hover {
+            color: #1a202c;
+        }
+
+        /* Floating contact button styles */
+        .floating-contact-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #1a202c;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            z-index: 1000;
+        }
+
+        .floating-contact-btn:hover {
+            background: #2d3748;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Contact modal styles */
+        .contact-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .contact-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .contact-modal-content h2 {
+            color: #1a202c;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .contact-modal-content label {
+            display: block;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .contact-modal-content textarea,
+        .contact-modal-content input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            font-family: inherit;
+        }
+
+        .contact-modal-content textarea:focus,
+        .contact-modal-content input:focus {
+            outline: none;
+            border-color: #1a202c;
+        }
+
+        .contact-modal-content button {
+            background: #1a202c;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .contact-modal-content button:hover {
+            background: #2d3748;
+        }
+
+        .loader {
+  border: 3px solid #e2e8f0;
+  border-top: 3px solid #4a5568;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+.success-check {
+  color: #16a34a;
+  font-size: 1.5em;
+  vertical-align: middle;
+}
+.truncate {
+  max-width: 320px;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+.progress-bar-label .truncate {
+  max-width: 340px;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+        .progress-value {
+            color: #1a202c !important;
+        }
+        .visually-hidden {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
+    </style>
+</head>
+
+<body>
+    <a href="#mainContent" class="skip-link" style="position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden;background:#fff;color:#1a202c;z-index:1000;">Skip to main content</a>
+    <header class="header" role="banner">
+        <div class="logo-section">
+            <div class="logo" style="cursor:pointer" onclick="window.location.href='/'">
+                <!-- Scissors SVG icon -->
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" aria-label="Scissors logo">
+                    <circle cx="6" cy="6" r="3"></circle>
+                    <circle cx="6" cy="18" r="3"></circle>
+                    <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
+                    <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+                    <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
+                </svg>
+                VideoClipper
+            </div>
+        </div>
+        <div class="hamburger" id="hamburgerMenu" aria-label="Open navigation" tabindex="0" style="display:none;" aria-controls="slideoutMenu" aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="/" class="nav-link" aria-current="page">Home</a>
+            <a href="/contact" class="nav-link">Contact</a>
+            <a href="/supported-sites" class="nav-link">Supported Sites</a>
+            <a href="/faq" class="nav-link">FAQ</a>
+            <a href="/terms" class="nav-link">Terms</a>
+            <a href="/privacy" class="nav-link">Privacy</a>
+        </nav>
+        <nav class="slideout-menu" id="slideoutMenu" aria-label="Mobile navigation" aria-hidden="true">
+            <button class="close-btn" id="closeSlideout" aria-label="Close navigation">&times;</button>
+            <a href="/" class="nav-link">Home</a>
+            <a href="/contact" class="nav-link">Contact</a>
+            <a href="/supported-sites" class="nav-link">Supported Sites</a>
+            <a href="/faq" class="nav-link">FAQ</a>
+            <a href="/terms" class="nav-link">Terms</a>
+            <a href="/privacy" class="nav-link">Privacy</a>
+        </nav>
+    </header>
+
+    <div style="display: flex; width: 100vw; margin: 0; padding: 0; max-width: 100%; overflow-x: hidden; background-color: #f8f9fa;">
+        <!-- Left Side Container -->
+        <div class="side-container" style="flex: 1; display: flex; flex-direction: column; align-items: center; background-color: #f8f9fa;">
+            <!-- Video editor ads will be loaded here -->
+        </div>
+
+        <!-- Main Content -->
+        <div class="page-wrapper">
+        <main class="container" id="mainContent">
+            <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 2rem;">
+                <h1 class="header-description-main" style="text-align: center;">Need to trim a video online?</h1>
+                <div class="header-description">
+                    <span class="header-description-sub">
+                        <strong class="just-text">Just</strong> 📋 Paste Video URL <span class="step-separator">•</span> ⏱️ Set Times <span class="step-separator">•</span> ⬇️ Download
+                    </span>
+                </div>
+            </div>
+            <form id="clipForm">
+                <div id="formError" style="color:#dc2626; margin-bottom:1rem; display:none;"></div>
+                <div class="url-input">
+                    <input type="text" placeholder="Paste YouTube, Facebook, or any video URL" id="videoUrl"
+                        name="videoUrl" required>
+                    <button type="button" class="paste-btn" aria-label="Paste from clipboard">
+                        <!-- Clipboard with plus (paste) SVG icon -->
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="9" y="2" width="6" height="4" rx="1" ry="1"></rect>
+                            <path d="M4 7V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7"></path>
+                            <path d="M12 11v6"></path>
+                            <path d="M9 14h6"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="time-controls">
+                    <div class="time-input">
+                        <label>Start Time (hh:mm:ss)</label>
+                        <input type="text" value="00:00:00" id="startTime" oninput="updateDuration()" required>
+                    </div>
+                    <div class="time-input">
+                        <label>End Time (hh:mm:ss)</label>
+                        <input type="text" value="00:01:00" id="endTime" oninput="updateDuration()" required>
+                    </div>
+                </div>
+                <div class="duration-display">
+                    <span>Duration:</span>
+                    <span id="durationTime">00:01:00</span>
+                </div>
+                <div id="durationNote" style="color:#4a5568; font-size:0.95rem; margin-top:0.5rem; margin-bottom:1rem;">
+                    <strong>Note:</strong> The maximum allowed clip length is 15 minutes per request. If you need a longer clip, please <a href="/contact">let us know</a>
+                </div>
+
+                <div class="actions">
+                    <button type="submit" class="download-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download Clip
+                    </button>
+                    <div class="quality-wrapper">
+                        <label class="quality-label" for="videoQuality">Video Quality</label>
+                        <select class="quality-select" id="videoQuality">
+                            <option value="360">360p</option>
+                            <option value="480">480p</option>
+                            <option value="720" selected>720p</option>
+                            <option value="1080">1080p</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-bar-label">
+                        <span>Processing Clip</span>
+                        <div id="progressError" style="color:#dc2626; margin:0 0 0.25rem 0; display:none; font-weight:500; font-size:1.05rem; text-align:left; width:100%; display:block; order:0;"></div>
+                        <span class="progress-value" style="order:1;">0%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+                <div id="progressCompleteMsg" style="display:none; text-align:center; font-size:1.08rem; font-weight:500; color:#16a34a; margin-top:0.5rem; opacity:0; transition:opacity 0.7s;">Your clip is ready! Download starting...</div>
+            </form>
+        </main>
+        
+        <!-- Horizontal Container -->
+        <div class="horizontal-container">
+            <!-- Cloud storage ads will be loaded here -->
+        </div>
+        </div>
+
+        <!-- Right Side Container -->
+        <div class="side-container" style="flex: 1; display: flex; flex-direction: column; align-items: center; overflow: hidden; background-color: #f8f9fa;">
+            <!-- VPN ads will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+        // Load and render ads from affiliate.json
+        async function loadAds() {
+            try {
+                const response = await fetch('/static/affiliate.json');
+                const data = await response.json();
+                
+                // Get container widths
+                const leftContainer = document.querySelector('.side-container:first-of-type');
+                const rightContainer = document.querySelector('.side-container:last-of-type');
+                const containerWidth = leftContainer.clientWidth;
+
+                // Function to find best banner size - prefers width >= targetWidth, falls back to closest
+                function findClosestBanner(banners, targetWidth) {
+                    // First try to find a banner with width >= targetWidth
+                    const suitableBanner = banners.reduce((best, banner) => {
+                        const [width] = banner.size.split('*').map(Number);
+                        if (width >= targetWidth) {
+                            if (!best || width < Number(best.size.split('*')[0])) {
+                                return banner; // Prefer the smallest width that's >= target
+                            }
+                        }
+                        return best;
+                    }, null);
+                    
+                    // If no banner is wide enough, find the closest one
+                    if (!suitableBanner) {
+                        return banners.reduce((closest, banner) => {
+                            const [width] = banner.size.split('*').map(Number);
+                            const closestWidth = closest ? Number(closest.size.split('*')[0]) : 0;
+                            return Math.abs(width - targetWidth) < Math.abs(closestWidth - targetWidth) ? banner : closest;
+                        }, null);
+                    }
+                    
+                    return suitableBanner;
+                }
+
+                // Function to create ad container
+                function createAdContainer(banner) {
+                    const adContainer = document.createElement('div');
+                    adContainer.className = 'ad-container';
+                    adContainer.style.width = '100%';
+                    adContainer.style.margin = '0';
+                    adContainer.style.padding = '0';
+                    adContainer.style.border = 'none';
+                    adContainer.style.borderRadius = '0';
+                    adContainer.style.background = 'none';
+                    // Replace any fixed widths in the banner HTML with 100%
+                    let html = banner.html.replace(/width=["\']\d+["\']/g, 'width="100%"');
+                    html = html.replace(/width:\s*\d+px/g, 'width:100%');
+                    adContainer.innerHTML = html;
+                    return adContainer;
+                }
+
+                // Clear containers
+                leftContainer.innerHTML = '';
+                rightContainer.innerHTML = '';
+                
+                // Get all ad types
+                const videoEditors = data.video_editors || [];
+                const vpns = data.vpn || [];
+                
+                // Render 3 video editor ads on the left
+                if (videoEditors.length > 0) {
+                    // Take first 3 video editors or duplicate if needed
+                    const editorsToShow = [];
+                    for (let i = 0; i < 3; i++) {
+                        const editor = videoEditors[i % videoEditors.length];
+                        if (editor) editorsToShow.push(editor);
+                    }
+                    
+                    editorsToShow.forEach(editor => {
+                        const banner = findClosestBanner(editor.banners, containerWidth);
+                        if (banner) {
+                            leftContainer.appendChild(createAdContainer(banner));
+                        }
+                    });
+                }
+                
+                // Render Renderforest and VPN ads on the right
+                // First add Renderforest if available
+                const renderforest = videoEditors.find(editor => editor.name === 'Renderforest');
+                if (renderforest) {
+                    const banner = findClosestBanner(renderforest.banners, containerWidth);
+                    if (banner) {
+                        rightContainer.appendChild(createAdContainer(banner));
+                    }
+                }
+                
+                // Then add up to 2 VPN ads
+                if (vpns.length > 0) {
+                    const vpnsToShow = vpns.slice(0, 2); // Get first 2 VPNs
+                    vpnsToShow.forEach(vpn => {
+                        const banner = findClosestBanner(vpn.banners, containerWidth);
+                        if (banner) {
+                            rightContainer.appendChild(createAdContainer(banner));
+                        }
+                    });
+                }
+
+                // Render cloud storage ad at the bottom
+                const horizontalContainer = document.querySelector('.horizontal-container');
+                if (data.cloud_storage && data.cloud_storage.length > 0) {
+                    const storage = data.cloud_storage[0];
+                    if (storage.banners && storage.banners.length > 0) {
+                        // Find the best banner size for the container (600px width)
+                        const banner = findClosestBanner(storage.banners, 600);
+                        if (banner) {
+                            const adContainer = document.createElement('div');
+                            adContainer.className = 'ad-container';
+                            // Replace any fixed widths in the banner HTML with 100%
+                            let html = banner.html.replace(/width=["']\d+["']/g, 'width="100%"');
+                            html = html.replace(/width:\s*\d+px/g, 'width:100%');
+                            adContainer.innerHTML = html;
+                            horizontalContainer.innerHTML = '';
+                            horizontalContainer.appendChild(adContainer);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading ads:', error);
+            }
+        }
+
+        // Load ads when the page loads
+        window.addEventListener('load', loadAds);
+
+        const startTimeInput = document.getElementById('startTime');
+        const endTimeInput = document.getElementById('endTime');
+
+        let isDragging = false;
+        let currentHandle = null;
+        const TOTAL_SECONDS = 300; // 5 minutes in seconds
+        const MAX_CLIP_DURATION = 900; // 15 minutes in seconds
+
+        function parseTimeToSeconds(timeStr) {
+            const [hours, minutes, seconds] = timeStr.split(':').map(Number);
+            return hours * 3600 + minutes * 60 + seconds;
+        }
+
+        function formatTime(seconds) {
+            const hrs = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function formatDurationShortWords(seconds) {
+            // If over 1 hour, just show total minutes and seconds
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            let result = '';
+            if (mins > 0) {
+                result += mins + ' min';
+            }
+            if (secs > 0 || mins === 0) {
+                if (result) result += ' ';
+                result += secs + ' sec';
+            }
+            return result;
+        }
+
+        function updateDuration() {
+            const startInput = startTimeInput.value.trim();
+            const endInput = endTimeInput.value.trim();
+
+            // Only update if both inputs are in the correct format
+            if (startInput.split(':').length === 3 && endInput.split(':').length === 3) {
+                const startSeconds = parseTimeToSeconds(startInput);
+                const endSeconds = parseTimeToSeconds(endInput);
+                const durationSeconds = Math.max(0, endSeconds - startSeconds);
+                document.getElementById('durationTime').textContent = formatDurationShortWords(durationSeconds);
+                // Show warning if over max duration
+                const formError = document.getElementById('formError');
+                if (durationSeconds > MAX_CLIP_DURATION) {
+                    formError.textContent = 'Maximum allowed clip length is 15 minutes.';
+                    formError.style.display = 'block';
+                } else {
+                    formError.style.display = 'none';
+                }
+            }
+        }
+
+
+        function validateTimeInputs() {
+            const startSeconds = parseTimeToSeconds(startTimeInput.value);
+            const endSeconds = parseTimeToSeconds(endTimeInput.value);
+
+            if (startSeconds > TOTAL_SECONDS) {
+                startTimeInput.value = formatTime(TOTAL_SECONDS);
+            }
+            if (endSeconds > TOTAL_SECONDS) {
+                endTimeInput.value = formatTime(TOTAL_SECONDS);
+            }
+
+            if (startSeconds > endSeconds) {
+                if (currentHandle === startHandle) {
+                    endTimeInput.value = startTimeInput.value;
+                    updateHandleFromTime(endTimeInput.value, endHandle);
+                } else {
+                    startTimeInput.value = endTimeInput.value;
+                    updateHandleFromTime(startTimeInput.value, startHandle);
+                }
+            }
+            updateDuration();
+        }
+
+
+
+        function validateTimeFormat(timeStr) {
+            const timeRegex = /^([0-1]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/;
+            return timeRegex.test(timeStr);
+        }
+
+        [startTimeInput, endTimeInput].forEach(input => {
+            input.addEventListener('keyup', (e) => {
+                let value = e.target.value;
+
+                // Auto-add colons if they're missing
+                if (value.length === 2 || value.length === 5) {
+                    value += ':';
+                    e.target.value = value;
+                }
+
+                // Try to update duration if we have a complete time format
+                if (value.split(':').length === 3) {
+                    updateDuration();
+                }
+            });
+
+            input.addEventListener('change', (e) => {
+                let value = e.target.value;
+                if (!validateTimeFormat(value)) {
+                    value = '00:00:00';
+                    e.target.value = value;
+                }
+                updateDuration();
+            });
+
+            // Also update duration when input loses focus
+            input.addEventListener('blur', () => {
+                updateDuration();
+            });
+        });
+
+
+        updateDuration();
+
+        const pasteBtn = document.querySelector('.paste-btn');
+        const videoUrlInput = document.getElementById('videoUrl');
+
+        pasteBtn.addEventListener('click', async () => {
+            if (navigator.clipboard && navigator.clipboard.readText) {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    videoUrlInput.value = text;
+                } catch (err) {
+                    showPasteFallback();
+                }
+            } else {
+                showPasteFallback();
+            }
+        });
+        function showPasteFallback() {
+            if (window.innerWidth <= 768) {
+                alert('Paste is not supported on your device/browser. Please long-press the input field and select Paste.');
+            } else {
+                alert('Clipboard access is not available. Please use Ctrl+V or right-click to paste.');
+            }
+        }
+
+        let isDownloading = false;
+        let errorActive = false;
+        let processCompleted = false;
+        let fadeOutTimeoutId = null;
+
+function showLoading(text, opts = {}) {
+    if (errorActive) return;
+    progressLabel.innerHTML = '';
+    progressLabel.classList.remove('pulse-text', 'animated-ellipsis', 'truncate');
+    progressLabel.style.color = '';
+    progressLabel.style.opacity = 1;
+    progressFill.classList.add('connecting');
+    let labelText = document.createElement('span');
+    labelText.className = 'label-text';
+    if (opts.titleLine) {
+        // Two-line label: main text, then title
+        const mainLine = document.createElement('span');
+        mainLine.textContent = text;
+        if (opts.animated) {
+            mainLine.classList.add('pulse-text', 'animated-ellipsis');
+        }
+        labelText.appendChild(mainLine);
+        const titleLine = document.createElement('span');
+        titleLine.className = 'truncate-title';
+        titleLine.textContent = opts.titleLine;
+        titleLine.title = opts.titleLine;
+        labelText.appendChild(titleLine);
+    } else {
+        const mainLine = document.createElement('span');
+        mainLine.textContent = text;
+        if (opts.animated) {
+            mainLine.classList.add('pulse-text', 'animated-ellipsis');
+        }
+        labelText.appendChild(mainLine);
+    }
+    progressLabel.appendChild(labelText);
+    progressValue.innerHTML = `<span class="loader"></span>`;
+    progressValue.style.color = '';
+    progressValue.style.opacity = 1;
+}
+function showSuccess(text) {
+    // Only replace the loader with the green check, keep the text as is
+    // If progressValue contains the loader, replace it with the check
+    if (progressValue.querySelector('.loader')) {
+        progressValue.innerHTML = `<span class="success-check">&#10003;</span>`;
+    }
+    progressValue.style.color = '#16a34a';
+    progressValue.style.opacity = 1;
+    progressFill.classList.remove('connecting');
+    // Only update the text if provided
+    if (text !== undefined && text !== null) {
+        progressLabel.textContent = text;
+        progressLabel.style.color = '#16a34a'; // green
+        progressLabel.style.opacity = 1;
+    }
+}
+function fadeOutText(element, callback) {
+    element.style.transition = 'opacity 3s';
+    element.style.opacity = 0;
+    if (fadeOutTimeoutId) clearTimeout(fadeOutTimeoutId);
+    fadeOutTimeoutId = setTimeout(() => {
+        element.style.transition = '';
+        if (processCompleted) return;
+        if (!errorActive && callback) callback();
+    }, 3000);
+}
+function showError(text) {
+    progressLabel.textContent = text; // Show the error message itself
+    progressLabel.style.color = '#dc2626';
+    progressValue.textContent = text;
+    progressValue.style.color = '#dc2626';
+    progressFill.classList.remove('connecting');
+    progressFill.style.width = '0%';
+}
+/*
+.loader {
+  border: 3px solid #e2e8f0;
+  border-top: 3px solid #4a5568;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+.success-check {
+  color: #16a34a;
+  font-size: 1.5em;
+  vertical-align: middle;
+}
+*/
+
+const progressBar = document.querySelector('.progress-bar');
+const progressFill = document.querySelector('.progress-fill');
+const progressValue = document.querySelector('.progress-value');
+const progressLabel = document.querySelector('.progress-bar-label span:first-child');
+const downloadBtn = document.querySelector('.download-btn');
+
+document.getElementById('clipForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Validate required fields
+    const url = videoUrlInput.value.trim();
+    const start = startTimeInput.value.trim();
+    const end = endTimeInput.value.trim();
+    const formError = document.getElementById('formError');
+    formError.style.display = 'none';
+    formError.textContent = '';
+    if (!url || !start || !end) {
+        formError.textContent = 'Please fill in the video URL, start time, and end time.';
+        formError.style.display = 'block';
+        return;
+    }
+
+    const startSeconds = parseTimeToSeconds(start);
+    const endSeconds = parseTimeToSeconds(end);
+    const durationSeconds = Math.max(0, endSeconds - startSeconds);
+    if (durationSeconds > MAX_CLIP_DURATION) {
+        formError.textContent = 'Maximum allowed clip length is 15 minutes.';
+        formError.style.display = 'block';
+        return;
+    }
+
+    if (isDownloading) {
+        alert('A download is already in progress. Please wait until it completes.');
+        return;
+    }
+
+    document.getElementById('progressError').style.display = 'none';
+    document.getElementById('progressError').textContent = '';
+
+    const videoUrl = document.getElementById('videoUrl').value.trim();
+    const clipStart = document.getElementById('startTime').value;
+    const clipEnd = document.getElementById('endTime').value;
+    const quality = document.getElementById('videoQuality').value;
+    isDownloading = true;
+    processCompleted = false;
+    progressBar.style.display = 'block';
+    progressFill.classList.add('connecting');
+    progressFill.style.width = '0%';
+    showLoading('Fetching video information', { animated: true });
+
+    try {
+        // Submit request
+        const response = await fetch('/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ videoUrl, clipStart, clipEnd, quality })
+        });
+
+        if (response.status === 429) {
+            // Show error only once on the left (progress bar label)
+            progressLabel.textContent = 'You have reached the maximum number of requests. Please try again later.';
+            progressLabel.style.color = '#dc2626';
+            progressValue.textContent = '';
+            progressValue.style.color = '';
+            progressFill.classList.remove('connecting');
+            progressFill.style.width = '0%';
+            progressBar.style.display = 'block';
+            document.getElementById('progressError').style.display = 'none';
+            document.getElementById('progressError').textContent = '';
+            downloadBtn.style.backgroundColor = '#1a202c';
+            isDownloading = false;
+            alert('You have reached the maximum number of requests. Please try again later.');
+            return;
+        }
+
+        const data = await response.json();
+
+        if (data.status === 'error') {
+            throw new Error(data.message || 'Failed to process video');
+        }
+
+        // Connect to SSE endpoint for progress updates
+        const eventSource = new EventSource(`/progress/${data.processId}`);
+
+        let gotTitle = false;
+        let gotProgress = false;
+        let videoTitle = '';
+
+        eventSource.addEventListener('title', (event) => {
+            const eventData = JSON.parse(event.data);
+            videoTitle = eventData.title || '';
+            showSuccess('Fetching video information');
+            fadeOutText(progressLabel, () => {
+                // After fade out, show new text and reset opacity
+                showLoading('Extracting the required clip from:', {
+                    animated: true,
+                    titleLine: videoTitle
+                });
+                progressLabel.style.opacity = 1;
+            });
+        });
+
+        eventSource.addEventListener('progress', (event) => {
+            const eventData = JSON.parse(event.data);
+            if (!gotProgress) {
+                gotProgress = true;
+                showSuccess('Clip is ready to process');
+                fadeOutText(progressLabel, () => {
+                    if (processCompleted) return;
+                    // Animate the text with pulse and animated-ellipsis
+                    progressLabel.innerHTML = '';
+                    progressLabel.classList.remove('pulse-text', 'animated-ellipsis', 'truncate');
+                    const mainLine = document.createElement('span');
+                    mainLine.textContent = 'Processing the required clip';
+                    mainLine.classList.add('pulse-text', 'animated-ellipsis');
+                    progressLabel.appendChild(mainLine);
+                    progressLabel.style.color = '';
+                    progressValue.innerHTML = '';
+                    progressValue.style.color = '';
+                    progressFill.classList.remove('connecting');
+                    progressLabel.style.opacity = 1;
+                });
+            }
+            // Update progress bar
+            if (processCompleted) return;
+            const percent = parseInt(eventData.progress, 10) || 0;
+            progressFill.style.width = `${percent}%`;
+            progressValue.textContent = `${percent}%`;
+        });
+
+        eventSource.addEventListener('complete', (event) => {
+            processCompleted = true;
+            if (fadeOutTimeoutId) clearTimeout(fadeOutTimeoutId);
+            const eventData = JSON.parse(event.data);
+            progressFill.style.width = '100%';
+            progressLabel.textContent = 'Process complete';
+            progressValue.innerHTML = '<span class="pulse-text animated-ellipsis">Download starting</span>';
+            // Show animated message above the progress bar
+            const completeMsg = document.getElementById('progressCompleteMsg');
+            completeMsg.style.display = 'block';
+            setTimeout(() => { completeMsg.style.opacity = 1; }, 10);
+            setTimeout(() => { completeMsg.style.opacity = 0; }, 3500);
+            setTimeout(() => { completeMsg.style.display = 'none'; }, 4200);
+            eventSource.close();
+            // Trigger download prompt
+            const a = document.createElement('a');
+            a.href = eventData.downloadUrl;
+            a.download = '';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            downloadBtn.style.backgroundColor = '#1a202c';
+            isDownloading = false;
+            // Only reset the progress fill, keep the label and value visible
+            setTimeout(() => {
+                progressFill.style.width = '0%';
+                // Do NOT hide the progress bar or clear the label/value
+            }, 3000);
+        });
+
+        eventSource.addEventListener('error', (event) => {
+            let msg = 'Failed to process video';
+            try {
+                const eventData = JSON.parse(event.data);
+                msg = eventData.message || msg;
+            } catch {}
+            errorActive = true;
+            // Show error only above the progress bar
+            document.getElementById('progressError').textContent = msg;
+            document.getElementById('progressError').style.display = 'block';
+            // Keep the progress bar label as 'Processing Clip' (or leave unchanged)
+            progressLabel.textContent = 'Processing Clip';
+            progressLabel.style.color = '';
+            progressValue.textContent = '';
+            progressValue.style.color = '';
+            progressFill.classList.remove('connecting');
+            progressFill.style.width = '0%';
+            progressBar.style.display = 'block';
+            eventSource.close();
+            downloadBtn.style.backgroundColor = '#1a202c';
+            isDownloading = false;
+            alert(msg);
+        });
+
+    } catch (error) {
+        showError(error.message);
+        downloadBtn.style.backgroundColor = '#1a202c';
+        isDownloading = false;
+    }
+});
+    </script>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>VideoClipper</h3>
+                <p>Trim, clip, and save the best moments from any video link. Fast, free, and works in your browser.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="/">Home</a>
+                <a href="/contact">Contact</a>
+                <a href="/supported-sites">Supported Sites</a>
+                <a href="/faq">FAQ</a>
+                <a href="/terms">Terms</a>
+                <a href="/privacy">Privacy</a>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <a href="/terms">Terms of Service</a>
+                <a href="/privacy">Privacy Policy</a>
+                <p class="visually-hidden">All trademarks and copyrights belong to their respective owners. VideoClipper does not host any copyrighted content.</p>
+            </div>
+        </div>
+    </footer>
+    <!-- Floating Contact Button -->
+    <button id="floatingContactBtn" class="floating-contact-btn">Contact</button>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="contact-modal">
+        <div class="contact-modal-content">
+            <h2>Quick Contact</h2>
+            <form id="miniContactForm">
+                <label for="miniEmail">Email (optional)</label>
+                <input type="email" id="miniEmail" name="miniEmail" placeholder="your@email.com">
+                <label for="miniMessage">Message *</label>
+                <textarea id="miniMessage" name="miniMessage" rows="3" placeholder="Your message..." required></textarea>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+    <!-- Include shared.js for common functionality including the floating contact button -->
+    <script src="/static/shared.js"></script>
+    
+    
+</body>
+
+</html>

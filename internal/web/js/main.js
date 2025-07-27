@@ -53,10 +53,33 @@ function setupMobileMenu() {
     }
 }
 
+
 // Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     // Update paths in the header
     updateHeaderPaths();
+    
+    // Adjust side ads on load, window resize, and scroll
+    if (document.querySelector('.video-clipper')) {
+        adjustSideAds();
+        window.addEventListener('resize', adjustSideAds);
+        // Add scroll event listener to ensure ads stay fixed
+        window.addEventListener('scroll', function() {
+            // Re-apply fixed positioning on scroll
+            const leftAd = document.querySelector('.ad-left');
+            const rightAd = document.querySelector('.ad-right');
+            
+            if (leftAd) {
+                leftAd.style.position = 'fixed';
+                leftAd.style.zIndex = '999';
+            }
+            
+            if (rightAd) {
+                rightAd.style.position = 'fixed';
+                rightAd.style.zIndex = '999';
+            }
+        });
+    }
     
     // Set active link in navigation
     setActiveLink();
