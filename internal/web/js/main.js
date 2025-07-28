@@ -1,22 +1,22 @@
 // Floating Button Component
 class FloatingButton {
-  constructor() {
-    this.initialized = false;
-  }
-
-  async init() {
-    if (this.initialized) return;
-    
-    // Create container if it doesn't exist
-    let container = document.getElementById('floating-button-container');
-    if (!container) {
-      container = document.createElement('div');
-      container.id = 'floating-button-container';
-      document.body.appendChild(container);
+    constructor() {
+        this.initialized = false;
     }
-    
-    // Add the floating button HTML
-    container.innerHTML = `
+
+    async init() {
+        if (this.initialized) return;
+
+        // Create container if it doesn't exist
+        let container = document.getElementById('floating-button-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'floating-button-container';
+            document.body.appendChild(container);
+        }
+
+        // Add the floating button HTML
+        container.innerHTML = `
       <button id="contact-float" class="floating-button" aria-label="Contact Us">
           <i class="fas fa-envelope"></i>
           <span>Contact Us</span>
@@ -46,22 +46,22 @@ class FloatingButton {
           </div>
       </div>
     `;
-    
-    // Add styles if they don't exist
-    this.addStyles();
-    
-    // Initialize event listeners
-    this.setupEventListeners();
-    this.initialized = true;
-  }
 
-  addStyles() {
-    // Only add styles if they haven't been added yet
-    if (document.getElementById('floating-button-styles')) return;
+        // Add styles if they don't exist
+        this.addStyles();
 
-    const style = document.createElement('style');
-    style.id = 'floating-button-styles';
-    style.textContent = `
+        // Initialize event listeners
+        this.setupEventListeners();
+        this.initialized = true;
+    }
+
+    addStyles() {
+        // Only add styles if they haven't been added yet
+        if (document.getElementById('floating-button-styles')) return;
+
+        const style = document.createElement('style');
+        style.id = 'floating-button-styles';
+        style.textContent = `
       /* Floating Button Styles */
       #floating-button-container .floating-button {
           position: fixed !important;
@@ -239,77 +239,77 @@ class FloatingButton {
           }
       }
     `;
-    document.head.appendChild(style);
-  }
+        document.head.appendChild(style);
+    }
 
-  setupEventListeners() {
-    const contactFloat = document.getElementById('contact-float');
-    const contactModal = document.getElementById('contact-modal');
-    const closeModal = document.querySelector('.close-modal');
-    const modalForm = document.getElementById('modal-contact-form');
+    setupEventListeners() {
+        const contactFloat = document.getElementById('contact-float');
+        const contactModal = document.getElementById('contact-modal');
+        const closeModal = document.querySelector('.close-modal');
+        const modalForm = document.getElementById('modal-contact-form');
 
-    if (contactFloat && contactModal) {
-      // Open modal
-      contactFloat.addEventListener('click', (e) => {
+        if (contactFloat && contactModal) {
+            // Open modal
+            contactFloat.addEventListener('click', (e) => {
+                e.preventDefault();
+                contactModal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            });
+
+            // Close modal
+            if (closeModal) {
+                closeModal.addEventListener('click', () => this.closeModal(contactModal));
+            }
+
+            // Close when clicking outside
+            contactModal.addEventListener('click', (e) => {
+                if (e.target === contactModal) {
+                    this.closeModal(contactModal);
+                }
+            });
+
+            // Close with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && contactModal.classList.contains('show')) {
+                    this.closeModal(contactModal);
+                }
+            });
+
+            // Form submission
+            if (modalForm) {
+                modalForm.addEventListener('submit', (e) => this.handleFormSubmit(e, modalForm, contactModal));
+            }
+        }
+    }
+
+    closeModal(modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    async handleFormSubmit(e, form, modal) {
         e.preventDefault();
-        contactModal.classList.add('show');
-        document.body.style.overflow = 'hidden';
-      });
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
 
-      // Close modal
-      if (closeModal) {
-        closeModal.addEventListener('click', () => this.closeModal(contactModal));
-      }
-
-      // Close when clicking outside
-      contactModal.addEventListener('click', (e) => {
-        if (e.target === contactModal) {
-          this.closeModal(contactModal);
+        try {
+            // Here you would typically send the data to your server
+            console.log('Form submitted:', data);
+            alert('Thank you for your message! We will get back to you soon.');
+            form.reset();
+            this.closeModal(modal);
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            alert('There was an error sending your message. Please try again.');
         }
-      });
-
-      // Close with Escape key
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && contactModal.classList.contains('show')) {
-          this.closeModal(contactModal);
-        }
-      });
-
-      // Form submission
-      if (modalForm) {
-        modalForm.addEventListener('submit', (e) => this.handleFormSubmit(e, modalForm, contactModal));
-      }
     }
-  }
-
-  closeModal(modal) {
-    modal.classList.remove('show');
-    document.body.style.overflow = '';
-  }
-
-  async handleFormSubmit(e, form, modal) {
-    e.preventDefault();
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData);
-
-    try {
-      // Here you would typically send the data to your server
-      console.log('Form submitted:', data);
-      alert('Thank you for your message! We will get back to you soon.');
-      form.reset();
-      this.closeModal(modal);
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('There was an error sending your message. Please try again.');
-    }
-  }
 }
 
 // Function to update paths in the header
 function updateHeaderPaths() {
     const isInPagesDir = window.location.pathname.includes('/pages/');
     const basePath = isInPagesDir ? '../' : '';
-    
+
     // Update logo and navigation links
     const logoLink = document.querySelector('.logo a[data-base-href]');
     if (logoLink) {
@@ -317,7 +317,7 @@ function updateHeaderPaths() {
         const logoImg = document.getElementById('header-logo');
         if (logoImg) logoImg.src = basePath + 'images/scissors.svg';
     }
-    
+
     // Update navigation links
     document.querySelectorAll('.nav-link').forEach(link => {
         const page = link.getAttribute('data-page');
@@ -326,7 +326,7 @@ function updateHeaderPaths() {
             link.href = basePath + path;
         }
     });
-    
+
     // Set active link
     setActiveLink();
 }
@@ -335,10 +335,10 @@ function updateHeaderPaths() {
 function setActiveLink() {
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     const pageName = currentPage.replace('.html', '');
-    
+
     document.querySelectorAll('.nav-link').forEach(link => {
         const linkPage = link.getAttribute('data-page');
-        if ((pageName === 'index' && linkPage === 'home') || 
+        if ((pageName === 'index' && linkPage === 'home') ||
             (pageName === linkPage)) {
             link.classList.add('active');
         } else {
@@ -351,7 +351,7 @@ function setActiveLink() {
 function setupMobileMenu() {
     const toggle = document.querySelector('.mobile-menu-toggle');
     const nav = document.querySelector('.nav-links');
-    
+
     if (toggle && nav) {
         toggle.addEventListener('click', () => {
             nav.classList.toggle('active');
@@ -365,38 +365,38 @@ function setupMobileMenu() {
 const floatingButton = new FloatingButton();
 
 // Initialize everything when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Update paths in the header
     updateHeaderPaths();
-    
+
     // Adjust side ads on load, window resize, and scroll
     if (document.querySelector('.video-clipper')) {
         adjustSideAds();
         window.addEventListener('resize', adjustSideAds);
         // Add scroll event listener to ensure ads stay fixed
-        window.addEventListener('scroll', function() {
+        window.addEventListener('scroll', function () {
             // Re-apply fixed positioning on scroll
             const leftAd = document.querySelector('.ad-left');
             const rightAd = document.querySelector('.ad-right');
-            
+
             if (leftAd) {
                 leftAd.style.position = 'fixed';
                 leftAd.style.zIndex = '999';
             }
-            
+
             if (rightAd) {
                 rightAd.style.position = 'fixed';
                 rightAd.style.zIndex = '999';
             }
         });
     }
-    
+
     // Set active link in navigation
     setActiveLink();
-    
+
     // Setup mobile menu
     setupMobileMenu();
-    
+
     // Initialize the floating button component if not already initialized
     if (!floatingButton.initialized) {
         floatingButton.init();
@@ -404,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Also try to initialize the floating button when the window is fully loaded
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
     if (!floatingButton.initialized) {
         floatingButton.init();
     }
@@ -417,15 +417,15 @@ function setupMobileMenu() {
     const body = document.body;
 
     if (menuToggle && navLinks) {
-        menuToggle.addEventListener('click', function() {
+        menuToggle.addEventListener('click', function () {
             this.classList.toggle('active');
             navLinks.classList.toggle('active');
             body.classList.toggle('menu-open');
-            
+
             // Toggle aria-expanded
             const expanded = this.getAttribute('aria-expanded') === 'true' || false;
             this.setAttribute('aria-expanded', !expanded);
-            
+
             // Toggle menu text
             const menuText = document.querySelector('.menu-text');
             if (menuText) {
@@ -436,7 +436,7 @@ function setupMobileMenu() {
         // Close menu when clicking on a nav link
         const navItems = document.querySelectorAll('.nav-links a');
         navItems.forEach(item => {
-            item.addEventListener('click', function() {
+            item.addEventListener('click', function () {
                 menuToggle.classList.remove('active');
                 navLinks.classList.remove('active');
                 body.classList.remove('menu-open');
@@ -450,20 +450,20 @@ function setupMobileMenu() {
 function setActiveLink() {
     const currentLocation = window.location.pathname;
     const navLinks = document.querySelectorAll('.nav-links .nav-link');
-    
+
     // Get the current page filename
     const currentPage = currentLocation.split('/').pop() || 'index.html';
-    
+
     navLinks.forEach(link => {
         // Remove active class from all links
         link.classList.remove('active');
-        
+
         // Get the link's target page
         const linkHref = link.getAttribute('href');
         const linkPage = linkHref.split('/').pop();
-        
+
         // Add active class if this link's page matches the current page
-        if ((currentPage === '' && linkPage === 'index.html') || 
+        if ((currentPage === '' && linkPage === 'index.html') ||
             (currentPage === linkPage) ||
             (currentPage === '' && linkHref.endsWith('/'))) {
             link.classList.add('active');
@@ -475,10 +475,10 @@ function setActiveLink() {
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
-        
+
         const targetId = this.getAttribute('href');
         if (targetId === '#') return;
-        
+
         const targetElement = document.querySelector(targetId);
         if (targetElement) {
             // Calculate the offset based on the header height
@@ -492,4 +492,273 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             });
         }
     });
+});
+
+// Function to shuffle an array using Fisher-Yates algorithm
+function shuffleArray(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+}
+
+// Function to rotate content
+function rotateContent() {
+    // Get DOM elements
+    const leftPanel = document.querySelector('.box-left');
+    const rightPanel = document.querySelector('.box-right');
+    const bottomContainer = document.querySelector('.tool-suggestion .suggestion-content');
+    
+    // Initialize content arrays if they don't exist
+    if (!window.contentRotation) {
+        // Make sure we have at least 2 items for side content
+        let sideItems = [...contentSuggestions.sides];
+        if (sideItems.length === 1) {
+            // If only one item, duplicate it to ensure both sides have content
+        }
+        // Shuffle function for one-time initialization
+        const shuffleArray = (array) => {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        };
+        
+        // Create pairs of ads that will always appear together
+        const createAdPairs = (items) => {
+            const pairs = [];
+            for (let i = 0; i < items.length; i += 2) {
+                const pair = [items[i]];
+                if (i + 1 < items.length) {
+                    pair.push(items[i + 1]);
+                } else {
+                    // If odd number of items, duplicate the last item to make a pair
+                    pair.push({...items[i]});
+                }
+                pairs.push(pair);
+            }
+            return pairs;
+        };
+        
+        // Initialize content rotation with ad pairs
+        window.contentRotation = {
+            isRotating: false,
+            // Store original items for reference
+            originalSideItems: [...sideItems],
+            // Create pairs that will always appear together
+            adPairs: createAdPairs(sideItems),
+            // Track current pair index
+            currentPairIndex: 0,
+            // Bottom content
+            bottomContent: [...contentSuggestions.bottom],
+            currentBottomIndex: 0,
+            intervalId: null,
+            interval: 5000 // 5 seconds
+        };
+    }
+    
+    // Don't start a new rotation if one is already in progress
+    if (window.contentRotation.isRotating) return;
+    window.contentRotation.isRotating = true;
+    
+    // Function to update a single panel with smooth crossfade
+    const updatePanel = (panel, content) => {
+        return new Promise((resolve) => {
+            if (!panel) {
+                resolve();
+                return;
+            }
+            
+            // Create container for new content
+            const newContent = document.createElement('div');
+            newContent.className = 'content-item';
+            newContent.style.cssText = 'opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;';
+            
+            // Create inner container for consistent sizing
+            const innerContainer = document.createElement('div');
+            innerContainer.style.cssText = 'max-width: 100%; max-height: 100%; width: 100%; padding: 10px; box-sizing: border-box;';
+            innerContainer.innerHTML = content;
+            
+            // Ensure images maintain aspect ratio
+            const images = innerContainer.getElementsByTagName('img');
+            Array.from(images).forEach(img => {
+                img.style.maxWidth = '100%';
+                img.style.maxHeight = '100%';
+                img.style.width = 'auto';
+                img.style.height = 'auto';
+                img.style.objectFit = 'contain';
+                img.style.display = 'block';
+                img.style.margin = '0 auto';
+            });
+            
+            newContent.appendChild(innerContainer);
+            panel.appendChild(newContent);
+            
+            // Force reflow to ensure new content is in the DOM
+            void newContent.offsetHeight;
+            
+            // Fade in new content
+            newContent.style.transition = 'opacity 0.5s ease';
+            newContent.style.opacity = '1';
+            
+            // Fade out and remove current content if it exists
+            const currentContent = panel.querySelector('.content-item:not([style*="opacity: 0"])');
+            if (currentContent && currentContent !== newContent) {
+                currentContent.style.transition = 'opacity 0.5s ease';
+                currentContent.style.opacity = '0';
+                
+                // Remove old content after transition
+                currentContent.addEventListener('transitionend', function handler() {
+                    if (currentContent.parentNode === panel) {
+                        panel.removeChild(currentContent);
+                    }
+                    currentContent.removeEventListener('transitionend', handler);
+                    resolve();
+                }, { once: true });
+            } else {
+                resolve();
+            }
+        });
+    };
+    
+    // Rotate side content with consistent pairs
+    const rotateSideContent = () => {
+        const { adPairs } = window.contentRotation;
+        
+        // Get the current pair of ads
+        const currentPair = adPairs[window.contentRotation.currentPairIndex];
+        
+        if (!currentPair) {
+            window.contentRotation.isRotating = false;
+            return;
+        }
+        
+        // Update both panels with the current pair
+        Promise.all([
+            leftPanel ? updatePanel(leftPanel, currentPair[0]?.html) : Promise.resolve(),
+            rightPanel ? updatePanel(rightPanel, currentPair[1]?.html) : Promise.resolve()
+        ]).then(() => {
+            // Move to next pair for next rotation
+            window.contentRotation.currentPairIndex = 
+                (window.contentRotation.currentPairIndex + 1) % adPairs.length;
+            
+            // If we've shown all pairs, reshuffle the pairs
+            if (window.contentRotation.currentPairIndex === 0) {
+                // Create new pairs from the original items
+                window.contentRotation.adPairs = createAdPairs(
+                    shuffleArray([...window.contentRotation.originalSideItems])
+                );
+            }
+            
+            // Rotate bottom content
+            rotateBottomContent();
+            
+        }).catch(error => {
+            console.error('Rotation error:', error);
+            window.contentRotation.isRotating = false;
+        });
+    };
+    
+    // Rotate bottom content
+    const rotateBottomContent = () => {
+        if (bottomContainer && window.contentRotation.bottomContent.length > 0) {
+            // First fade out (slower fade out) and update content immediately
+            bottomContainer.style.transition = 'opacity 1.5s ease-out';
+            bottomContainer.style.opacity = '0';
+            
+            // Update content immediately after starting fade out
+            const currentContent = window.contentRotation.bottomContent[window.contentRotation.currentBottomIndex];
+            if (currentContent?.html) {
+                bottomContainer.style.display = 'flex';
+                bottomContainer.innerHTML = `<div class="content-item">${currentContent.html}</div>`;
+                bottomContainer.style.transition = 'opacity 0s, transform 0s';
+                bottomContainer.style.opacity = '0';
+                bottomContainer.style.transform = 'translateY(10px)';
+            }
+            
+            // After fade out completes, start fade in
+            setTimeout(() => {
+                if (!bottomContainer) {
+                    window.contentRotation.isRotating = false;
+                    return;
+                }
+                
+                if (!currentContent?.html) {
+                    bottomContainer.style.display = 'none';
+                    window.contentRotation.isRotating = false;
+                    return;
+                }
+                
+                // Force reflow
+                void bottomContainer.offsetHeight;
+                
+                // Fade in with slide up
+                bottomContainer.style.opacity = '1';
+                bottomContainer.style.transform = 'translateY(0)';
+                
+                // Update index for next rotation
+                window.contentRotation.currentBottomIndex = (window.contentRotation.currentBottomIndex + 1) % window.contentRotation.bottomContent.length;
+                
+                // If we've gone through all bottom content, reshuffle for the next round
+                if (window.contentRotation.currentBottomIndex === 0) {
+                    window.contentRotation.bottomContent = shuffleArray([...contentSuggestions.bottom]);
+                }
+                
+                // Reset rotation flag after all animations complete
+                setTimeout(() => {
+                    window.contentRotation.isRotating = false;
+                }, 500);
+            }, 1500); // Wait for fade out to complete (1.5s)
+        } else {
+            if (bottomContainer) {
+                bottomContainer.style.display = 'none';
+            }
+            window.contentRotation.isRotating = false;
+        }
+    };
+    
+    // Start the rotation sequence
+    rotateSideContent();
+}
+
+// Content suggestions data
+const contentSuggestions = {
+    sides: [
+        {
+            html: "<a href=\"https://www.mvvitrk.com/bDig55\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753699762/300x600_tazs11.png\" alt=\"\" style=\"width: 100%; height: 100%; object-fit: contain;\"></a>"
+        },
+        {
+            html: "<a href=\"https://akool.com/?via=mh1619\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753718205/screen-0_cbfutf.jpg\" alt=\"\" style=\"width: 100%; height: 100%; object-fit: contain;\"></a>"
+        },
+        {
+            html: "<a href=\"https://flixier.com?fpr=mh1619\" target=\"_blank\"><img src=\"https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24623/120x600px-4.png\" alt=\"\" style=\"width: 100%; height: 100%; object-fit: contain;\"></a>"
+        },
+        {
+            html: "<a rel=\"sponsored\" href=\"https://renderforest.pxf.io/c/6416428/1957251/14885\" target=\"_top\" id=\"1957251\"><img src=\"https://a.impactradius-go.com/display-ad/14885-1957251\" alt=\"\" style=\"width: 100%; height: 100%; object-fit: contain;\"></a>"
+        }
+    ],
+    bottom: [
+        {
+            html: "<a href=\"https://partner.pcloud.com/r/146969\" title=\"pCloud Premium\" target=\"_blank\"><img src=\"https://partner.pcloud.com/media/banners/lifetime/lifetime0111200628.jpg\" alt=\"\" style=\"width: 100%; max-height: 90px; object-fit: contain;\"/></a>"
+        },
+        {
+            html: "<a href=\"https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902\" target=\"_blank\" rel=\"sponsored\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753394990/728x90_baajhd.png\" alt=\"\" style=\"width: 100%; max-height: 90px; object-fit: contain;\" /></a>"
+        },
+        {
+            html: "<a href=\"https://privadovpn.com/getprivadovpn/#a_aid=1619\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753306325/728x90_c9y6b3.png\" alt=\"\" style=\"width: 100%; max-height: 90px; object-fit: contain;\"></a>"
+        }
+    ]
+};
+
+// Initialize content rotation when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', function () {
+    // Initial rotation
+    rotateContent();
+
+    // Set up interval for rotation (every 5 seconds)
+    setInterval(rotateContent, 5000);
 });
