@@ -544,20 +544,24 @@ function rotateContent() {
             return pairs;
         };
         
-        // Initialize content rotation with ad pairs
+        // Shuffle side and bottom ads once
+        const shuffledSideItems = shuffleArray([...sideItems]);
+        const shuffledBottomContent = shuffleArray([...contentSuggestions.bottom]);
+        
+        // Initialize content rotation with pre-shuffled ad pairs
         window.contentRotation = {
             isRotating: false,
-            // Store original items for reference
-            originalSideItems: [...sideItems],
-            // Create pairs that will always appear together
-            adPairs: createAdPairs(sideItems),
+            // Store shuffled items - these won't be re-shuffled
+            originalSideItems: [...shuffledSideItems],
+            // Create pairs from the pre-shuffled items
+            adPairs: createAdPairs([...shuffledSideItems]),
             // Track current pair index
             currentPairIndex: 0,
-            // Bottom content
-            bottomContent: [...contentSuggestions.bottom],
+            // Bottom content - use pre-shuffled array
+            bottomContent: [...shuffledBottomContent],
             currentBottomIndex: 0,
-            intervalId: null,
-            interval: 5000 // 5 seconds
+            // Remove reshuffling flag since we're not doing it anymore
+            isRotatingBottom: false
         };
     }
     
@@ -601,14 +605,14 @@ function rotateContent() {
             // Force reflow to ensure new content is in the DOM
             void newContent.offsetHeight;
             
-            // Fade in new content
-            newContent.style.transition = 'opacity 0.5s ease';
+            // Fade in new content (0.5s fade-in with ease-in timing function)
+            newContent.style.transition = 'opacity 0.5s ease-in';
             newContent.style.opacity = '1';
             
-            // Fade out and remove current content if it exists
+            // Fade out and remove current content if it exists (0.5s fade-out with ease-out timing function)
             const currentContent = panel.querySelector('.content-item:not([style*="opacity: 0"])');
             if (currentContent && currentContent !== newContent) {
-                currentContent.style.transition = 'opacity 0.5s ease';
+                currentContent.style.transition = 'opacity 0.5s ease-out';
                 currentContent.style.opacity = '0';
                 
                 // Remove old content after transition
@@ -646,13 +650,8 @@ function rotateContent() {
             window.contentRotation.currentPairIndex = 
                 (window.contentRotation.currentPairIndex + 1) % adPairs.length;
             
-            // If we've shown all pairs, reshuffle the pairs
-            if (window.contentRotation.currentPairIndex === 0) {
-                // Create new pairs from the original items
-                window.contentRotation.adPairs = createAdPairs(
-                    shuffleArray([...window.contentRotation.originalSideItems])
-                );
-            }
+            // No need to reshuffle, just loop back to the start
+            // We're using the same shuffled list for all rotations
             
             // Rotate bottom content
             rotateBottomContent();
@@ -703,10 +702,8 @@ function rotateContent() {
                 // Update index for next rotation
                 window.contentRotation.currentBottomIndex = (window.contentRotation.currentBottomIndex + 1) % window.contentRotation.bottomContent.length;
                 
-                // If we've gone through all bottom content, reshuffle for the next round
-                if (window.contentRotation.currentBottomIndex === 0) {
-                    window.contentRotation.bottomContent = shuffleArray([...contentSuggestions.bottom]);
-                }
+                // No need to reshuffle, just loop back to the start
+                // We're using the same shuffled list for all rotations
                 
                 // Reset rotation flag after all animations complete
                 setTimeout(() => {
@@ -743,7 +740,7 @@ const contentSuggestions = {
     ],
     bottom: [
         {
-            html: "<a href=\"https://partner.pcloud.com/r/146969\" title=\"pCloud Premium\" target=\"_blank\"><img src=\"https://partner.pcloud.com/media/banners/lifetime/lifetime0111200628.jpg\" alt=\"\" style=\"width: 100%; max-height: 90px; object-fit: contain;\"/></a>"
+            html: "<a href=\"https://partner.pcloud.com/r/146969\" title=\"pCloud Premium\" target=\"_blank\"><img src=\"https://partner.pcloud.com/media/banners/lifetime/lifetime00472890.jpg\" alt=\"pCloud Premium\"/></a>"
         },
         {
             html: "<a href=\"https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902\" target=\"_blank\" rel=\"sponsored\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753394990/728x90_baajhd.png\" alt=\"\" style=\"width: 100%; max-height: 90px; object-fit: contain;\" /></a>"
@@ -759,6 +756,56 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initial rotation
     rotateContent();
 
-    // Set up interval for rotation (every 5 seconds)
-    setInterval(rotateContent, 5000);
+    // Set up intervals for rotations
+    setInterval(rotateContent, 12000); // Side ads rotation (12 seconds)
+    
+    // Set up separate interval for bottom ads (every 10 seconds)
+    const rotateBottomContent = () => {
+        const bottomContainer = document.querySelector('.tool-suggestion .suggestion-content');
+        if (!bottomContainer || !window.contentRotation?.bottomContent?.length) return;
+        
+        if (window.contentRotation.isRotatingBottom) return;
+        window.contentRotation.isRotatingBottom = true;
+        
+        // Fade out
+        bottomContainer.style.transition = 'opacity 0.5s ease-out';
+        bottomContainer.style.opacity = '0';
+        
+        // Update content after fade out
+        setTimeout(() => {
+            const currentContent = window.contentRotation.bottomContent[window.contentRotation.currentBottomIndex];
+            if (currentContent?.html) {
+                bottomContainer.style.display = 'flex';
+                bottomContainer.innerHTML = `<div class="content-item">${currentContent.html}</div>`;
+                bottomContainer.style.transition = 'opacity 0s, transform 0s';
+                bottomContainer.style.opacity = '0';
+                bottomContainer.style.transform = 'translateY(10px)';
+                
+                // Force reflow
+                void bottomContainer.offsetHeight;
+                
+                // Fade in
+                bottomContainer.style.transition = 'opacity 0.5s ease-in, transform 0.5s ease-in';
+                bottomContainer.style.opacity = '1';
+                bottomContainer.style.transform = 'translateY(0)';
+                
+                // Update index for next rotation (loop back to start if we reach the end)
+                // We update it here but after a delay to ensure the current ad is shown
+                setTimeout(() => {
+                    window.contentRotation.currentBottomIndex = 
+                        (window.contentRotation.currentBottomIndex + 1) % window.contentRotation.bottomContent.length;
+                }, 100);
+            }
+            
+            window.contentRotation.isRotatingBottom = false;
+        }, 500); // Wait for fade out to complete
+    };
+    
+    // Initial bottom rotation
+    if (window.contentRotation) {
+        rotateBottomContent();
+    }
+    
+    // Set interval for bottom rotation (12 seconds)
+    setInterval(rotateBottomContent, 12000);
 });
