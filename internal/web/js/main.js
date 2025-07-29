@@ -740,7 +740,7 @@ const contentSuggestions = {
     ],
     bottom: [
         {
-            html: "<a href=\"https://partner.pcloud.com/r/146969\" title=\"pCloud Premium\" target=\"_blank\"><img src=\"https://partner.pcloud.com/media/banners/lifetime/lifetime00472890.jpg\" alt=\"pCloud Premium\"/></a>"
+            html: '<a href="https://partner.pcloud.com/r/146969" title="pCloud Premium" target="_blank"><img src="https://partner.pcloud.com/media/banners/personal/personal00272890.jpg" alt="pCloud Premium"/></a>'
         },
         {
             html: "<a href=\"https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902\" target=\"_blank\" rel=\"sponsored\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753394990/728x90_baajhd.png\" alt=\"\" style=\"width: 100%; max-height: 90px; object-fit: contain;\" /></a>"
@@ -809,3 +809,99 @@ document.addEventListener('DOMContentLoaded', function () {
     // Set interval for bottom rotation (12 seconds)
     setInterval(rotateBottomContent, 12000);
 });
+
+// Recommended tools data
+// Function to create a tool card element
+function createToolCard(tool) {
+    const card = document.createElement('div');
+    card.className = 'recommended-card';
+    
+    // Process description
+    const description = tool.description.trim();
+    const hasNewlines = description.includes('\n');
+    const descriptionHtml = hasNewlines 
+        ? description.split('\n').filter(line => line.trim() !== '').join('<br>')
+        : description;
+    
+    card.innerHTML = `
+        <div class="recommended-card-inner">
+            <a href="${tool.link}" target="_blank" rel="noopener noreferrer" class="recommended-image">
+                <img src="${tool.image}" alt="${tool.header}" loading="lazy">
+            </a>
+            <div class="recommended-content">
+                <h3>${tool.header}</h3>
+                <div class="recommended-desc">
+                    <p class="description">${descriptionHtml}</p>
+                </div>
+                <a href="${tool.link}" target="_blank" rel="noopener noreferrer" class="learn-more-btn">
+                    Learn More <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    `;
+    
+    // No need for Read More functionality anymore
+    
+    return card;
+}
+
+// Function to render recommended tools
+document.addEventListener('DOMContentLoaded', function() {
+    const recommendedGrid = document.querySelector('.recommended-grid');
+    
+    if (recommendedGrid) {
+        // Clear any existing content
+        recommendedGrid.innerHTML = '';
+        
+        // Create and append cards for each tool
+        recommended_tools.forEach(tool => {
+            const card = createToolCard(tool);
+            recommendedGrid.appendChild(card);
+        });
+    }
+});
+
+const recommended_tools = [
+    {
+        "header": "Your do-it-all video-making bundle",
+        "link": "https://www.mvvitrk.com/bDig55",
+        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/v1753291631/300x250_ewu5d8.png",
+        "description": "Auto subtitles with one click, ready-made templates\nHandy video editing, file conversion, and screen recording\nHundreds of drag-and-drop filters, transitions, titles, and overlays"
+    },
+    {
+        "header": "Transform Your Content with AI Magic",
+        "link": "https://akool.com/?via=mh1619",
+        "image": "https://pbs.twimg.com/media/GutshQgWUAA21xd?format=jpg&name=large",
+        "description": "Realistic face‑swaps, live avatars, and talking photos—just upload & go.\nTranslate & clone your voice into multilingual videos in seconds.\nPerfect for creators, marketers, and global campaigns."
+    },
+    {
+        "header": "Your Cloud-Powered Video Studio",
+        "link": "https://flixier.com?fpr=mh1619",
+        "image": "https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24598/300x160px.png",
+        "description": "AI subtitle, voiceover & translation tools—all built right into your browser.\nCloud rendering delivers full‑HD or 4K videos in minutes, no high-end PC needed.\nCollaborative editing, stock media & templates—team up and produce faster."
+    },
+    {
+        "header": "Bring Your Ideas to Life—Animated, Branded & Ready",
+        "link": "https://renderforest.pxf.io/c/6416428/1957251/14885",
+        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/v1753734800/1-300x250_upo9z2.jpg",
+        "description": "Pick a template, type your script, and let AI do the rest.\nCustomize colors, fonts & music with drag‑and‑drop ease.\nExport in HD or 4K with advanced features available on premium plans."
+    },
+    {
+        "header": "Smart Virtual Drive—Cloud Storage That Works Like Local",
+        "link": "https://partner.pcloud.com/r/146969",
+        "image": "https://partner.pcloud.com/media/banners/personal/personal008300250.jpg",
+        "description": "Start with free 10GB, expand easily, or lock in lifetime access for one fee.\nEnjoy built-in media streaming, automatic cross‑platform backups, and file previews.\nOptional Crypto encryption gives you exclusive control over sensitive files."
+    },
+    {
+        "header": "Trusted by Millions, Audited for Privacy – Take your online security to the next level with NordVPN",
+        "link": "https://go.nordvpn.net/aff_c?offer_id=15&aff_id=127970&url_id=902",
+        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/v1753303315/300x250_krlpqk.png",
+        "description": "Threat Protection Pro blocks malware, trackers, and phishing sites in real-time.\nDark Web Monitor alerts you if your credentials appear in data breaches.\nSplit tunneling, dedicated IP, and Meshnet secure all your devices—even across continents."
+    },
+    {
+        "header": "Budget VPN Built for Privacy & Streaming",
+        "link": "https://privadovpn.com/getprivadovpn/#a_aid=1619",
+        "image": "https://affiliates.privadovpn.com/accounts/default1/3abd4o9y/fb34eb50.png?t=1632790058",
+        "description": "Deep discounts with long-term plans: ultra-low pricing from $1.11/month*.\nReliable speeds for HD streaming and browsing on global servers.\nPremium features like unlimited devices, streaming unblock & ad blocking."
+    }
+];
