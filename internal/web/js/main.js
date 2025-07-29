@@ -746,7 +746,7 @@ const contentSuggestions = {
             html: "<a href=\"https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902\" target=\"_blank\" rel=\"sponsored\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753394990/728x90_baajhd.png\" alt=\"\" style=\"width: 100%; max-height: 90px; object-fit: contain;\" /></a>"
         },
         {
-            html: "<a href=\"https://privadovpn.com/getprivadovpn/#a_aid=1619\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753306325/728x90_c9y6b3.png\" alt=\"\" style=\"width: 100%; max-height: 90px; object-fit: contain;\"></a>"
+            html: "<a href=\"https://privadovpn.com/resources/best-vpn-for-gaming#a_aid=1619&a_bid=203d5f79\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753306325/728x90_c9y6b3.png\" alt=\"\" style=\"width: 100%; max-height: 90px; object-fit: contain;\"></a>"
         }
     ]
 };
@@ -824,10 +824,12 @@ function createToolCard(tool) {
         : description;
     
     card.innerHTML = `
-        <div class="recommended-card-inner">
-            <a href="${tool.link}" target="_blank" rel="noopener noreferrer" class="recommended-image">
-                <img src="${tool.image}" alt="${tool.header}" loading="lazy">
-            </a>
+        <div class="recommended-card-inner" style="width: 520px; max-width: 520px; padding: 0; margin: 0 auto; border-radius: 12px; overflow: hidden;">
+            <div class="recommended-image-container" style="width: 100%; padding: 0; background: transparent; box-sizing: border-box; display: flex; justify-content: center; align-items: center;">
+                <a href="${tool.link}" target="_blank" rel="noopener noreferrer" style="display: flex; justify-content: center; align-items: center; background: transparent; overflow: hidden; padding: 1rem;">
+                    <img src="${tool.image}" alt="${tool.header}" loading="lazy" style="max-width: 100%; max-height: 280px; width: auto; height: auto; object-fit: contain; display: block;">
+                </a>
+            </div>
             <div class="recommended-content">
                 <h3>${tool.header}</h3>
                 <div class="recommended-desc">
