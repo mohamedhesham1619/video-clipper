@@ -824,11 +824,13 @@ function createToolCard(tool) {
         : description;
     
     card.innerHTML = `
-        <div class="recommended-card-inner" style="width: 520px; max-width: 520px; padding: 0; margin: 0 auto; border-radius: 12px; overflow: hidden;">
-            <div class="recommended-image-container" style="width: 100%; padding: 0; background: transparent; box-sizing: border-box; display: flex; justify-content: center; align-items: center;">
-                <a href="${tool.link}" target="_blank" rel="noopener noreferrer" style="display: flex; justify-content: center; align-items: center; background: transparent; overflow: hidden; padding: 1rem;">
-                    <img src="${tool.image}" alt="${tool.header}" loading="lazy" style="max-width: 100%; max-height: 280px; width: auto; height: auto; object-fit: contain; display: block;">
-                </a>
+        <div class="recommended-card-inner">
+            <div class="recommended-image-container">
+                <div class="recommended-image">
+                    <a href="${tool.link}" target="_blank" rel="noopener noreferrer">
+                        <img src="${tool.image}" alt="${tool.header}" loading="lazy">
+                    </a>
+                </div>
             </div>
             <div class="recommended-content">
                 <h3>${tool.header}</h3>
@@ -841,8 +843,6 @@ function createToolCard(tool) {
             </div>
         </div>
     `;
-    
-    // No need for Read More functionality anymore
     
     return card;
 }
@@ -879,7 +879,7 @@ const recommended_tools = [
     {
         "header": "Your Cloud-Powered Video Studio",
         "link": "https://flixier.com?fpr=mh1619",
-        "image": "https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24598/300x160px.png",
+        "image": "https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24602/720x300px.png",
         "description": "AI subtitle, voiceover & translation tools—all built right into your browser.\nCloud rendering delivers full‑HD or 4K videos in minutes, no high-end PC needed.\nCollaborative editing, stock media & templates—team up and produce faster."
     },
     {

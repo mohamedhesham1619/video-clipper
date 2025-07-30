@@ -42,15 +42,12 @@ func New() *Server {
 	mux.HandleFunc("/supported-sites", handlers.SupportedSitesPageHandler)
 	mux.HandleFunc("/faq", handlers.FAQPageHandler)
 
-	// Static asset routes
-	mux.HandleFunc("/shared.js", handlers.SharedJSHandler)
-	mux.HandleFunc("/favicon.svg", handlers.FaviconHandler)
-	mux.HandleFunc("/favicon.png", handlers.FaviconPNGHandler)
-
-	// Serve all files under /static/ from internal/web/static
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("internal/web/static"))))
-
 	// SEO/static root files
+	fs := http.FileServer(http.Dir("internal/web/"))
+	mux.Handle("/css/", fs)
+	mux.Handle("/js/", fs)
+	mux.Handle("/images/", fs)
+	mux.Handle("/components/", fs)
 	mux.HandleFunc("/robots.txt", handlers.RobotsTxtHandler)
 	mux.HandleFunc("/sitemap.xml", handlers.SitemapXMLHandler)
 

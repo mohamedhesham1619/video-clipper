@@ -1,17 +1,22 @@
-<!-- Floating contact button -->
-<button id="contact-float" class="floating-button" aria-label="Contact Us">
+<!-- Floating contact button with structured data -->
+<div itemscope itemtype="https://schema.org/ContactPoint" style="display: none;">
+  <meta itemprop="contactType" content="customer service">
+  <meta itemprop="email" content="support@videoclipper.online">
+  <meta itemprop="url" content="https://videoclipper.online/contact">
+</div>
+<button id="contact-float" class="floating-button" aria-label="Contact Us" itemscope itemtype="https://schema.org/ContactPage">
     <i class="fas fa-envelope"></i>
     <span>Contact Us</span>
 </button>
 
 <!-- Contact Form Modal -->
-<div id="contact-modal" class="modal">
-    <div class="modal-content">
+<div id="contact-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content" itemscope itemtype="https://schema.org/ContactPage">
         <span class="close-modal">&times;</span>
-        <h2>Contact Us</h2>
+        <h2 id="modal-title" itemprop="name">Contact Us</h2>
         <p class="subtitle">Have a question or need help? Send us a message.</p>
         
-        <form id="modal-contact-form" class="minimal-contact-form">
+        <form id="modal-contact-form" class="minimal-contact-form" itemscope itemtype="https://schema.org/ContactForm">
             <div class="form-group">
                 <label for="modal-email">Email (optional)</label>
                 <input type="email" id="modal-email" name="email" class="form-control" placeholder="your@email.com">
