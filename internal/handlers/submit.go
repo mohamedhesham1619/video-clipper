@@ -19,8 +19,10 @@ type response struct {
 func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 	// Read the request from the client
 	var videoRequest models.VideoRequest
-	json.NewDecoder(r.Body).Decode(&videoRequest)
-
+	if err := json.NewDecoder(r.Body).Decode(&videoRequest); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
 	// Log the request details
 	clipDuration, _ := utils.ParseClipDuration(videoRequest.ClipStart, videoRequest.ClipEnd)
 	clipDurationFormatted := utils.FormatSecondsToMMSS(clipDuration)
@@ -104,7 +106,7 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 		close(progressChan)
 
 		// wait for a while to ensure the client can download the file then clean up
-		time.Sleep(10 * time.Minute)
+		time.Sleep(15 * time.Minute)
 		data.cleanupAll(fileId)
 		slog.Info("cleanup completed for process", "processId", fileId)
 	}()

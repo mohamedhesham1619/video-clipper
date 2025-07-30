@@ -1,28 +1,42 @@
 <!DOCTYPE html>
 <html lang="en" itemscope itemtype="https://schema.org/WebApplication">
+
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3TYZ3E3FGY"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-3TYZ3E3FGY');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="✂️ Free online video clipper & downloader. Trim, cut, and download video clips from YouTube, Vimeo, Facebook, and 1000+ sites. No watermarks, no registration. Fast & easy! 🚀">
-    <meta name="keywords" content="video clipper, online video editor, trim video, cut video, download video clips, youtube clipper, vimeo clipper, facebook video downloader, video editor online, free video cutter, mp4 clipper, video trimmer online, clip video from url, best video clipper, video downloader, online video trimmer">
+    <meta name="description"
+        content="✂️ Free online video clipper & downloader. Trim, cut, and download video clips from YouTube, Vimeo, Facebook, and 1000+ sites. No watermarks, no registration. Fast & easy! 🚀">
+    <meta name="keywords"
+        content="video clipper, online video editor, trim video, cut video, download video clips, youtube clipper, vimeo clipper, facebook video downloader, video editor online, free video cutter, mp4 clipper, video trimmer online, clip video from url, best video clipper, video downloader, online video trimmer">
     <meta name="author" content="VideoClipper">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://videoclipper.online/">
     <meta property="og:title" content="✂️ VideoClipper | Free Online Video Clipper & Downloader (No Watermark)">
-    <meta property="og:description" content="Cut, trim, and download video clips from YouTube, Vimeo, Facebook, and 1000+ sites. No watermarks, no registration. Start clipping in seconds! 🚀">
+    <meta property="og:description"
+        content="Cut, trim, and download video clips from YouTube, Vimeo, Facebook, and 1000+ sites. No watermarks, no registration. Start clipping in seconds! 🚀">
     <meta property="og:image" content="/images/preview.jpg">
     <meta property="og:site_name" content="VideoClipper">
-    
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://videoclipper.online/">
     <meta name="twitter:title" content="✂️ VideoClipper | Free Online Video Clipper & Downloader">
-    <meta name="twitter:description" content="Cut, trim, and download video clips from 1000+ sites. No watermarks, no registration. Start clipping in seconds! 🚀">
+    <meta name="twitter:description"
+        content="Cut, trim, and download video clips from 1000+ sites. No watermarks, no registration. Start clipping in seconds! 🚀">
     <meta name="twitter:image" content="/images/preview.jpg">
-    
+
     <title>VideoClipper | Free Online Video Clipper & Downloader (No Watermark)</title>
     <link rel="canonical" href="https://videoclipper.online" />
     <!-- Favicon and Site Icon for Search Engines -->
@@ -65,12 +79,16 @@
     }
     </script>
 </head>
+
 <body>
-    <header class="main-header" role="banner" style="padding: 0 !important; min-height: 85px; display: flex; align-items: center;">
+    <header class="main-header" role="banner"
+        style="padding: 0 !important; min-height: 85px; display: flex; align-items: center;">
         <div class="container" style="padding: 0.5rem 5% !important; display: flex; align-items: center; height: 100%;">
             <div class="logo" style="display: flex; align-items: center;">
-                <a href="/" class="logo-link" aria-label="VideoClipper Home" style="display: flex; align-items: center;">
-                    <img src="/images/icon.png" alt="VideoClipper Logo" class="logo-img" style="width: 60px; height: 60px; object-fit: contain;">
+                <a href="/" class="logo-link" aria-label="VideoClipper Home"
+                    style="display: flex; align-items: center;">
+                    <img src="/images/icon.png" alt="VideoClipper Logo" class="logo-img"
+                        style="width: 60px; height: 60px; object-fit: contain;">
                     <span style="font-size: 1.6rem; margin-left: 1px;">VideoClipper</span>
                 </a>
             </div>
@@ -105,13 +123,16 @@
                             <i class="fas fa-video"></i>
                         </div>
                         <h1 style="white-space: nowrap;">Clip and Download Any Video by URL</h1>
-                        <p class="subtitle">Paste your video URL, set the start and end times, and download your perfect clip.</p>
+                        <p class="subtitle">Paste your video URL, set the start and end times, and download your perfect
+                            clip.</p>
                         <form id="clip-form" class="clip-form">
                             <div class="form-group">
                                 <label for="video-url">Video URL</label>
                                 <div class="input-with-paste">
-                                    <input type="url" id="video-url" name="video-url" placeholder="https://example.com/video" required>
-                                    <button type="button" id="paste-url" class="paste-button" title="Paste from clipboard">
+                                    <input type="url" id="video-url" name="video-url"
+                                        placeholder="https://example.com/video" required>
+                                    <button type="button" id="paste-url" class="paste-button"
+                                        title="Paste from clipboard">
                                         <i class="fas fa-paste"></i>
                                     </button>
                                 </div>
@@ -121,14 +142,16 @@
                                     <label for="start-time">Start Time <span class="time-hint">(hh:mm:ss)</span></label>
                                     <div class="input-with-icon left-icon">
                                         <i class="far fa-clock"></i>
-                                        <input type="text" id="start-time" name="start-time" value="00:00:00" pattern="[0-9]{1,2}:[0-9]{2}:[0-9]{2}" placeholder="00:00:00" required>
+                                        <input type="text" id="start-time" name="start-time" value="00:00:00"
+                                            pattern="[0-9]{1,2}:[0-9]{2}:[0-9]{2}" placeholder="00:00:00" required>
                                     </div>
                                 </div>
                                 <div class="form-group time-group">
                                     <label for="end-time">End Time <span class="time-hint">(hh:mm:ss)</span></label>
                                     <div class="input-with-icon left-icon">
                                         <i class="far fa-clock"></i>
-                                        <input type="text" id="end-time" name="end-time" value="00:01:00" pattern="[0-9]{1,2}:[0-9]{2}:[0-9]{2}" placeholder="00:00:00" required>
+                                        <input type="text" id="end-time" name="end-time" value="00:01:00"
+                                            pattern="[0-9]{1,2}:[0-9]{2}:[0-9]{2}" placeholder="00:00:00" required>
                                     </div>
                                 </div>
                             </div>
@@ -163,7 +186,7 @@
                 </div>
             </div>
         </section>
-        
+
         <!-- How It Works Section -->
         <section id="get-started" class="content-section">
             <h2>How It Works</h2>
@@ -171,19 +194,22 @@
                 <div class="feature">
                     <i class="fas fa-bolt"></i>
                     <h3>Lightning Fast Downloads</h3>
-                    <p>Download online videos instantly using our optimized servers. Just enter the video link from platforms like YouTube, TikTok, or Instagram and get your file in seconds.</p>
+                    <p>Download online videos instantly using our optimized servers. Just enter the video link from
+                        platforms like YouTube, TikTok, or Instagram and get your file in seconds.</p>
 
                 </div>
                 <div class="feature">
                     <i class="far fa-lightbulb"></i>
                     <h3>Intuitive & Easy To Use</h3>
-                    <p>Our browser-based downloader requires no installation or login. Paste the video URL and save clips from sites like Facebook, Twitter, and more — all in one click.</p>
+                    <p>Our browser-based downloader requires no installation or login. Paste the video URL and save
+                        clips from sites like Facebook, Twitter, and more — all in one click.</p>
 
                 </div>
                 <div class="feature">
                     <i class="fas fa-tv"></i>
                     <h3>High Quality Output</h3>
-                    <p>Save videos in top quality — up to 1080p Full HD. Our tool ensures clear visuals and crisp sound for the best viewing experience on any device.</p>
+                    <p>Save videos in top quality — up to 1080p Full HD. Our tool ensures clear visuals and crisp sound
+                        for the best viewing experience on any device.</p>
 
                 </div>
             </div>
@@ -208,7 +234,8 @@
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>VideoClipper is a free online video downloader and clipper that lets you extract and trim a specific part or clip from a video — no installation or login required.</p>
+                        <p>VideoClipper is a free online video downloader and clipper that lets you extract and trim a
+                            specific part or clip from a video — no installation or login required.</p>
                     </div>
                 </div>
 
@@ -228,7 +255,8 @@
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>There is no strict limit on the duration of the clip you select, but longer clips will take more time to process.</p>
+                        <p>There is no strict limit on the duration of the clip you select, but longer clips will take
+                            more time to process.</p>
                     </div>
                 </div>
 
@@ -238,7 +266,9 @@
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>VideoClipper supports over 1,000 video platforms. Popular supported sites include YouTube, Facebook, Instagram, TikTok, Twitter (X), Vimeo, Twitch, Reddit, Coursera, LinkedIn, and Udemy.
+                        <p>VideoClipper supports over 1,000 video platforms. Popular supported sites include YouTube,
+                            Facebook, Instagram, TikTok, Twitter (X), Vimeo, Twitch, Reddit, Coursera, LinkedIn, and
+                            Udemy.
 
                             You can check out the full list of major supported sites on our Supported Sites page.</p>
                     </div>
@@ -250,10 +280,11 @@
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>Yes, it's secure and doesn't ask for login credentials, installations, or access to your personal data.</p>
+                        <p>Yes, it's secure and doesn't ask for login credentials, installations, or access to your
+                            personal data.</p>
                     </div>
                 </div>
-                
+
                 <!-- View All FAQs Button -->
                 <div class="faq-view-all">
                     <a href="pages/faq.html" class="view-all-button">
@@ -314,13 +345,17 @@
     </main>
 
     <!-- Footer -->
-    <footer class="main-footer" role="contentinfo" style="background-color: #f5f5f5; padding: 30px 0; margin-top: 50px; border-top: 1px solid #e9ecef;">
-        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;" itemscope itemtype="https://schema.org/WPFooter">
+    <footer class="main-footer" role="contentinfo"
+        style="background-color: #f5f5f5; padding: 30px 0; margin-top: 50px; border-top: 1px solid #e9ecef;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;" itemscope
+            itemtype="https://schema.org/WPFooter">
             <!-- Main Footer Content -->
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 30px;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 30px;">
                 <!-- Left Side: Logo, Title, and Description in one line -->
                 <div style="display: flex; align-items: center; gap: 15px; flex-wrap: nowrap;">
-                    <img src="/images/icon.png" alt="VideoClipper Logo" style="width: 30px; height: 30px; object-fit: contain; flex-shrink: 0;">
+                    <img src="/images/icon.png" alt="VideoClipper Logo"
+                        style="width: 30px; height: 30px; object-fit: contain; flex-shrink: 0;">
                     <h3 style="margin: 0; font-size: 1.3rem; font-weight: 600; color: #2c3e50; white-space: nowrap;">
                         VideoClipper
                     </h3>
@@ -331,22 +366,29 @@
 
                 <!-- Right Side: Quick Links -->
                 <nav style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: flex-end;">
-                    <a href="/" style="color: #3b82f6; text-decoration: none; transition: color 0.2s; font-weight: bold;">Home</a>
-                    <a href="/supported-sites" style="color: #495057; text-decoration: none; transition: color 0.2s;">Supported Sites</a>
+                    <a href="/"
+                        style="color: #3b82f6; text-decoration: none; transition: color 0.2s; font-weight: bold;">Home</a>
+                    <a href="/supported-sites"
+                        style="color: #495057; text-decoration: none; transition: color 0.2s;">Supported Sites</a>
                     <a href="/faq" style="color: #495057; text-decoration: none; transition: color 0.2s;">FAQ</a>
-                    <a href="/contact" style="color: #495057; text-decoration: none; transition: color 0.2s;">Contact</a>
+                    <a href="/contact"
+                        style="color: #495057; text-decoration: none; transition: color 0.2s;">Contact</a>
                     <a href="/terms" style="color: #495057; text-decoration: none; transition: color 0.2s;">Terms</a>
-                    <a href="/privacy" style="color: #495057; text-decoration: none; transition: color 0.2s;">Privacy</a>
+                    <a href="/privacy"
+                        style="color: #495057; text-decoration: none; transition: color 0.2s;">Privacy</a>
                 </nav>
             </div>
 
             <!-- Footer Bottom -->
-            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e9ecef; color: #6c757d; font-size: 0.9rem;">
+            <div
+                style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e9ecef; color: #6c757d; font-size: 0.9rem;">
                 <p style="margin-bottom: 5px;">&copy; 2025 VideoClipper.online</p>
                 <p style="margin: 5px 0;">
                     Developed and maintained by Mohamed Hesham.
-                    <a href="https://www.linkedin.com/in/mohamed-hesham11/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" style="color: #495057; margin: 0 5px;"><i class="fab fa-linkedin"></i></a>
-                    <a href="https://github.com/mohamedhesham1619" target="_blank" rel="noopener noreferrer" aria-label="GitHub" style="color: #495057; margin: 0 5px;"><i class="fab fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/mohamed-hesham11/" target="_blank" rel="noopener noreferrer"
+                        aria-label="LinkedIn" style="color: #495057; margin: 0 5px;"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://github.com/mohamedhesham1619" target="_blank" rel="noopener noreferrer"
+                        aria-label="GitHub" style="color: #495057; margin: 0 5px;"><i class="fab fa-github"></i></a>
                 </p>
             </div>
         </div>
@@ -354,7 +396,8 @@
 
     <!-- Floating button will be added here by main.js -->
     <script src="js/main.js"></script>
-    <script src="js/clip-form.js"></script>
+    <script src="js/video-clipper.js"></script>
     <script src="js/faq.js"></script>
 </body>
+
 </html>
