@@ -141,7 +141,7 @@ function displaySites() {
             : `<img src="${site.logo}" alt="${site.name} logo" class="site-logo-img">`;
         
         siteCard.innerHTML = `
-            <a href="../index.html" class="site-logo-link">
+            <a href="/index" class="site-logo-link">
                 <div class="site-logo">
                     ${logoHtml}
                 </div>

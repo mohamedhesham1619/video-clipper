@@ -289,18 +289,65 @@ class FloatingButton {
 
     async handleFormSubmit(e, form, modal) {
         e.preventDefault();
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData);
-
+        
         try {
-            // Here you would typically send the data to your server
-            console.log('Form submitted:', data);
+            // Get form data
+            const formData = new FormData(form);
+            console.log('Form data:', Object.fromEntries(formData.entries()));
+            
+            const data = {
+                email: formData.get('email')?.trim() || '',
+                message: formData.get('message')?.trim() || ''
+            };
+
+            console.log('Processed data:', data);
+
+            // Simple validation
+            if (!data.message) {
+                throw new Error('Please enter your message.');
+            }
+            
+            if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+                throw new Error('Please enter a valid email address or leave it empty.');
+            }
+
+            console.log('Sending request to /feedback...');
+            const response = await fetch('/feedback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            
+            console.log('Response status:', response.status);
+            
+            let responseData;
+            try {
+                responseData = await response.json();
+                console.log('Response data:', responseData);
+            } catch (parseError) {
+                console.error('Error parsing response:', parseError);
+                const text = await response.text();
+                console.error('Response text:', text);
+                throw new Error('Invalid response from server. Please try again.');
+            }
+            
+            if (!response.ok) {
+                throw new Error(responseData.message || `Server returned status: ${response.status}`);
+            }
+            
             alert('Thank you for your message! We will get back to you soon.');
             form.reset();
             this.closeModal(modal);
         } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('There was an error sending your message. Please try again.');
+            console.error('Error in handleFormSubmit:', {
+                error: error,
+                name: error.name,
+                message: error.message,
+                stack: error.stack
+            });
+            alert(error.message || 'There was an error sending your message. Please try again.');
         }
     }
 }
@@ -885,7 +932,7 @@ const recommended_tools = [
     {
         "header": "Bring Your Ideas to Life—Animated, Branded & Ready",
         "link": "https://renderforest.pxf.io/c/6416428/1957251/14885",
-        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/v1753734800/1-300x250_upo9z2.jpg",
+        "image": "https://app.impact.com/display-ad/14885-1957252?v=1",
         "description": "Pick a template, type your script, and let AI do the rest.\nCustomize colors, fonts & music with drag‑and‑drop ease.\nExport in HD or 4K with advanced features available on premium plans."
     },
     {
