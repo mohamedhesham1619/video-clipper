@@ -97,7 +97,7 @@ func prepareFfmpegCommand(downloadPath string) *exec.Cmd {
 		"-c", "copy", // Just copy the stream yt-dlp provides.
 		"-avoid_negative_ts", "make_zero", // Avoid negative timestamps.
 		"-fflags", "+genpts", // Generate missing timestamps.
-		"-y", // Overwrite output file without asking.
+		"-y",         // Overwrite output file without asking.
 		downloadPath, // Output file path
 	)
 }
@@ -139,6 +139,10 @@ func GetVideoTitle(videoRequest models.VideoRequest) (string, error) {
 		"--no-playlist",
 		"--no-download",
 		"--no-warnings",
+		"--ignore-errors",        // Prevents crashes on format issues
+		"--no-abort-on-error",    // Continues trying other formats
+		"--socket-timeout", "20", // Prevents hanging
+		"--retries", "2",
 	}
 	if isYouTubeURL(videoRequest.VideoURL) {
 		args = append(args, "--cookies", "cookie.txt")
