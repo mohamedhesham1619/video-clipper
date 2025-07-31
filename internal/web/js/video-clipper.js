@@ -505,36 +505,123 @@ const VideoClipper = (function() {
         
         if (!pasteButton || !videoUrlInput) return;
         
-        const handlePaste = async (e) => {
-            e.preventDefault();
-            try {
-                // Focus input first to ensure proper mobile keyboard behavior
-                videoUrlInput.focus();
-                
-                // Try modern clipboard API first
-                if (navigator.clipboard && navigator.clipboard.readText) {
-                    const text = await navigator.clipboard.readText();
-                    if (text) {
-                        videoUrlInput.value = text;
-                        // Trigger input event for any listeners
-                        const event = new Event('input', { bubbles: true });
-                        videoUrlInput.dispatchEvent(event);
-                    }
-                } else {
-                    // Fallback for older browsers
-                    document.execCommand('paste');
-                }
-            } catch (err) {
-                console.error('Failed to read from clipboard:', err);
-                // Final fallback - just focus the input
-                videoUrlInput.focus();
-                showError('Please paste the URL manually');
-            }
+        // Store original button state
+        const originalHTML = pasteButton.innerHTML;
+        const originalTitle = pasteButton.title;
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        
+        // Function to reset button state
+        const resetButton = () => {
+            pasteButton.innerHTML = originalHTML;
+            pasteButton.title = originalTitle;
+            pasteButton.disabled = false;
         };
         
-        // Add both click and touch events for better mobile support
+        // Function to show loading state
+        const showLoading = () => {
+            pasteButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            pasteButton.title = 'Reading clipboard...';
+            pasteButton.disabled = true;
+        };
+        
+        // Function to handle successful paste
+        const handlePasteSuccess = (text) => {
+            if (!text) return false;
+            
+            // Insert text at cursor position
+            const start = videoUrlInput.selectionStart;
+            const end = videoUrlInput.selectionEnd;
+            const before = videoUrlInput.value.substring(0, start);
+            const after = videoUrlInput.value.substring(end);
+            
+            videoUrlInput.value = before + text + after;
+            
+            // Move cursor to the end of the pasted text
+            const newCursorPos = start + text.length;
+            videoUrlInput.setSelectionRange(newCursorPos, newCursorPos);
+            
+            // Trigger input event
+            videoUrlInput.dispatchEvent(new Event('input', { bubbles: true }));
+            
+            // Show success state
+            pasteButton.innerHTML = '<i class="fas fa-check"></i>';
+            pasteButton.title = 'Pasted!';
+            setTimeout(resetButton, 1500);
+            
+            return true;
+        };
+        
+        // Function to handle paste operation
+        const handlePaste = async (e) => {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            // Focus the input first
+            videoUrlInput.focus();
+            
+            // On mobile, just show instructions
+            if (isMobile) {
+                showError('Tap and hold in the input field, then select "Paste"');
+                return;
+            }
+            
+            // For desktop, try to read from clipboard
+            showLoading();
+            
+            try {
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    const text = await navigator.clipboard.readText();
+                    if (!handlePasteSuccess(text)) {
+                        showError('Clipboard is empty');
+                    }
+                } else {
+                    showError('Please paste manually (Ctrl+V)');
+                }
+            } catch (err) {
+                console.error('Clipboard access error:', err);
+                showError('Please paste manually (Ctrl+V)');
+            }
+            
+            // Reset the button after a short delay
+            setTimeout(resetButton, 1000);
+        };
+        
+        // Initialize input field for mobile
+        const initMobileInput = () => {
+            // Ensure input field is editable
+            videoUrlInput.removeAttribute('readonly');
+            videoUrlInput.removeAttribute('disabled');
+            
+            // Reset any problematic styles
+            videoUrlInput.style.cssText = '';
+            
+            // Ensure standard input behavior
+            videoUrlInput.style.webkitAppearance = 'none';
+            videoUrlInput.style.MozAppearance = 'textfield';
+            videoUrlInput.style.appearance = 'none';
+        };
+        
+        // Initialize mobile input if needed
+        if (isMobile) {
+            initMobileInput();
+            pasteButton.title = 'Tap to paste (long-press in the input field)';
+        }
+        
+        // Add event listeners
         pasteButton.addEventListener('click', handlePaste);
-        pasteButton.addEventListener('touchend', handlePaste);
+        
+        // Make input focusable
+        videoUrlInput.addEventListener('click', function() {
+            this.focus();
+        });
+        
+        // Prevent any event handlers that might interfere with input
+        const stopProp = (e) => e.stopPropagation();
+        videoUrlInput.addEventListener('keydown', stopProp);
+        videoUrlInput.addEventListener('keyup', stopProp);
+        videoUrlInput.addEventListener('input', stopProp);
     }
 
     function formatTimeInput(value, isDeleting = false) {
@@ -568,57 +655,48 @@ const VideoClipper = (function() {
     function setupTimeInputs() {
         const timeInputs = document.querySelectorAll('input[type="text"][pattern]');
         
-        const handleTimeInput = (input) => {
-            const cursorPosition = input.selectionStart;
-            const currentValue = input.value;
-            const isDeleting = input.getAttribute('data-deleting') === 'true';
+        // Simple format function that only runs on blur
+        const formatTimeOnBlur = (input) => {
+            let value = input.value || '';
             
-            // Format the time input
-            const formatted = formatTimeInput(currentValue, isDeleting);
+            // If empty, set to default
+            if (!value.trim()) {
+                input.value = '00:00:00';
+                return;
+            }
             
-            // Only update if value changed
-            if (currentValue !== formatted) {
-                input.value = formatted;
+            // Only format if it's a valid time format
+            const timeRegex = /^(\d{0,2}):?(\d{0,2}):?(\d{0,2})/;
+            const match = value.match(timeRegex);
+            
+            if (match) {
+                let [_, hh = '00', mm = '00', ss = '00'] = match;
                 
-                // Try to maintain cursor position
-                try {
-                    // If we're not at the end, try to maintain position
-                    if (cursorPosition !== currentValue.length || isDeleting) {
-                        requestAnimationFrame(() => {
-                            let newPosition = cursorPosition;
-                            
-                            // If we were deleting, try to maintain position
-                            if (isDeleting) {
-                                newPosition = Math.max(0, cursorPosition - (currentValue.length - formatted.length));
-                            }
-                            
-                            // Ensure position is within bounds
-                            newPosition = Math.min(Math.max(0, newPosition), formatted.length);
-                            input.setSelectionRange(newPosition, newPosition);
-                        });
-                    }
-                } catch (e) {
-                    console.error('Error setting cursor position:', e);
-                }
+                // Pad with leading zeros
+                hh = hh.padStart(2, '0');
+                mm = mm.padStart(2, '0');
+                ss = ss.padStart(2, '0');
+                
+                // Limit values
+                hh = Math.min(99, parseInt(hh) || 0).toString().padStart(2, '0');
+                mm = Math.min(59, parseInt(mm) || 0).toString().padStart(2, '0');
+                ss = Math.min(59, parseInt(ss) || 0).toString().padStart(2, '0');
+                
+                input.value = `${hh}:${mm}:${ss}`;
             }
             
             updateDurationDisplay();
-            
-            // Reset deleting flag
-            if (isDeleting) {
-                input.setAttribute('data-deleting', 'false');
-            }
         };
         
+        // Initialize time inputs
         timeInputs.forEach(input => {
+            // Reset any problematic styles
+            input.style.webkitAppearance = 'none';
+            input.style.MozAppearance = 'textfield';
+            input.style.appearance = 'none';
+            
             // Format on blur
-            input.addEventListener('blur', (e) => {
-                const formatted = formatTimeInput(e.target.value);
-                if (formatted !== e.target.value) {
-                    e.target.value = formatted;
-                }
-                updateDurationDisplay();
-            });
+            input.addEventListener('blur', () => formatTimeOnBlur(input));
             
             // Initialize if empty on focus
             input.addEventListener('focus', (e) => {
@@ -627,22 +705,15 @@ const VideoClipper = (function() {
                 }
             });
             
-            // Handle keydown to detect backspace/delete
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Backspace' || e.key === 'Delete') {
-                    input.setAttribute('data-deleting', 'true');
-                } else {
-                    input.setAttribute('data-deleting', 'false');
+            // Allow any input - we'll format on blur
+            input.addEventListener('input', updateDurationDisplay);
+            
+            // Only allow numbers and colons
+            input.addEventListener('keypress', (e) => {
+                if (!/[0-9:]/.test(e.key)) {
+                    e.preventDefault();
                 }
             });
-            
-            // Handle input
-            input.addEventListener('input', (e) => {
-                handleTimeInput(e.target);
-            });
-            
-            // Initialize data attribute
-            input.setAttribute('data-deleting', 'false');
         });
         
         // Initial update
