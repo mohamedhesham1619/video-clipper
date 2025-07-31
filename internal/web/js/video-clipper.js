@@ -16,63 +16,184 @@ const VideoClipper = (function() {
     // Private methods
     function updateStatus(message) {
         if (state.statusText) {
-            state.statusText.textContent = message;
+            state.statusText.innerHTML = message;
+            // Add visible class to trigger animation
+            state.statusText.classList.add('visible');
+            // Force reflow to ensure animation plays
+            void state.statusText.offsetWidth;
         }
     }
 
     function updateProgress(percent) {
-        if (state.progressBar) {
-            const progress = Math.min(100, Math.max(0, percent));
-            state.progressBar.style.width = `${progress}%`;
+        if (state.progressFill && state.progressLoading) {
+            const safePercent = Math.min(100, Math.max(0, percent));
             
-            // Add animation effect
-            state.progressBar.style.transform = 'scaleX(1.02)';
-            setTimeout(() => {
-                if (state.progressBar) {
-                    state.progressBar.style.transform = 'scaleX(1)';
-                }
-            }, 150);
+            // Update progress fill width
+            state.progressFill.style.width = `${safePercent}%`;
+            
+            // Update progress state
+            if (safePercent === 0) {
+                // Show loading animation
+                state.progressLoading.style.display = 'block';
+                state.progressFill.style.display = 'none';
+                state.progressFill.classList.remove('progress-complete');
+            } else if (safePercent === 100) {
+                // Show complete state
+                state.progressLoading.style.display = 'none';
+                state.progressFill.style.display = 'block';
+                state.progressFill.classList.add('progress-complete');
+                state.progressFill.style.width = '100%';
+            } else {
+                // Show progress
+                state.progressLoading.style.display = 'none';
+                state.progressFill.style.display = 'block';
+                state.progressFill.classList.remove('progress-complete');
+            }
+            
+            // Update ARIA attributes
+            state.progressBar.setAttribute('aria-valuenow', safePercent);
+            state.progressBar.setAttribute('aria-valuetext', `${safePercent}% complete`);
+        }
+        
+        // Update aria attributes for accessibility
+        if (state.progressContainer) {
+            state.progressContainer.setAttribute('aria-valuenow', percent);
+            state.progressContainer.setAttribute('aria-valuetext', `${Math.round(percent)}% complete`);
         }
     }
 
     function showLoading() {
+        // Hide action buttons and quality selector
+        const actionButtons = document.querySelector('.action-buttons');
+        const qualitySelector = document.querySelector('.quality-selector');
+        
+        if (actionButtons) actionButtons.classList.add('hidden');
+        if (qualitySelector) qualitySelector.classList.add('hidden');
+
+        // Create progress elements if they don't exist
+        if (!state.progressContainer) {
+            createProgressElements();
+        }
+
+        // Show and animate progress container
         if (state.progressContainer) {
             state.progressContainer.style.display = 'block';
-            setTimeout(() => {
-                state.progressContainer.style.opacity = '1';
-            }, 10);
+            state.progressContainer.classList.add('visible');
+            
+            // Set up loading state for progress bar
+            if (state.progressLoading && state.progressFill) {
+                // Show loading animation
+                state.progressLoading.style.display = 'block';
+                state.progressFill.style.display = 'none';
+                // Reset progress
+                state.progressFill.style.width = '0%';
+                state.progressFill.classList.remove('progress-complete');
+            }
         }
-        if (state.statusText) state.statusText.style.display = 'block';
-        if (state.actionButtons) state.actionButtons.style.display = 'none';
+
+        // Show status text with animation
+        if (state.statusText) {
+            state.statusText.setAttribute('data-status', 'loading');
+            state.statusText.innerHTML = `
+                <div class="status-message">
+                    <div>Getting video information...</div>
+                </div>
+            `;
+            state.statusText.style.display = 'block';
+            state.statusText.classList.add('visible');
+        }
+
+        // Initial progress update
+        updateProgress(0);
     }
 
     function hideLoading() {
-        if (state.progressContainer) {
-            state.progressContainer.style.opacity = '0';
-            setTimeout(() => {
-                if (state.progressContainer) {
-                    state.progressContainer.style.display = 'none';
-                }
-            }, 300);
-        }
-        if (state.statusText) state.statusText.style.display = 'none';
-        if (state.actionButtons) state.actionButtons.style.display = 'block';
+        // Show action buttons and quality selector again after a delay
+        setTimeout(() => {
+            const actionButtons = document.querySelector('.action-buttons');
+            const qualitySelector = document.querySelector('.quality-selector');
+            
+            if (actionButtons) actionButtons.classList.remove('hidden');
+            if (qualitySelector) qualitySelector.classList.remove('hidden');
+
+            // Hide progress container with fade out effect
+            if (state.progressContainer) {
+                state.progressContainer.classList.remove('visible');
+                // Wait for the fade out transition to complete before hiding
+                setTimeout(() => {
+                    if (state.progressContainer) {
+                        state.progressContainer.style.display = 'none';
+                    }
+                }, 300);
+            }
+
+            // Hide status text
+            if (state.statusText) {
+                state.statusText.classList.remove('visible');
+            }
+        }, 5000); // 5 second delay before showing buttons again
     }
 
     function showError(message) {
-        updateStatus(`Error: ${message}`);
-        setTimeout(hideLoading, 3000);
+        console.error('Error:', message);
+        
+        // Show error message in the status text
+        if (state.statusText) {
+            state.statusText.textContent = message || 'An error occurred while processing your request.';
+            state.statusText.classList.add('error');
+            
+            // Update progress bar to show error state
+            if (state.progressBar) {
+                state.progressBar.style.background = 'linear-gradient(90deg, #ef4444, #f87171, #ef4444)';
+                state.progressBar.style.animation = 'progress-pulse 1.5s ease-in-out infinite';
+            }
+        }
+        
+        // Hide loading state and show buttons again after a delay
+        setTimeout(() => {
+            hideLoading();
+            
+            // Remove error class after hiding
+            if (state.statusText) {
+                state.statusText.classList.remove('error');
+            }
+        }, 5000);
     }
 
     function handleTitleEvent(event) {
         try {
             const data = JSON.parse(event.data);
             let title = data.title || 'the video';
-            const maxLength = 50;
-            if (title.length > maxLength) {
-                title = title.substring(0, maxLength) + '...';
+            // Clean up the title from any HTML entities or special characters
+            title = title.replace(/&[^;]+;/g, '').trim();
+            
+            // Create status message with title
+            state.statusText.setAttribute('data-status', 'extracting');
+            const statusHTML = `
+                <div class="status-message">
+                    <div style="color: #000000;">Extracting the required clip from:</div>
+                    <div class="truncate-title" title="${title.replace(/"/g, '&quot;')}">${title}</div>
+                </div>
+            `;
+            
+            // Update the status with our custom HTML
+            if (state.statusText) {
+                state.statusText.innerHTML = statusHTML;
+                state.statusText.classList.add('visible');
+                
+                // Ensure the status message has the gradient animation
+                const statusMessage = state.statusText.querySelector('.status-message > div:first-child');
+                if (statusMessage) {
+                    statusMessage.style.background = 'linear-gradient(90deg, #4f46e5, #8b5cf6, #4f46e5)';
+                    statusMessage.style.backgroundSize = '200% auto';
+                    statusMessage.style.backgroundClip = 'text';
+                    statusMessage.style.webkitBackgroundClip = 'text';
+                    statusMessage.style.webkitTextFillColor = 'transparent';
+                    statusMessage.style.animation = 'textGradient 3s linear infinite';
+                    statusMessage.style.display = 'inline-block';
+                    statusMessage.style.padding = '0.25rem 0';
+                }
             }
-            updateStatus(`Processing: ${title}`);
         } catch (e) {
             console.error('Error parsing title event:', e);
         }
@@ -82,66 +203,141 @@ const VideoClipper = (function() {
         try {
             const data = JSON.parse(event.data);
             const progress = parseInt(data.progress || '0', 10);
-            updateProgress(progress);
-            updateStatus('Processing video...');
+            
+            // Ensure progress elements are visible
+            if (state.progressContainer && state.progressContainer.style.display === 'none') {
+                state.progressContainer.style.display = 'block';
+                void state.progressContainer.offsetHeight;
+                state.progressContainer.classList.add('visible');
+            }
+            
+            // Update progress with a smooth transition
+            requestAnimationFrame(() => {
+                updateProgress(progress);
+            });
         } catch (e) {
             console.error('Error parsing progress event:', e);
         }
     }
 
     function handleCompleteEvent(event) {
+        // Update status to show completion message
+        if (state.statusText) {
+            state.statusText.setAttribute('data-status', 'complete');
+        }
+        updateStatus('Process complete, download starting...');
+        
+        // Force the progress bar to green
+        if (state.progressFill) {
+            state.progressFill.style.background = '#10b981';
+            state.progressFill.style.width = '100%';
+            state.progressFill.style.transition = 'all 0.3s ease-out';
+            if (state.progressLoading) {
+                state.progressLoading.style.display = 'none';
+            }
+        }
+        
+        // Start the download automatically
         try {
             const data = JSON.parse(event.data);
-            updateProgress(100);
-            updateStatus('Download starting...');
-            
-            if (state.progressBar) {
-                state.progressBar.style.backgroundColor = '#10b981';
-            }
-            
-            if (data.downloadUrl) {
+            if (data && data.downloadUrl) { 
+                // Create a temporary link and trigger download
                 const link = document.createElement('a');
                 link.href = data.downloadUrl;
-                link.download = '';
+                link.download = data.filename || 'video_clip.mp4';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+                
+                // Keep the UI in the completed state for a moment before hiding
+                setTimeout(() => {
+                    hideLoading();
+                }, 3000);
+            } else {
+                throw new Error('Invalid download URL received');
             }
-            
-            setTimeout(hideLoading, 1000);
-        } catch (e) {
-            console.error('Error handling complete event:', e);
-            showError('Failed to process download');
-            hideLoading();
+        } catch (error) {
+            console.error('Error handling complete event:', error);
+            showError('Error processing download. ' + (error.message || 'Please try again.'));
+            // Still show completion state even if there was an error with the download
+            if (state.progressFill) {
+                state.progressFill.style.background = '#10b981';
+                state.progressFill.style.width = '100%';
+                state.progressFill.style.transition = 'all 0.3s ease-out';
+                if (state.progressLoading) {
+                    state.progressLoading.style.display = 'none';
+                }
+            }
+            setTimeout(() => {
+                hideLoading();
+            }, 3000);
         }
     }
 
-    function handleSSEError() {
-        console.error('SSE connection error');
-        if (state.eventSource) {
-            state.eventSource.close();
-            state.eventSource = null;
-        }
-        showError('Connection to server was interrupted');
+    function handleSSEError(error) {
+        console.error('SSE Error:', error);
+        showError('Connection error. Please try again.');
+        hideLoading();
     }
 
     function setupSSEConnection(jobId) {
+        // Close any existing connection
         if (state.eventSource) {
             state.eventSource.close();
+            state.eventSource = null;
         }
 
         const progressUrl = `/progress/${jobId}`;
         state.eventSource = new EventSource(progressUrl);
 
+        const onConnectionError = (error) => {
+            console.error('SSE Connection Error:', error);
+            if (state.eventSource) {
+                state.eventSource.close();
+                state.eventSource = null;
+            }
+            showError('Connection to server was interrupted. Please try again.');
+            hideLoading();
+        };
+
+        // Handle successful connection
         state.eventSource.onopen = () => {
             console.log('SSE connection established');
             updateStatus('Connected to server...');
         };
 
-        state.eventSource.onerror = handleSSEError;
+        // Handle errors
+        state.eventSource.onerror = onConnectionError;
+
+        // Set up event listeners
         state.eventSource.addEventListener('title', handleTitleEvent);
         state.eventSource.addEventListener('progress', handleProgressEvent);
         state.eventSource.addEventListener('complete', handleCompleteEvent);
+        
+        // Add a global error handler for uncaught errors
+        const errorHandler = (event) => {
+            console.error('SSE Error Event:', event);
+            showError('An error occurred while processing your request');
+            if (state.eventSource) {
+                state.eventSource.close();
+                state.eventSource = null;
+            }
+            hideLoading();
+            // Remove this listener after it's been called
+            window.removeEventListener('error', errorHandler);
+        };
+        
+        // Add the global error handler
+        window.addEventListener('error', errorHandler);
+        
+        // Clean up after connection closes
+        state.eventSource.addEventListener('complete', () => {
+            if (state.eventSource) {
+                state.eventSource.close();
+                state.eventSource = null;
+            }
+            window.removeEventListener('error', errorHandler);
+        }, { once: true });
     }
 
     function validateTimeFormat(timeStr) {
@@ -245,13 +441,8 @@ const VideoClipper = (function() {
                 throw new Error('End time must be after start time');
             }
             
-            // Maximum clip duration: 10 minutes (600 seconds)
-            if ((endSeconds - startSeconds) > 600) {
-                throw new Error('Maximum clip duration is 10 minutes');
-            }
-            
             showLoading();
-            updateStatus('Preparing your clip...');
+            updateStatus('Getting video information...');
             updateProgress(0);
             
             // Add timeout for the fetch request
@@ -275,7 +466,7 @@ const VideoClipper = (function() {
                 
                 if (!response.ok) {
                     if (response.status === 429) {
-                        throw new Error('Rate limit exceeded. Please try again in a few minutes.');
+                        throw new Error('You have reached the maximum number of requests. Please try again later.');
                     }
                     const error = await response.json().catch(() => ({}));
                     throw new Error(error.message || `Server error: ${response.status} ${response.statusText}`);
@@ -309,7 +500,7 @@ const VideoClipper = (function() {
     }
 
     function setupPasteButton() {
-        const pasteButton = document.getElementById('paste-button');
+        const pasteButton = document.getElementById('paste-url');
         const videoUrlInput = document.getElementById('video-url');
         
         if (!pasteButton || !videoUrlInput) return;
@@ -411,16 +602,11 @@ const VideoClipper = (function() {
 
     function createProgressElements() {
         if (!state.progressContainer) {
+            // Create progress container
             state.progressContainer = document.createElement('div');
             state.progressContainer.className = 'progress-container';
-            state.progressContainer.style.cssText = `
-                margin: 1.5rem 0;
-                width: 100%;
-                opacity: 0;
-                transition: opacity 0.3s ease-in-out;
-                display: none;
-            `;
             
+            // Create status text
             state.statusText = document.createElement('div');
             state.statusText.className = 'status-text';
             state.statusText.style.cssText = `
@@ -428,36 +614,90 @@ const VideoClipper = (function() {
                 text-align: center;
                 font-weight: 500;
                 color: #4b5563;
+                opacity: 0;
+                transform: translateY(10px);
+                transition: opacity 0.3s ease-out, transform 0.3s ease-out;
             `;
             
+            // Create progress bar container
             const progressBarContainer = document.createElement('div');
             progressBarContainer.className = 'progress-bar-container';
-            progressBarContainer.style.cssText = `
-                width: 100%;
-                height: 8px;
-                background-color: #e9ecef;
-                border-radius: 4px;
-                overflow: hidden;
-            `;
             
+            // Create progress bar wrapper
             state.progressBar = document.createElement('div');
             state.progressBar.className = 'progress-bar';
             state.progressBar.style.cssText = `
-                height: 100%;
-                width: 0%;
-                background-color: #4f46e5;
-                transition: width 0.3s ease-out, background-color 0.3s ease;
-                will-change: width, transform;
+                position: relative;
+                height: 16px;
+                width: 100%;
+                background-color: #f1f5f9;
+                border-radius: 8px;
+                overflow: hidden;
             `;
             
+            // Create loading overlay
+            state.progressLoading = document.createElement('div');
+            state.progressLoading.className = 'progress-loading';
+            state.progressLoading.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                display: none;
+            `;
+            
+            // Create progress fill
+            state.progressFill = document.createElement('div');
+            state.progressFill.className = 'progress-fill';
+            state.progressFill.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 0%;
+                background: #4f46e5;
+                transition: width 0.3s ease-out;
+                display: none;
+            `;
+            
+            // Assemble the progress bar
+            state.progressBar.appendChild(state.progressLoading);
+            state.progressBar.appendChild(state.progressFill);
             progressBarContainer.appendChild(state.progressBar);
+            
+            // Add elements to container
             state.progressContainer.appendChild(state.statusText);
             state.progressContainer.appendChild(progressBarContainer);
             
+            // Add styles for animations
+            if (!document.getElementById('progress-bar-styles')) {
+                const style = document.createElement('style');
+                style.id = 'progress-bar-styles';
+                style.textContent = `
+                    @keyframes loadingShine {
+                        0% { background-position: 200% 0; }
+                        100% { background-position: -200% 0; }
+                    }
+                    @keyframes fadeInUp {
+                        from { opacity: 0; transform: translateY(10px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                    .status-text.visible {
+                        animation: fadeInUp 0.3s ease-out forwards;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Insert into DOM
             const form = document.getElementById('clip-form');
             if (form) {
                 form.parentNode.insertBefore(state.progressContainer, form.nextSibling);
             }
+            
+            // Initialize loading state
+            state.progressLoading.style.display = 'block';
         }
     }
 

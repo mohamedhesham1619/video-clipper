@@ -23,7 +23,6 @@ RUN pip install --upgrade yt-dlp --break-system-packages
 WORKDIR /app
 
 COPY --from=builder /app/internal/web ./internal/web
-COPY --from=builder /app/internal/data ./internal/data
 COPY --from=builder /app/build/clipper .
 COPY cookie.txt ./cookie.txt
 

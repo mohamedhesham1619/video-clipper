@@ -71,9 +71,15 @@ func isYouTubeURL(url string) bool {
 
 func prepareYtDlpCommand(videoRequest models.VideoRequest) *exec.Cmd {
 	args := []string{
-		"-f", fmt.Sprintf("bv*[height<=%[1]v]+ba/b[height<=%[1]v]/best", videoRequest.Quality),
+		"-f", fmt.Sprintf("best[height<=%[1]v]/bv*[height<=%[1]v]+ba/best/bv+ba/worst", videoRequest.Quality),
 		"--download-sections", fmt.Sprintf("*%s-%s", videoRequest.ClipStart, videoRequest.ClipEnd),
 		"--no-warnings",
+		"--ignore-errors",
+		"--no-abort-on-error",
+		"--audio-quality", "0",
+		"--prefer-free-formats",
+		"--socket-timeout", "20",
+		"--retries", "2",
 		"-o", "-", // Output to stdout
 	}
 	if isYouTubeURL(videoRequest.VideoURL) {
@@ -89,6 +95,9 @@ func prepareFfmpegCommand(downloadPath string) *exec.Cmd {
 		"-i", "pipe:0", // Read from stdin
 		"-progress", "pipe:1", // Progress to stdout
 		"-c", "copy", // Just copy the stream yt-dlp provides.
+		"-avoid_negative_ts", "make_zero", // Avoid negative timestamps.
+		"-fflags", "+genpts", // Generate missing timestamps.
+		"-y", // Overwrite output file without asking.
 		downloadPath, // Output file path
 	)
 }
@@ -126,7 +135,7 @@ func preparePipes(ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd) error {
 func GetVideoTitle(videoRequest models.VideoRequest) (string, error) {
 	args := []string{
 		"-f", fmt.Sprintf("bv*[height<=%[1]v]+ba/b[height<=%[1]v]/best", videoRequest.Quality),
-		"--print", "%(title).244s-%(height)sp.%(ext)s",
+		"--print", "%(title).220s-%(height)sp.%(ext)s",
 		"--no-playlist",
 		"--no-download",
 		"--no-warnings",
