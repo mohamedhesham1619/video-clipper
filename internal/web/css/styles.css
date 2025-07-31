@@ -72,6 +72,8 @@
     animation: slideIn 0.3s ease-out forwards;
     text-align: center;
     padding: 0 1rem;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .progress-container.visible {
@@ -93,6 +95,10 @@
     position: relative;
     opacity: 0;
     animation: slideIn 0.5s ease-out forwards;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    padding: 0 0.5rem;
+    box-sizing: border-box;
 }
 
 /* Shimmer effect for specific status messages */
@@ -1265,6 +1271,11 @@ header.main-header {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+    /* Hide footer description on mobile */
+    .main-footer span[style*="white-space: nowrap"] {
+        display: none !important;
+    }
+
     .recommended-grid {
         grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
         gap: 1.5rem;
@@ -1443,18 +1454,35 @@ header.main-header {
 }
 
 @media (max-width: 768px) {
+    /* Hide footer description on mobile */
+    .main-footer span[style*="white-space: nowrap"] {
+        display: none !important;
+    }
+
     #sites-container {
         grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
         gap: 0.5rem;
+        padding: 0.25rem !important;
     }
 
     .site-logo {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
 
     .site-card h3 {
-        font-size: 0.8rem;
-        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+    }
+    
+    /* Reduce space above sites on supported-sites page */
+    .supported-sites-content {
+        margin-top: 0.5rem !important;
+        padding-top: 0.5rem !important;
+    }
+    
+    .page-header {
+        padding: 1.5rem 0 1rem !important;
+        margin-bottom: 1rem !important;
     }
 }
 
@@ -2105,6 +2133,11 @@ header.main-header {
 }
 
 @media (max-width: 768px) {
+    /* Hide footer description on mobile */
+    .main-footer span[style*="white-space: nowrap"] {
+        display: none !important;
+    }
+
     .clip-card {
         padding: 1.5rem;
         margin: 0 1rem;
@@ -2298,8 +2331,199 @@ header.main-header {
 }
 
 @media (max-width: 768px) {
+    /* Hide footer description on mobile */
+    .main-footer span[style*="white-space: nowrap"] {
+        display: none !important;
+    }
+
+    /* Center main content */
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        overflow-x: hidden;
+    }
+    
+    main {
+        flex: 1;
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 0;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .content-section {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 15px;
+        box-sizing: border-box;
+    }
+    
+    .clip-card {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 1.5rem;
+        box-sizing: border-box;
+    }
+    
+    /* Fix heading overflow */
+    .clip-card h1 {
+        white-space: normal !important;
+        word-wrap: break-word;
+        font-size: 1.5rem;
+        padding: 0 10px;
+        text-align: center;
+    }
+    
+    /* Recommended section */
+    .recommended-section {
+        width: 100%;
+        padding: 1rem 0 !important;
+        background-color: #f8f9fa;
+        overflow: hidden;
+    }
+    
     .recommended-grid {
-        grid-template-columns: 1fr;
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem;
+        padding: 0 15px !important;
+        max-width: 400px !important;
+        margin: 0 auto !important;
+    }
+    
+    .recommended-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .recommended-card img {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: contain;
+        aspect-ratio: 16/9;
+        margin: 0 auto;
+        max-height: 200px;
+    }
+    
+    .recommended-card h3 {
+        font-size: 1.1rem;
+        margin: 0.75rem 1rem;
+    }
+    
+    .recommended-card p {
+        margin: 0.5rem 1rem 1rem;
+        color: #555;
+        font-size: 0.9rem;
+    }
+    
+    /* Fix footer */
+    .main-footer {
+        padding: 30px 0 20px !important;
+        margin-top: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+        background-color: #f5f5f5;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .main-footer > div {
+        max-width: 1200px !important;
+        width: 100% !important;
+        padding: 0 15px !important;
+        margin: 0 auto !important;
+        box-sizing: border-box;
+    }
+    
+    .main-footer > div > div:first-child {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 20px !important;
+        width: 100% !important;
+        margin-bottom: 20px;
+    }
+    
+    .main-footer .logo-title-desc {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    .main-footer .logo-title-desc > span {
+        display: none; /* Hide description on mobile */
+    }
+    
+    @media (min-width: 769px) {
+        .main-footer .logo-title-desc > span {
+            display: block;
+            white-space: normal;
+            margin: 10px 0 0 0;
+            color: #6c757d;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            max-width: 100%;
+        }
+    }
+    
+    .main-footer nav {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 15px !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 10px 0;
+    }
+    
+    .main-footer nav a {
+        color: #495057;
+        text-decoration: none;
+        font-size: 0.95rem;
+        transition: color 0.2s;
+        white-space: nowrap;
+        padding: 5px 0;
+    }
+    
+    .main-footer nav a:hover {
+        color: #3b82f6;
+    }
+    
+    .main-footer .footer-bottom {
+        text-align: center;
+        padding: 20px 15px 0 !important;
+        max-width: 100% !important;
+        margin-top: 20px !important;
+        border-top: 1px solid #e9ecef;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .main-footer .footer-bottom p {
+        margin: 10px 0 !important;
+        line-height: 1.5;
+    }
+    
+    .main-footer .footer-bottom a {
+        color: #495057;
+        margin: 0 5px;
     }
     
     /* Hide side ads on mobile */
@@ -2308,28 +2532,73 @@ header.main-header {
         display: none !important;
     }
     
-    /* Adjust main content to take full width on mobile */
+    /* Adjust main content */
     .main-content {
         width: 100% !important;
-        padding: 0 15px !important;
+        padding: 0 5px !important;
     }
     
     /* Remove background color below bottom ad */
     .video-clipper {
         background: none !important;
+        padding-bottom: 0.5rem;
     }
     
     /* Adjust bottom ad container */
     .tool-suggestion {
-        margin-top: 20px;
-        padding: 15px 0;
+        margin: 10px auto 0 !important;
+        padding: 0 5px !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        box-sizing: border-box;
         background: none !important;
+        overflow: hidden;
+    }
+    
+    .tool-suggestion > div {
+        background: none !important;
+        padding: 0 !important;
+        margin: 0 auto !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        display: flex;
+        justify-content: center;
+        overflow: hidden;
+    }
+    
+    /* Ensure ad content fits within container */
+    .tool-suggestion iframe,
+    .tool-suggestion ins,
+    .tool-suggestion .adsbygoogle,
+    .tool-suggestion img {
+        max-width: 100% !important;
+        height: auto !important;
+        margin: 0 auto !important;
+        display: block !important;
+        overflow: hidden !important;
     }
     
     /* Ensure content row takes full width */
     .content-row {
-        margin: 0 !important;
+        margin: 0 auto !important;
         width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 5px !important;
+    }
+    
+    /* Fix form elements */
+    .clip-form {
+        padding: 0 5px;
+    }
+    
+    .time-inputs {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 1rem;
     }
 }
 
@@ -2545,6 +2814,11 @@ header.main-header {
 }
 
 @media (max-width: 768px) {
+    /* Hide footer description on mobile */
+    .main-footer span[style*="white-space: nowrap"] {
+        display: none !important;
+    }
+
     .recommended-grid {
         grid-template-columns: 1fr;
         padding: 0 1rem;
@@ -2572,6 +2846,11 @@ header.main-header {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+    /* Hide footer description on mobile */
+    .main-footer span[style*="white-space: nowrap"] {
+        display: none !important;
+    }
+
     .recommended-grid {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     }
@@ -2595,6 +2874,13 @@ header.main-header {
 /* Floating Contact Button - Replaced by the new implementation in main.js */
 /* The floating button is now implemented as a component in main.js */
 /* Old styles are removed to prevent conflicts with the new implementation */
+
+/* Hide nav divider on mobile */
+@media (max-width: 768px) {
+    .nav-divider {
+        display: none !important;
+    }
+}
 
 /* Mobile Menu */
 .mobile-menu-toggle {
@@ -2743,6 +3029,11 @@ header.main-header {
 }
 
 @media (max-width: 768px) {
+    /* Hide footer description on mobile */
+    .main-footer span[style*="white-space: nowrap"] {
+        display: none !important;
+    }
+
     .hero {
         padding: 6rem 0 3rem;
     }
@@ -2834,4 +3125,164 @@ header.main-header {
     max-width: 100%;
     margin: 0 auto;
     padding: 0 1rem;
+}
+
+/* Fix for supported-sites page header overlap on mobile */
+@media (max-width: 768px) {
+    body[itemtype$="/supported-sites"] main {
+        margin-top: 80px !important;
+    }
+    
+    body[itemtype$="/supported-sites"] .page-header {
+        padding: 0.5rem 0 !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    body[itemtype$="/supported-sites"] .supported-sites-content {
+        padding-top: 0.25rem !important;
+    }
+}
+
+/* Mobile-specific fixes for layout issues */
+@media (max-width: 768px) {
+    /* Ensure proper spacing between How It Works and Recommended sections */
+    #get-started {
+        padding-bottom: 2rem !important;
+        margin-bottom: 1.5rem !important;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .recommended-section {
+        margin-top: 0 !important;
+        padding-top: 2rem !important;
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Ensure features have proper spacing */
+    .features {
+        gap: 1.5rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+    
+    .feature {
+        padding: 1.5rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    /* Ensure Learn More button is visible on mobile */
+    .learn-more-btn {
+        display: inline-flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        background-color: #4f46e5;
+        color: white !important;
+        border-radius: 6px;
+        text-decoration: none !important;
+        transition: background-color 0.2s;
+    }
+    
+    .learn-more-btn:hover {
+        background-color: #4338ca;
+        color: white !important;
+    }
+    
+    .learn-more-btn i {
+        margin-left: 0.5rem;
+    }
+}
+
+/* Recommended Cards Image Centering */
+.recommended-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: white;
+}
+
+.recommended-card-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.recommended-image-container {
+    width: 100%;
+    height: 200px; /* Fixed height for the image container */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.recommended-image {
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.recommended-image img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    display: block;
+}
+
+.recommended-content {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.recommended-content h3 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1.25rem;
+    color: #2d3748;
+}
+
+.recommended-desc {
+    margin-bottom: 1rem;
+    flex-grow: 1;
+}
+
+.recommended-desc p {
+    margin: 0;
+    color: #4a5568;
+    line-height: 1.5;
+}
+
+.learn-more-btn {
+    display: inline-flex;
+    align-items: center;
+    color: #4f46e5;
+    font-weight: 500;
+    text-decoration: none;
+    margin-top: auto;
+    transition: color 0.2s;
+}
+
+.learn-more-btn:hover {
+    color: #4338ca;
+    text-decoration: underline;
+}
+
+.learn-more-btn i {
+    margin-left: 0.5rem;
+    transition: transform 0.2s;
+}
+
+.learn-more-btn:hover i {
+    transform: translateX(4px);
 }

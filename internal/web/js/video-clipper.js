@@ -505,19 +505,36 @@ const VideoClipper = (function() {
         
         if (!pasteButton || !videoUrlInput) return;
         
-        pasteButton.addEventListener('click', async () => {
+        const handlePaste = async (e) => {
+            e.preventDefault();
             try {
-                const text = await navigator.clipboard.readText();
-                if (text) {
-                    videoUrlInput.value = text;
-                    videoUrlInput.dispatchEvent(new Event('input'));
+                // Focus input first to ensure proper mobile keyboard behavior
+                videoUrlInput.focus();
+                
+                // Try modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    const text = await navigator.clipboard.readText();
+                    if (text) {
+                        videoUrlInput.value = text;
+                        // Trigger input event for any listeners
+                        const event = new Event('input', { bubbles: true });
+                        videoUrlInput.dispatchEvent(event);
+                    }
+                } else {
+                    // Fallback for older browsers
+                    document.execCommand('paste');
                 }
             } catch (err) {
                 console.error('Failed to read from clipboard:', err);
+                // Final fallback - just focus the input
                 videoUrlInput.focus();
                 showError('Please paste the URL manually');
             }
-        });
+        };
+        
+        // Add both click and touch events for better mobile support
+        pasteButton.addEventListener('click', handlePaste);
+        pasteButton.addEventListener('touchend', handlePaste);
     }
 
     function formatTimeInput(value, isDeleting = false) {
@@ -551,9 +568,49 @@ const VideoClipper = (function() {
     function setupTimeInputs() {
         const timeInputs = document.querySelectorAll('input[type="text"][pattern]');
         
-        timeInputs.forEach(input => {
-            let isDeleting = false;
+        const handleTimeInput = (input) => {
+            const cursorPosition = input.selectionStart;
+            const currentValue = input.value;
+            const isDeleting = input.getAttribute('data-deleting') === 'true';
             
+            // Format the time input
+            const formatted = formatTimeInput(currentValue, isDeleting);
+            
+            // Only update if value changed
+            if (currentValue !== formatted) {
+                input.value = formatted;
+                
+                // Try to maintain cursor position
+                try {
+                    // If we're not at the end, try to maintain position
+                    if (cursorPosition !== currentValue.length || isDeleting) {
+                        requestAnimationFrame(() => {
+                            let newPosition = cursorPosition;
+                            
+                            // If we were deleting, try to maintain position
+                            if (isDeleting) {
+                                newPosition = Math.max(0, cursorPosition - (currentValue.length - formatted.length));
+                            }
+                            
+                            // Ensure position is within bounds
+                            newPosition = Math.min(Math.max(0, newPosition), formatted.length);
+                            input.setSelectionRange(newPosition, newPosition);
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error setting cursor position:', e);
+                }
+            }
+            
+            updateDurationDisplay();
+            
+            // Reset deleting flag
+            if (isDeleting) {
+                input.setAttribute('data-deleting', 'false');
+            }
+        };
+        
+        timeInputs.forEach(input => {
             // Format on blur
             input.addEventListener('blur', (e) => {
                 const formatted = formatTimeInput(e.target.value);
@@ -568,32 +625,24 @@ const VideoClipper = (function() {
                 if (!e.target.value) {
                     e.target.value = '00:00:00';
                 }
-                isDeleting = false;
             });
             
             // Handle keydown to detect backspace/delete
             input.addEventListener('keydown', (e) => {
-                isDeleting = (e.key === 'Backspace' || e.key === 'Delete');
+                if (e.key === 'Backspace' || e.key === 'Delete') {
+                    input.setAttribute('data-deleting', 'true');
+                } else {
+                    input.setAttribute('data-deleting', 'false');
+                }
             });
             
             // Handle input
             input.addEventListener('input', (e) => {
-                // Don't format while deleting
-                if (!isDeleting) {
-                    const formatted = formatTimeInput(e.target.value);
-                    if (formatted !== e.target.value) {
-                        const cursorPos = e.target.selectionStart;
-                        e.target.value = formatted;
-                        // Try to maintain cursor position
-                        requestAnimationFrame(() => {
-                            const newPos = Math.min(cursorPos + (formatted.length - e.target.value.length), formatted.length);
-                            e.target.setSelectionRange(newPos, newPos);
-                        });
-                    }
-                }
-                
-                updateDurationDisplay();
+                handleTimeInput(e.target);
             });
+            
+            // Initialize data attribute
+            input.setAttribute('data-deleting', 'false');
         });
         
         // Initial update

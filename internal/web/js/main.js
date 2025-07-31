@@ -399,14 +399,45 @@ function setupMobileMenu() {
     const toggle = document.querySelector('.mobile-menu-toggle');
     const nav = document.querySelector('.nav-links');
 
-    if (toggle && nav) {
-        toggle.addEventListener('click', () => {
-            nav.classList.toggle('active');
-            toggle.classList.toggle('active');
+    if (!toggle || !nav) return;
+    
+    // Remove any existing event listeners to prevent duplicates
+    const newToggle = toggle.cloneNode(true);
+    const newNav = nav.cloneNode(true);
+    
+    toggle.parentNode.replaceChild(newToggle, toggle);
+    nav.parentNode.replaceChild(newNav, nav);
+    
+    // Add click handler to toggle button
+    newToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        newNav.classList.toggle('active');
+        newToggle.classList.toggle('active');
+        document.body.classList.toggle('menu-open');
+    });
+    
+    // Close menu when clicking on nav links
+    const navLinks = newNav.querySelectorAll('a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            newNav.classList.remove('active');
+            newToggle.classList.remove('active');
+            document.body.classList.remove('menu-open');
         });
-    }
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (newNav.classList.contains('active') && 
+            !newToggle.contains(e.target) && 
+            !newNav.contains(e.target)) {
+            newNav.classList.remove('active');
+            newToggle.classList.remove('active');
+            document.body.classList.remove('menu-open');
+        }
+    });
 }
-
 
 // Initialize the floating button immediately when the script loads
 const floatingButton = new FloatingButton();
@@ -415,6 +446,9 @@ const floatingButton = new FloatingButton();
 document.addEventListener('DOMContentLoaded', function () {
     // Update paths in the header
     updateHeaderPaths();
+    
+    // Setup mobile menu toggle
+    setupMobileMenu();
 
     // Adjust side ads on load, window resize, and scroll
     if (document.querySelector('.video-clipper')) {
@@ -456,42 +490,6 @@ window.addEventListener('load', function () {
         floatingButton.init();
     }
 });
-
-// Mobile menu functionality
-function setupMobileMenu() {
-    const menuToggle = document.querySelector('.mobile-menu-toggle');
-    const navLinks = document.querySelector('.nav-links');
-    const body = document.body;
-
-    if (menuToggle && navLinks) {
-        menuToggle.addEventListener('click', function () {
-            this.classList.toggle('active');
-            navLinks.classList.toggle('active');
-            body.classList.toggle('menu-open');
-
-            // Toggle aria-expanded
-            const expanded = this.getAttribute('aria-expanded') === 'true' || false;
-            this.setAttribute('aria-expanded', !expanded);
-
-            // Toggle menu text
-            const menuText = document.querySelector('.menu-text');
-            if (menuText) {
-                menuText.textContent = expanded ? 'Menu' : 'Close';
-            }
-        });
-
-        // Close menu when clicking on a nav link
-        const navItems = document.querySelectorAll('.nav-links a');
-        navItems.forEach(item => {
-            item.addEventListener('click', function () {
-                menuToggle.classList.remove('active');
-                navLinks.classList.remove('active');
-                body.classList.remove('menu-open');
-                menuToggle.setAttribute('aria-expanded', 'false');
-            });
-        });
-    }
-}
 
 // Set active link based on current page
 function setActiveLink() {

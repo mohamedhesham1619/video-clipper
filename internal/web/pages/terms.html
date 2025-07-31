@@ -22,6 +22,7 @@
     <meta name="msapplication-square310x310logo" content="/images/icon.png">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/js/main.js"></script>
     <style>
         .legal-content {
             max-width: 1000px !important;
@@ -115,7 +116,25 @@
         </div>
     </header>
 
-    <main role="main" itemscope itemtype="https://schema.org/WebPageElement">
+    <main role="main" itemscope itemtype="https://schema.org/WebPageElement" id="main-content">
+        <style>
+            @media (max-width: 768px) {
+                #main-content {
+                    margin-top: 110px !important;
+                }
+                .page-header {
+                    padding: 1rem 0 !important;
+                    margin-bottom: 1.5rem !important;
+                }
+                .page-header p {
+                    margin-bottom: 1rem !important;
+                    display: block;
+                }
+                .content-section {
+                    padding-top: 1rem !important;
+                }
+            }
+        </style>
         <section class="page-header">
             <div class="container">
                 <h1>Terms of Service</h1>

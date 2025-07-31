@@ -35,6 +35,7 @@
     <meta name="msapplication-square310x310logo" content="/images/icon.png">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/js/main.js"></script>
 </head>
 
 <body itemscope itemtype="https://schema.org/WebPage">
@@ -69,7 +70,21 @@
         </div>
     </header>
 
-    <main role="main" itemscope itemtype="https://schema.org/ItemList" style="margin-top: 3rem;">
+    <main role="main" itemscope itemtype="https://schema.org/ItemList" style="margin-top: 3rem;" id="main-content">
+        <style>
+            @media (max-width: 768px) {
+                #main-content {
+                    margin-top: 110px !important;
+                }
+                .page-header {
+                    padding: 1rem 0 !important;
+                    margin-bottom: 1rem !important;
+                }
+                .supported-sites-content {
+                    padding-top: 1rem !important;
+                }
+            }
+        </style>
         <meta itemprop="name" content="Supported Video Platforms">
         <meta itemprop="description" content="List of video platforms and websites supported by VideoClipper">
         <section class="page-header" style="margin-bottom: 3rem; padding-bottom: 2rem;">
