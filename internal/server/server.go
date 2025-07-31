@@ -50,6 +50,7 @@ func New() *Server {
 	mux.Handle("/components/", fs)
 	mux.HandleFunc("/robots.txt", handlers.RobotsTxtHandler)
 	mux.HandleFunc("/sitemap.xml", handlers.SitemapXMLHandler)
+	mux.Handle("/favicon.ico", http.FileServer(http.Dir("internal/web/images")))
 
 	return &Server{mux: mux}
 }

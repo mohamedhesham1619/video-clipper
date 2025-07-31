@@ -771,27 +771,27 @@ function rotateContent() {
 const contentSuggestions = {
     sides: [
         {
-            html: "<a href=\"https://www.mvvitrk.com/bDig55\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753699762/300x600_tazs11.png\" alt=\"\" style=\"width: 100%; height: 100%; object-fit: contain;\"></a>"
+            html: "<a href=\"https://www.mvvitrk.com/bDig55\" target=\"_blank\" rel=\"noopener\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753699762/300x600_tazs11.png\" alt=\"\" style=\"width: 100%; height: 100%; object-fit: contain;\"></a>"
         },
         {
-            html: "<a href=\"https://akool.com/?via=mh1619\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753718205/screen-0_cbfutf.jpg\" alt=\"\" style=\"width: 100%; height: 100%; object-fit: contain;\"></a>"
+            html: "<a href=\"https://akool.com/?via=mh1619\" target=\"_blank\" rel=\"noopener\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753718205/screen-0_cbfutf.jpg\" alt=\"\" style=\"width: 100%; height: 100%; object-fit: contain;\"></a>"
         },
         {
-            html: "<a href=\"https://flixier.com?fpr=mh1619\" target=\"_blank\"><img src=\"https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24623/120x600px-4.png\" alt=\"\" style=\"width: 100%; height: 100%; object-fit: contain;\"></a>"
+            html: "<a href=\"https://flixier.com?fpr=mh1619\" target=\"_blank\" rel=\"noopener\"><img src=\"https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24623/120x600px-4.png\" alt=\"\" style=\"width: 100%; height: 100%; object-fit: contain;\"></a>"
         },
         {
-            html: "<a rel=\"sponsored\" href=\"https://renderforest.pxf.io/c/6416428/1957251/14885\" target=\"_top\" id=\"1957251\"><img src=\"https://a.impactradius-go.com/display-ad/14885-1957251\" alt=\"\" style=\"width: 100%; height: 100%; object-fit: contain;\"></a>"
+            html: "<a rel=\"noopener\" href=\"https://renderforest.pxf.io/c/6416428/1957251/14885\" target=\"_top\" id=\"1957251\"><img src=\"https://a.impactradius-go.com/display-ad/14885-1957251\" alt=\"\" style=\"width: 100%; height: 100%; object-fit: contain;\"></a>"
         }
     ],
     bottom: [
         {
-            html: '<a href="https://partner.pcloud.com/r/146969" title="pCloud Premium" target="_blank"><img src="https://partner.pcloud.com/media/banners/personal/personal00272890.jpg" alt="pCloud Premium"/></a>'
+            html: '<a href="https://partner.pcloud.com/r/146969" title="pCloud Premium" target="_blank" rel="noopener"><img src="https://partner.pcloud.com/media/banners/personal/personal00272890.jpg" alt="pCloud Premium"/></a>'
         },
         {
-            html: "<a href=\"https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902\" target=\"_blank\" rel=\"sponsored\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753394990/728x90_baajhd.png\" alt=\"\" style=\"width: 100%; max-height: 90px; object-fit: contain;\" /></a>"
+            html: "<a href=\"https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902\" target=\"_blank\" rel=\"noopener\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753394990/728x90_baajhd.png\" alt=\"\" style=\"width: 100%; max-height: 90px; object-fit: contain;\" /></a>"
         },
         {
-            html: "<a href=\"https://privadovpn.com/resources/best-vpn-for-gaming#a_aid=1619&a_bid=203d5f79\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753306325/728x90_c9y6b3.png\" alt=\"\" style=\"width: 100%; max-height: 90px; object-fit: contain;\"></a>"
+            html: "<a href=\"https://privadovpn.com/resources/best-vpn-for-gaming#a_aid=1619&a_bid=203d5f79\" target=\"_blank\" rel=\"noopener\"><img src=\"https://res.cloudinary.com/ddozq3vu5/image/upload/v1753306325/728x90_c9y6b3.png\" alt=\"\" style=\"width: 100%; max-height: 90px; object-fit: contain;\"></a>"
         }
     ]
 };
@@ -872,7 +872,7 @@ function createToolCard(tool) {
         <div class="recommended-card-inner">
             <div class="recommended-image-container">
                 <div class="recommended-image">
-                    <a href="${tool.link}" target="_blank" rel="noopener noreferrer">
+                    <a href="${tool.link}" target="_blank" rel="noopener">
                         <img src="${tool.image}" alt="${tool.header}" loading="lazy">
                     </a>
                 </div>
