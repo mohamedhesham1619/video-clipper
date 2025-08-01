@@ -97,6 +97,7 @@ func prepareFfmpegCommand(downloadPath string) *exec.Cmd {
 		"-c", "copy", // Just copy the stream yt-dlp provides.
 		"-avoid_negative_ts", "make_zero", // Avoid negative timestamps.
 		"-fflags", "+genpts", // Generate missing timestamps.
+		"-f", "mp4", // Force the output format to mp4.
 		"-y",         // Overwrite output file without asking.
 		downloadPath, // Output file path
 	)
@@ -135,7 +136,7 @@ func preparePipes(ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd) error {
 func GetVideoTitle(videoRequest models.VideoRequest) (string, error) {
 	args := []string{
 		"-f", fmt.Sprintf("bv*[height<=%[1]v]+ba/b[height<=%[1]v]/best", videoRequest.Quality),
-		"--print", "%(title).220s-%(height)sp.%(ext)s",
+		"--print", "%(title).220s-%(height)sp.mp4",
 		"--no-playlist",
 		"--no-download",
 		"--no-warnings",
