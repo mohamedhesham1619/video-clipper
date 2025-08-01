@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"path/filepath"
 	"strings"
 )
@@ -24,8 +25,10 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	slog.Info("Request for DownloadHandler: ", "fileId", fileId, "filePath", filePath)
 
 	fileName := filepath.Base(filePath)
+	ext := filepath.Ext(fileName)
+	safeFileName := fmt.Sprintf("clip%s",ext)
 
-	disposition := fmt.Sprintf("attachment; filename=\"%s\"", fileName)
+	disposition := fmt.Sprintf("attachment; filename=\"%s\"; filename*=UTF-8''%s", safeFileName, url.PathEscape(fileName))
 
 	w.Header().Set("Content-Disposition", disposition)
 
