@@ -48,6 +48,299 @@
     <meta name="msapplication-TileColor" content="#ffffff">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        // Test ad domains and known ad server URLs
+        const adDomains = [
+            'https://a.impactradius-go.com/display-ad/14885-1957251',
+            'https://res.cloudinary.com/ddozq3vu5/image/upload/v1753394990/728x90_baajhd.png',
+            'https://affiliates.privadovpn.com/accounts/default1/3abd4o9y/fb34eb50.png?t=1632790058',
+            'https://res.cloudinary.com/ddozq3vu5/image/upload/v1753303315/300x250_krlpqk.png'
+        ];
+
+        // Create a MutationObserver to detect DOM changes
+        const observer = new MutationObserver((mutations) => {
+            if (window.adBlockDetected) {
+                mutations.forEach((mutation) => {
+                    if (!document.getElementById('adblock-overlay') || 
+                        !document.body.contains(document.getElementById('adblock-overlay'))) {
+                        createOverlay();
+                        showAdBlockOverlay();
+                    }
+                });
+            }
+        });
+
+        // Function to check if any ad domain is blocked
+        function checkAdBlock() {
+            console.log('Starting ad block detection with test domains...');
+            let blockedCount = 0;
+            let checksCompleted = 0;
+            const totalChecks = adDomains.length;
+
+            function checkAdDomain(url) {
+                return new Promise((resolve) => {
+                    // First try with an image load
+                    const img = new Image();
+                    
+                    img.onload = function() {
+                        console.log(`Ad domain loaded successfully: ${url}`);
+                        resolve(false);
+                    };
+                    
+                    img.onerror = function(e) {
+                        console.log(`Ad domain likely blocked: ${url}`, e);
+                        // Only count as blocked if it's a real block, not just CORS
+                        if (e && e.message && e.message.includes('blocked by client')) {
+                            resolve(true);
+                        } else {
+                            // For other errors, try XHR as fallback
+                            const xhr = new XMLHttpRequest();
+                            xhr.open('GET', url, true);
+                            xhr.timeout = 2000;
+                            
+                            xhr.onload = function() {
+                                console.log(`Ad domain loaded via XHR: ${url}`);
+                                resolve(false);
+                            };
+                            
+                            xhr.onerror = function() {
+                                console.log(`Ad domain blocked via XHR: ${url}`);
+                                resolve(true);
+                            };
+                            
+                            xhr.ontimeout = function() {
+                                console.log(`Ad domain check timed out: ${url}`);
+                                resolve(false); // Don't count timeouts as blocks
+                            };
+                            
+                            try {
+                                xhr.send();
+                            } catch (e) {
+                                console.log(`XHR error for ${url}:`, e);
+                                resolve(false);
+                            }
+                        }
+                    };
+                    
+                    // Start the image load
+                    img.src = url + '?t=' + Date.now();
+                    
+                    // Set a timeout in case the image doesn't load or error
+                    setTimeout(() => {
+                        if (!img.complete) {
+                            console.log(`Ad domain check timed out: ${url}`);
+                            resolve(false); // Don't count timeouts as blocks
+                        }
+                    }, 2000);
+                });
+            }
+
+            // Check each domain
+            adDomains.forEach(url => {
+                checkAdDomain(url).then(isBlocked => {
+                    if (isBlocked) blockedCount++;
+                    checksCompleted++;
+                    
+                    if (checksCompleted === totalChecks) {
+                        console.log(`Ad block check complete. Blocked: ${blockedCount}/${totalChecks}`);
+                        if (blockedCount >= 2) { // Require at least 2 blocked to avoid false positives
+                            window.adBlockDetected = true;
+                            console.log('Ad blocker detected, showing overlay');
+                            createOverlay();
+                            showAdBlockOverlay();
+                            // Start observing after detection
+                            observer.observe(document.body, { 
+                                childList: true, 
+                                subtree: true,
+                                attributes: true,
+                                childList: true,
+                                characterData: true
+                            });
+                            // Disable scrolling
+                            document.body.style.overflow = 'hidden';
+                            // Disable selection
+                            document.onselectstart = () => false;
+                        } else {
+                            window.adBlockDetected = false;
+                        }
+                    }
+                });
+            });
+        }
+
+        // Function to create the overlay if it doesn't exist
+        function createOverlay() {
+            if (!document.getElementById('adblock-overlay')) {
+                const overlay = document.createElement('div');
+                overlay.id = 'adblock-overlay';
+                overlay.className = 'hidden';
+                overlay.style.display = 'none';
+                overlay.innerHTML = `
+                    <div id="adblock-overlay-content">
+                        <h2><i class="fas fa-exclamation-triangle"></i> Ad Blocker Detected</h2>
+                        <p>We understand that ads can be annoying. That's why we keep ours simple and respectful—no popups, no tricks. Just quiet support that keeps this tool free.</p>
+                        <p><strong>Please consider whitelisting us 💙</strong></p>
+                        <p>If you believe this is a mistake, please <a href="/contact" style="color: #38a169; font-weight: 600; text-decoration: none;">contact us</a>.</p>
+                        <button onclick="window.location.reload()">I've disabled my ad blocker</button>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+            }
+        }
+
+
+
+        function showAdBlockOverlay() {
+            console.log('Attempting to show ad block overlay');
+            const overlay = document.getElementById('adblock-overlay');
+            if (overlay) {
+                console.log('Overlay element found, removing hidden class');
+                overlay.style.display = 'flex';
+                overlay.classList.remove('hidden');
+                // Force reflow/repaint
+                void overlay.offsetHeight;
+                overlay.style.opacity = '1';
+                console.log('Overlay should be visible now');
+            } else {
+                console.error('Overlay element not found!');
+            }
+        }
+
+        // Run the check when the page loads
+        console.log('Setting up enhanced ad block detection...');
+        
+        // Start detection after a short delay
+        setTimeout(() => {
+            console.log('Starting initial ad block check...');
+            checkAdBlock();
+        }, 1000);
+        
+        // Also check on window load
+        window.addEventListener('load', function() {
+            console.log('Window loaded, performing additional ad block check...');
+            setTimeout(checkAdBlock, 1500);
+        });
+        
+        // Check periodically in case the overlay is removed
+        setInterval(() => {
+            if (window.adBlockDetected && (!document.getElementById('adblock-overlay') || 
+                !document.body.contains(document.getElementById('adblock-overlay')))) {
+                console.log('Overlay missing, recreating...');
+                createOverlay();
+                showAdBlockOverlay();
+            }
+        }, 2000);
+        
+        // Add additional protection against right-click and dev tools
+        document.addEventListener('contextmenu', (e) => {
+            if (window.adBlockDetected) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Prevent F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+        document.addEventListener('keydown', (e) => {
+            if (window.adBlockDetected && (
+                e.key === 'F12' ||
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'i' || e.key === 'j' || e.key === 'c'))
+            )) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
+    <style>
+        #adblock-overlay {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(2px);
+            z-index: 2147483647;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0s 0.3s, background-color 0.3s ease-in-out;
+            pointer-events: none;
+        }
+        #adblock-overlay:not(.hidden) {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease-in-out;
+        }
+        #adblock-overlay-content {
+            max-width: 650px;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            pointer-events: auto;
+            backdrop-filter: blur(5px);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        #adblock-overlay h2 {
+            font-size: 28px;
+            margin: 0 0 20px 0;
+            color: #2d3748;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        #adblock-overlay h2 i {
+            color: #e53e3e;
+        }
+        
+        #adblock-overlay p {
+            margin: 0 0 22px 0;
+            line-height: 1.7;
+            font-size: 18px;
+            color: #4a5568;
+        }
+        
+        #adblock-overlay p:last-child {
+            font-size: 16px;
+            margin-bottom: 0;
+        }
+        #adblock-overlay button {
+            background-color: #38a169;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 18px;
+            font-weight: 500;
+            margin: 15px 0 0 0;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 2px 8px rgba(56, 161, 105, 0.3);
+        }
+        #adblock-overlay button:hover {
+            background-color: #2f855a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(56, 161, 105, 0.4);
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
     <script src="/js/main.js"></script>
     <script type="application/ld+json">
         {
@@ -400,6 +693,7 @@
     <script src="/js/video-clipper.js"></script>
     <script src="/js/faq.js"></script>
     <script src="/js/floating-button.js"></script>
+    <!-- Overlay will be created dynamically by JavaScript -->
 </body>
 
 </html>

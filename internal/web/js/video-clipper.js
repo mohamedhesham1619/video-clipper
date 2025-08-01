@@ -296,7 +296,7 @@ const VideoClipper = (function() {
                 state.eventSource.close();
                 state.eventSource = null;
             }
-            showError('Connection to server was interrupted. Please try again.');
+            showError(error.message);
             hideLoading();
         };
 
