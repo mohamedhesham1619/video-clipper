@@ -365,10 +365,10 @@ function rotateContent() {
 const contentSuggestions = {
     sides: [
         {
-            html: `<a href="https://www.mvvitrk.com/bDig55" target="_blank" rel="noopener" onclick="gtag('event', 'ad_click', { ad_name: 'Movavi', ad_position: 'side' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/v1753699762/300x600_tazs11.png" alt="" style="width: 100%; height: 100%; object-fit: contain;"></a>`
+            html: `<a href="https://www.mvvitrk.com/bDig55" target="_blank" rel="noopener" onclick="gtag('event', 'ad_click', { ad_name: 'Movavi', ad_position: 'side' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753699762/300x600_tazs11.png" alt="" style="width: 100%; height: 100%; object-fit: contain;"></a>`
         },
         {
-            html: `<a href="https://akool.com/?via=mh1619" target="_blank" rel="noopener" onclick="gtag('event', 'ad_click', { ad_name: 'Akool', ad_position: 'side' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/v1753718205/screen-0_cbfutf.jpg" alt="" style="width: 100%; height: 100%; object-fit: contain;"></a>`
+            html: `<a href="https://akool.com/?via=mh1619" target="_blank" rel="noopener" onclick="gtag('event', 'ad_click', { ad_name: 'Akool', ad_position: 'side' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753718205/screen-0_cbfutf.jpg" alt="" style="width: 100%; height: 100%; object-fit: contain;"></a>`
         },
         {
             html: `<a href="https://flixier.com?fpr=mh1619" target="_blank" rel="noopener" onclick="gtag('event', 'ad_click', { ad_name: 'Flixier', ad_position: 'side' })"><img src="https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24623/120x600px-4.png" alt="" style="width: 100%; height: 100%; object-fit: contain;"></a>`
@@ -382,13 +382,14 @@ const contentSuggestions = {
             html: `<a href="https://partner.pcloud.com/r/146969" title="pCloud Premium" target="_blank" rel="noopener" onclick="gtag('event', 'ad_click', { ad_name: 'pCloud', ad_position: 'bottom' })"><img src="https://partner.pcloud.com/media/banners/personal/personal00272890.jpg" alt="pCloud Premium"/></a>`
         },
         {
-            html: `<a href="https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902" target="_blank" rel="noopener" onclick="gtag('event', 'ad_click', { ad_name: 'NordVPN', ad_position: 'bottom' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/v1753394990/728x90_baajhd.png" alt="" style="width: 100%; max-height: 90px; object-fit: contain;" /></a>`
+            html: `<a href="https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902" target="_blank" rel="noopener" onclick="gtag('event', 'ad_click', { ad_name: 'NordVPN', ad_position: 'bottom' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753394990/728x90_baajhd.png" alt="" style="width: 100%; max-height: 90px; object-fit: contain;" /></a>`
         },
         {
-            html: `<a href="https://privadovpn.com/resources/best-vpn-for-gaming#a_aid=1619&a_bid=203d5f79" target="_blank" rel="noopener" onclick="gtag('event', 'ad_click', { ad_name: 'PrivadoVPN', ad_position: 'bottom' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/v1753306325/728x90_c9y6b3.png" alt="" style="width: 100%; max-height: 90px; object-fit: contain;"></a>`
+            html: `<a href="https://privadovpn.com/resources/best-vpn-for-gaming#a_aid=1619&a_bid=203d5f79" target="_blank" rel="noopener" onclick="gtag('event', 'ad_click', { ad_name: 'PrivadoVPN', ad_position: 'bottom' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753306325/728x90_c9y6b3.png" alt="" style="width: 100%; max-height: 90px; object-fit: contain;"></a>`
         }
     ]
 };
+
 
 
 // Initialize content rotation when the DOM is fully loaded
@@ -507,7 +508,7 @@ const recommended_tools = [
     {
         "header": "Your do-it-all video-making bundle",
         "link": "https://www.mvvitrk.com/bDig55",
-        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/v1753291631/300x250_ewu5d8.png",
+        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753291631/300x250_ewu5d8.png",
         "description": "Auto subtitles with one click, ready-made templates\nHandy video editing, file conversion, and screen recording\nHundreds of drag-and-drop filters, transitions, titles, and overlays"
     },
     {
@@ -537,7 +538,7 @@ const recommended_tools = [
     {
         "header": "Trusted by Millions, Audited for Privacy – Take your online security to the next level with NordVPN",
         "link": "https://go.nordvpn.net/aff_c?offer_id=15&aff_id=127970&url_id=902",
-        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/v1753303315/300x250_krlpqk.png",
+        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753303315/300x250_krlpqk.png",
         "description": "Threat Protection Pro blocks malware, trackers, and phishing sites in real-time.\nDark Web Monitor alerts you if your credentials appear in data breaches.\nSplit tunneling, dedicated IP, and Meshnet secure all your devices—even across continents."
     },
     {
@@ -547,3 +548,4 @@ const recommended_tools = [
         "description": "Deep discounts with long-term plans: ultra-low pricing from $1.11/month*.\nReliable speeds for HD streaming and browsing on global servers.\nPremium features like unlimited devices, streaming unblock & ad blocking."
     }
 ];
+
