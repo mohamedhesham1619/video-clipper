@@ -70,8 +70,18 @@ func isYouTubeURL(url string) bool {
 }
 
 func prepareYtDlpCommand(videoRequest models.VideoRequest) *exec.Cmd {
+
+	var formatString string
+
+	if isYouTubeURL(videoRequest.VideoURL) {
+		// Youtube often seperate the audio and video streams, so we need to prefer seperate streams to get the required video quality.
+		formatString = fmt.Sprintf("bestvideo[height<=%[1]v]+bestaudio/best[height<=%[1]v]/best", videoRequest.Quality)
+	} else {
+		// For other sites, we can prefer the merged stream.
+		formatString = fmt.Sprintf("best[height<=%[1]v]/bv*[height<=%[1]v]+ba/best/bv+ba/worst", videoRequest.Quality)
+	}
 	args := []string{
-		"-f", fmt.Sprintf("best[height<=%[1]v]/bv*[height<=%[1]v]+ba/best/bv+ba/worst", videoRequest.Quality),
+		"-f", formatString,
 		"--download-sections", fmt.Sprintf("*%s-%s", videoRequest.ClipStart, videoRequest.ClipEnd),
 		"--no-warnings",
 		"--ignore-errors",
