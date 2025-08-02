@@ -14,36 +14,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Free Online Video Trimmer & Cutter. Trim, cut, and download videos from YouTube, TikTok, Facebook, and 1000+ sites. No watermarks, no registration. The best online video cutter & trimmer tool! 🚀">
+        content="Free Online Video Trimmer & Cutter. Trim, cut, and download videos from YouTube, TikTok, Facebook, and 1000+ sites. No signup, no watermarks. The best online video cutter & trimmer tool! 🚀">
     <meta name="keywords"
-        content="video trimmer, video cutter, online video cutter, video clipper, trim video online, cut video online, free video trimmer, free video cutter, online video editor, trim youtube video, cut tiktok video, video cliper online, download video clips, youtube trimmer, tiktok cutter, facebook video trimmer, video editor online, mp4 cutter, video trimmer online, best video trimmer, video downloader, online video trimmer">
+        content="video trimmer, video cutter, online video cutter, video clipper, trim video online, cut video online, free video trimmer, free video cutter, trim youtube video, cut tiktok video, video cliper online, youtube trimmer, tiktok cutter, facebook video trimmer, video trimmer online, best video trimmer, video downloader, online video trimmer">
     <meta name="author" content="VideoClipper">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://videoclipper.online/">
-    <meta property="og:title" content="✂️ Video Trimmer & Cutter Online - Free Video Editor (No Watermark)">
+    <meta property="og:title" content="VideoClipper - Free Online Video Cutter & Trimmer (No Signup)">
     <meta property="og:description"
-        content="Cut, trim, and edit videos online with our free video cutter & trimmer. Works with YouTube, TikTok, Vimeo, Facebook, and 1000+ sites. No watermarks, no registration. Start trimming in seconds! 🚀">
+        content="Free Online Video Trimmer & Cutter. Trim, cut, and download videos from YouTube, TikTok, Facebook, and 1000+ sites. No signup, no watermarks. The best online video cutter & trimmer tool! 🚀">
     <meta property="og:image" content="/images/preview.jpg">
     <meta property="og:site_name" content="VideoClipper">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://videoclipper.online/">
-    <meta name="twitter:title" content="✂️ Free Video Trimmer & Cutter Online - Edit Videos Easily">
+    <meta name="twitter:title" content="VideoClipper - Free Online Video Cutter & Trimmer (No Signup)">
     <meta name="twitter:description"
-        content="Trim, cut and edit videos online with our free video cutter. Works with 1000+ sites. No watermarks, no registration. Start trimming your videos now! 🚀">
+        content="Free Online Video Trimmer & Cutter. Trim, cut, and download videos from YouTube, TikTok, Facebook, and 1000+ sites. No signup, no watermarks. The best online video cutter & trimmer tool! 🚀">
     <meta name="twitter:image" content="/images/preview.jpg">
 
-    <title>Free Online Video Cutter & Trimmer - No Watermarks | VideoClipper</title>
+    <title>VideoClipper - Free Online Video Cutter & Trimmer (No Signup)</title>
     <link rel="canonical" href="https://videoclipper.online" />
     <!-- Favicon and Site Icon for Search Engines -->
-    <link rel="icon" type="image/png" href="/images/small-icon.png">
-    <link rel="icon" href="/images/small-icon.png" sizes="192x192">
-    <link rel="apple-touch-icon" href="/images/small-icon.png">
-    <link rel="shortcut icon" href="/images/small-icon.png">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!-- High-res PNG for modern browsers and Google -->
+    <link rel="icon" type="image/png" sizes="512x512" href="/images/small-icon.png">
+
+    <link rel="apple-touch-icon" sizes="512x512" href="/images/small-icon.png">
+
+    <link rel="icon" type="image/x-icon" sizes="48x48" href="/favicon.ico">
+
     <meta name="msapplication-TileImage" content="/images/small-icon.png">
     <meta name="msapplication-TileColor" content="#ffffff">
     <link rel="stylesheet" href="css/styles.css">
@@ -61,7 +65,7 @@
         const observer = new MutationObserver((mutations) => {
             if (window.adBlockDetected) {
                 mutations.forEach((mutation) => {
-                    if (!document.getElementById('adblock-overlay') || 
+                    if (!document.getElementById('adblock-overlay') ||
                         !document.body.contains(document.getElementById('adblock-overlay'))) {
                         createOverlay();
                         showAdBlockOverlay();
@@ -81,13 +85,13 @@
                 return new Promise((resolve) => {
                     // First try with an image load
                     const img = new Image();
-                    
-                    img.onload = function() {
+
+                    img.onload = function () {
                         console.log(`Ad domain loaded successfully: ${url}`);
                         resolve(false);
                     };
-                    
-                    img.onerror = function(e) {
+
+                    img.onerror = function (e) {
                         console.log(`Ad domain likely blocked: ${url}`, e);
                         // Only count as blocked if it's a real block, not just CORS
                         if (e && e.message && e.message.includes('blocked by client')) {
@@ -97,22 +101,22 @@
                             const xhr = new XMLHttpRequest();
                             xhr.open('GET', url, true);
                             xhr.timeout = 2000;
-                            
-                            xhr.onload = function() {
+
+                            xhr.onload = function () {
                                 console.log(`Ad domain loaded via XHR: ${url}`);
                                 resolve(false);
                             };
-                            
-                            xhr.onerror = function() {
+
+                            xhr.onerror = function () {
                                 console.log(`Ad domain blocked via XHR: ${url}`);
                                 resolve(true);
                             };
-                            
-                            xhr.ontimeout = function() {
+
+                            xhr.ontimeout = function () {
                                 console.log(`Ad domain check timed out: ${url}`);
                                 resolve(false); // Don't count timeouts as blocks
                             };
-                            
+
                             try {
                                 xhr.send();
                             } catch (e) {
@@ -121,10 +125,10 @@
                             }
                         }
                     };
-                    
+
                     // Start the image load
                     img.src = url + '?t=' + Date.now();
-                    
+
                     // Set a timeout in case the image doesn't load or error
                     setTimeout(() => {
                         if (!img.complete) {
@@ -140,7 +144,7 @@
                 checkAdDomain(url).then(isBlocked => {
                     if (isBlocked) blockedCount++;
                     checksCompleted++;
-                    
+
                     if (checksCompleted === totalChecks) {
                         console.log(`Ad block check complete. Blocked: ${blockedCount}/${totalChecks}`);
                         if (blockedCount >= 2) { // Require at least 2 blocked to avoid false positives
@@ -149,8 +153,8 @@
                             createOverlay();
                             showAdBlockOverlay();
                             // Start observing after detection
-                            observer.observe(document.body, { 
-                                childList: true, 
+                            observer.observe(document.body, {
+                                childList: true,
                                 subtree: true,
                                 attributes: true,
                                 childList: true,
@@ -208,29 +212,29 @@
 
         // Run the check when the page loads
         console.log('Setting up enhanced ad block detection...');
-        
+
         // Start detection after a short delay
         setTimeout(() => {
             console.log('Starting initial ad block check...');
             checkAdBlock();
         }, 1000);
-        
+
         // Also check on window load
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             console.log('Window loaded, performing additional ad block check...');
             setTimeout(checkAdBlock, 1500);
         });
-        
+
         // Check periodically in case the overlay is removed
         setInterval(() => {
-            if (window.adBlockDetected && (!document.getElementById('adblock-overlay') || 
+            if (window.adBlockDetected && (!document.getElementById('adblock-overlay') ||
                 !document.body.contains(document.getElementById('adblock-overlay')))) {
                 console.log('Overlay missing, recreating...');
                 createOverlay();
                 showAdBlockOverlay();
             }
         }, 2000);
-        
+
         // Add additional protection against right-click and dev tools
         document.addEventListener('contextmenu', (e) => {
             if (window.adBlockDetected) {
@@ -272,11 +276,13 @@
             transition: opacity 0.3s ease-in-out, visibility 0s 0.3s, background-color 0.3s ease-in-out;
             pointer-events: none;
         }
+
         #adblock-overlay:not(.hidden) {
             opacity: 1;
             visibility: visible;
             transition: opacity 0.3s ease-in-out;
         }
+
         #adblock-overlay-content {
             max-width: 650px;
             background: rgba(255, 255, 255, 0.98);
@@ -288,6 +294,7 @@
             backdrop-filter: blur(5px);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
+
         #adblock-overlay h2 {
             font-size: 28px;
             margin: 0 0 20px 0;
@@ -298,22 +305,23 @@
             justify-content: center;
             gap: 10px;
         }
-        
+
         #adblock-overlay h2 i {
             color: #e53e3e;
         }
-        
+
         #adblock-overlay p {
             margin: 0 0 22px 0;
             line-height: 1.7;
             font-size: 18px;
             color: #4a5568;
         }
-        
+
         #adblock-overlay p:last-child {
             font-size: 16px;
             margin-bottom: 0;
         }
+
         #adblock-overlay button {
             background-color: #38a169;
             color: white;
@@ -332,11 +340,13 @@
             max-width: 400px;
             box-shadow: 0 2px 8px rgba(56, 161, 105, 0.3);
         }
+
         #adblock-overlay button:hover {
             background-color: #2f855a;
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(56, 161, 105, 0.4);
         }
+
         .hidden {
             display: none !important;
         }
@@ -348,7 +358,7 @@
             "@type": "WebApplication",
             "name": "VideoClipper", 
             "url": "https://videoclipper.online",
-            "description": "Free online tool to cut, trim, and download video clips from YouTube, Vimeo, TikTok, Facebook, and 1000+ sites using video URL. No watermarks, no registration required.",
+            "description": "Free Online Video Trimmer & Cutter. Trim, cut, and download videos from YouTube, TikTok, Facebook, and 1000+ sites. No signup, no watermarks. The best online video cutter & trimmer tool!",
             "applicationCategory": "MultimediaApplication",
             "operatingSystem": ["Windows", "macOS", "Linux", "Android", "iOS"],
             "screenshot": "https://videoclipper.online/images/screenshot.PNG",
@@ -359,12 +369,12 @@
             },
             "featureList": [
             "trim video from link",
-            "Video clipping from 1000+ sites including YouTube, TikTok, Vimeo, Facebook, Instagram, Twitter, and more",
+            "Video clipping from 1000+ sites including YouTube, TikTok, Reddit, Facebook, Instagram, Twitter, and more",
             "Custom start and end time selection",
             "Multiple video quality options",
-            "No watermarks", 
+            "Real-time progress update",
             "No registration required",
-            "High quality downloads"
+            
             ],
             "creator": {
               "@type": "Organization",
@@ -418,7 +428,8 @@
                             <i class="fas fa-video"></i>
                         </div>
                         <h1 style="white-space: nowrap;">Free Online Video Trimmer & Cutter</h1>
-                        <p class="subtitle">Paste any video URL, trim your perfect clip, and download instantly - no watermarks, no registration.</p>
+                        <p class="subtitle">Paste any video URL, trim your perfect clip, and download instantly - no
+                            watermarks, no registration.</p>
                         <form id="clip-form" class="clip-form">
                             <div class="form-group">
                                 <label for="video-url">Video URL</label>
@@ -636,8 +647,8 @@
               ]
             }
             </script>
-            
-            <script type="application/ld+json">
+
+        <script type="application/ld+json">
             {
               "@context": "https://schema.org",
               "@type": "HowTo",
