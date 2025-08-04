@@ -468,22 +468,51 @@ function createToolCard(tool) {
     const descriptionHtml = hasNewlines
         ? description.split('\n').filter(line => line.trim() !== '').join('<br>')
         : description;
-
+    
     card.innerHTML = `
-        <div class="recommended-card-inner">
-            <div class="recommended-image-container">
-                <div class="recommended-image">
-                    <a href="${tool.link}" target="_blank" rel="noopener sponsored">
-                        <img src="${tool.image}" alt="${tool.header}" loading="lazy">
-                    </a>
+        <div class="recommended-card-inner" style="display: flex; flex-direction: column; height: 100%;">
+            <a href="${tool.link}" target="_blank" rel="noopener sponsored" class="image-link">
+                <div class="image-wrapper">
+                    <img src="${tool.image}" alt="${tool.header}" loading="lazy">
                 </div>
-            </div>
-            <div class="recommended-content">
-                <h3>${tool.header}</h3>
+            </a>
+            <div class="recommended-content" style="padding: 1.25rem !important;">
+                <h3 class="recommended-title" style="
+                    font-size: 1.1rem !important;
+                    font-weight: 600 !important;
+                    color: #1f2937 !important;
+                    margin: 0 0 0.75rem 0 !important;
+                    line-height: 1.3 !important;
+                ">
+                    ${tool.header}
+                </h3>
                 <div class="recommended-desc">
-                    <p class="description">${descriptionHtml}</p>
+                    <p class="recommended-description" style="
+                        font-size: 0.9rem !important;
+                        color: #4b5563 !important;
+                        margin: 0 0 1.25rem 0 !important;
+                        line-height: 1.5 !important;
+                    ">
+                        ${descriptionHtml}
+                    </p>
                 </div>
-                <a href="${tool.link}" target="_blank" rel="noopener sponsored" class="learn-more-btn">
+                <a href="${tool.link}" target="_blank" rel="noopener sponsored" class="learn-more-btn" style="
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    padding: 0.6rem 1.25rem !important;
+                    background-color: #4f46e5 !important;
+                    color: white !important;
+                    border-radius: 0.375rem !important;
+                    font-weight: 500 !important;
+                    font-size: 0.95rem !important;
+                    text-decoration: none !important;
+                    transition: background-color 0.2s ease !important;
+                    margin-top: auto !important;
+                    margin-left: auto !important;
+                    margin-right: auto !important;
+                    width: fit-content !important;
+                ">
                     Learn More <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
@@ -502,7 +531,7 @@ document.addEventListener('DOMContentLoaded', function () {
         recommendedGrid.innerHTML = '';
 
         // Create and append cards for each tool
-        recommended_tools.forEach(tool => {
+        recommended_tools.forEach((tool) => {
             const card = createToolCard(tool);
             recommendedGrid.appendChild(card);
         });
