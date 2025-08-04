@@ -59,14 +59,14 @@ function setupMobileMenu() {
     const nav = document.querySelector('.nav-links');
 
     if (!toggle || !nav) return;
-    
+
     // Remove any existing event listeners to prevent duplicates
     const newToggle = toggle.cloneNode(true);
     const newNav = nav.cloneNode(true);
-    
+
     toggle.parentNode.replaceChild(newToggle, toggle);
     nav.parentNode.replaceChild(newNav, nav);
-    
+
     // Add click handler to toggle button
     newToggle.addEventListener('click', (e) => {
         e.preventDefault();
@@ -75,7 +75,7 @@ function setupMobileMenu() {
         newToggle.classList.toggle('active');
         document.body.classList.toggle('menu-open');
     });
-    
+
     // Close menu when clicking on nav links
     const navLinks = newNav.querySelectorAll('a');
     navLinks.forEach(link => {
@@ -85,11 +85,11 @@ function setupMobileMenu() {
             document.body.classList.remove('menu-open');
         });
     });
-    
+
     // Close menu when clicking outside
     document.addEventListener('click', (e) => {
-        if (newNav.classList.contains('active') && 
-            !newToggle.contains(e.target) && 
+        if (newNav.classList.contains('active') &&
+            !newToggle.contains(e.target) &&
             !newNav.contains(e.target)) {
             newNav.classList.remove('active');
             newToggle.classList.remove('active');
@@ -99,10 +99,10 @@ function setupMobileMenu() {
 }
 
 // Initialize everything when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Update paths in the header
     updateHeaderPaths();
-    
+
     // Setup mobile menu
     setupMobileMenu();
 
@@ -149,7 +149,7 @@ function rotateContent() {
     const leftPanel = document.querySelector('.box-left');
     const rightPanel = document.querySelector('.box-right');
     const bottomContainer = document.querySelector('.tool-suggestion .suggestion-content');
-    
+
     // Initialize content arrays if they don't exist
     if (!window.contentRotation) {
         // Make sure we have at least 2 items for side content
@@ -166,7 +166,7 @@ function rotateContent() {
             }
             return newArray;
         };
-        
+
         // Create pairs of ads that will always appear together
         const createAdPairs = (items) => {
             const pairs = [];
@@ -176,17 +176,17 @@ function rotateContent() {
                     pair.push(items[i + 1]);
                 } else {
                     // If odd number of items, duplicate the last item to make a pair
-                    pair.push({...items[i]});
+                    pair.push({ ...items[i] });
                 }
                 pairs.push(pair);
             }
             return pairs;
         };
-        
+
         // Shuffle side and bottom ads once
         const shuffledSideItems = shuffleArray([...sideItems]);
         const shuffledBottomContent = shuffleArray([...contentSuggestions.bottom]);
-        
+
         // Initialize content rotation with pre-shuffled ad pairs
         window.contentRotation = {
             isRotating: false,
@@ -203,11 +203,11 @@ function rotateContent() {
             isRotatingBottom: false
         };
     }
-    
+
     // Don't start a new rotation if one is already in progress
     if (window.contentRotation.isRotating) return;
     window.contentRotation.isRotating = true;
-    
+
     // Function to update a single panel with smooth crossfade
     const updatePanel = (panel, content) => {
         return new Promise((resolve) => {
@@ -215,17 +215,17 @@ function rotateContent() {
                 resolve();
                 return;
             }
-            
+
             // Create container for new content
             const newContent = document.createElement('div');
             newContent.className = 'content-item';
             newContent.style.cssText = 'opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;';
-            
+
             // Create inner container for consistent sizing
             const innerContainer = document.createElement('div');
             innerContainer.style.cssText = 'max-width: 100%; max-height: 100%; width: 100%; padding: 10px; box-sizing: border-box;';
             innerContainer.innerHTML = content;
-            
+
             // Ensure images maintain aspect ratio
             const images = innerContainer.getElementsByTagName('img');
             Array.from(images).forEach(img => {
@@ -237,23 +237,23 @@ function rotateContent() {
                 img.style.display = 'block';
                 img.style.margin = '0 auto';
             });
-            
+
             newContent.appendChild(innerContainer);
             panel.appendChild(newContent);
-            
+
             // Force reflow to ensure new content is in the DOM
             void newContent.offsetHeight;
-            
+
             // Fade in new content (0.5s fade-in with ease-in timing function)
             newContent.style.transition = 'opacity 0.5s ease-in';
             newContent.style.opacity = '1';
-            
+
             // Fade out and remove current content if it exists (0.5s fade-out with ease-out timing function)
             const currentContent = panel.querySelector('.content-item:not([style*="opacity: 0"])');
             if (currentContent && currentContent !== newContent) {
                 currentContent.style.transition = 'opacity 0.5s ease-out';
                 currentContent.style.opacity = '0';
-                
+
                 // Remove old content after transition
                 currentContent.addEventListener('transitionend', function handler() {
                     if (currentContent.parentNode === panel) {
@@ -267,47 +267,47 @@ function rotateContent() {
             }
         });
     };
-    
+
     // Rotate side content with consistent pairs
     const rotateSideContent = () => {
         const { adPairs } = window.contentRotation;
-        
+
         // Get the current pair of ads
         const currentPair = adPairs[window.contentRotation.currentPairIndex];
-        
+
         if (!currentPair) {
             window.contentRotation.isRotating = false;
             return;
         }
-        
+
         // Update both panels with the current pair
         Promise.all([
             leftPanel ? updatePanel(leftPanel, currentPair[0]?.html) : Promise.resolve(),
             rightPanel ? updatePanel(rightPanel, currentPair[1]?.html) : Promise.resolve()
         ]).then(() => {
             // Move to next pair for next rotation
-            window.contentRotation.currentPairIndex = 
+            window.contentRotation.currentPairIndex =
                 (window.contentRotation.currentPairIndex + 1) % adPairs.length;
-            
+
             // No need to reshuffle, just loop back to the start
             // We're using the same shuffled list for all rotations
-            
+
             // Rotate bottom content
             rotateBottomContent();
-            
+
         }).catch(error => {
             console.error('Rotation error:', error);
             window.contentRotation.isRotating = false;
         });
     };
-    
+
     // Rotate bottom content
     const rotateBottomContent = () => {
         if (bottomContainer && window.contentRotation.bottomContent.length > 0) {
             // First fade out (slower fade out) and update content immediately
             bottomContainer.style.transition = 'opacity 1.5s ease-out';
             bottomContainer.style.opacity = '0';
-            
+
             // Update content immediately after starting fade out
             const currentContent = window.contentRotation.bottomContent[window.contentRotation.currentBottomIndex];
             if (currentContent?.html) {
@@ -317,33 +317,33 @@ function rotateContent() {
                 bottomContainer.style.opacity = '0';
                 bottomContainer.style.transform = 'translateY(10px)';
             }
-            
+
             // After fade out completes, start fade in
             setTimeout(() => {
                 if (!bottomContainer) {
                     window.contentRotation.isRotating = false;
                     return;
                 }
-                
+
                 if (!currentContent?.html) {
                     bottomContainer.style.display = 'none';
                     window.contentRotation.isRotating = false;
                     return;
                 }
-                
+
                 // Force reflow
                 void bottomContainer.offsetHeight;
-                
+
                 // Fade in with slide up
                 bottomContainer.style.opacity = '1';
                 bottomContainer.style.transform = 'translateY(0)';
-                
+
                 // Update index for next rotation
                 window.contentRotation.currentBottomIndex = (window.contentRotation.currentBottomIndex + 1) % window.contentRotation.bottomContent.length;
-                
+
                 // No need to reshuffle, just loop back to the start
                 // We're using the same shuffled list for all rotations
-                
+
                 // Reset rotation flag after all animations complete
                 setTimeout(() => {
                     window.contentRotation.isRotating = false;
@@ -356,7 +356,7 @@ function rotateContent() {
             window.contentRotation.isRotating = false;
         }
     };
-    
+
     // Start the rotation sequence
     rotateSideContent();
 }
@@ -365,28 +365,33 @@ function rotateContent() {
 const contentSuggestions = {
     sides: [
         {
-            html: `<a href="https://www.mvvitrk.com/bDig55" target="_blank" rel="noopener" onclick="gtag('event', 'ad_click', { ad_name: 'Movavi', ad_position: 'side' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753699762/300x600_tazs11.png" alt="" style="width: 100%; height: 100%; object-fit: contain;"></a>`
+            html: `<a href="https://www.mvvitrk.com/bDig55" target="_blank" rel="noopener sponsored" onclick="gtag('event', 'ad_click', { ad_name: 'Movavi', ad_position: 'side' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753699762/300x600_tazs11.png" alt="" style="width: 100%; height: 100%; object-fit: contain;"></a>`
         },
         {
-            html: `<a href="https://akool.com/?via=mh1619" target="_blank" rel="noopener" onclick="gtag('event', 'ad_click', { ad_name: 'Akool', ad_position: 'side' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753718205/screen-0_cbfutf.jpg" alt="" style="width: 100%; height: 100%; object-fit: contain;"></a>`
+            html: `<a href="https://akool.com/?via=mh1619" target="_blank" rel="noopener sponsored" onclick="gtag('event', 'ad_click', { ad_name: 'Akool', ad_position: 'side' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753718205/screen-0_cbfutf.jpg" alt="" style="width: 100%; height: 100%; object-fit: contain;"></a>`
         },
         {
-            html: `<a href="https://flixier.com?fpr=mh1619" target="_blank" rel="noopener" onclick="gtag('event', 'ad_click', { ad_name: 'Flixier', ad_position: 'side' })"><img src="https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24623/120x600px-4.png" alt="" style="width: 100%; height: 100%; object-fit: contain;"></a>`
+            html: `<a href="https://flixier.com?fpr=mh1619" target="_blank" rel="noopener sponsored" onclick="gtag('event', 'ad_click', { ad_name: 'Flixier', ad_position: 'side' })"><img src="https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24623/120x600px-4.png" alt="" style="width: 100%; height: 100%; object-fit: contain;"></a>`
         },
         {
-            html: `<a rel="noopener" href="https://renderforest.pxf.io/c/6416428/1957251/14885" target="_top" id="1957251" onclick="gtag('event', 'ad_click', { ad_name: 'Renderforest', ad_position: 'side' })"><img src="https://a.impactradius-go.com/display-ad/14885-1957251" alt="" style="width: 100%; height: 100%; object-fit: contain;"></a>`
+            html: `<a rel="noopener sponsored" href="https://renderforest.pxf.io/c/6416428/1957251/14885" target="_blank" id="1957251" onclick="gtag('event', 'ad_click', { ad_name: 'Renderforest', ad_position: 'side' })"><img src="https://a.impactradius-go.com/display-ad/14885-1957251" alt="" style="width: 100%; height: 100%; object-fit: contain;"></a>`
+        },
+        {
+            html: `<a rel="noopener sponsored" href="https://1.envato.market/c/6416428/847702/4662" target="_blank" id="847702">
+ <img src="//a.impactradius-go.com/display-ad/4662-847702" border="0" alt="" width="300" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/847702/4662" style="position:absolute;visibility:hidden;" border="0" />`
         }
     ],
     bottom: [
         {
-            html: `<a href="https://partner.pcloud.com/r/146969" title="pCloud Premium" target="_blank" rel="noopener" onclick="gtag('event', 'ad_click', { ad_name: 'pCloud', ad_position: 'bottom' })"><img src="https://partner.pcloud.com/media/banners/personal/personal00272890.jpg" alt="pCloud Premium"/></a>`
+            html: `<a href="https://partner.pcloud.com/r/146969" title="pCloud Premium" target="_blank" rel="noopener sponsored" onclick="gtag('event', 'ad_click', { ad_name: 'pCloud', ad_position: 'bottom' })"><img src="https://partner.pcloud.com/media/banners/personal/personal00272890.jpg" alt="pCloud Premium"/></a>`
         },
         {
-            html: `<a href="https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902" target="_blank" rel="noopener" onclick="gtag('event', 'ad_click', { ad_name: 'NordVPN', ad_position: 'bottom' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753394990/728x90_baajhd.png" alt="" style="width: 100%; max-height: 90px; object-fit: contain;" /></a>`
+            html: `<a href="https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902" target="_blank" rel="noopener sponsored" onclick="gtag('event', 'ad_click', { ad_name: 'NordVPN', ad_position: 'bottom' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753394990/728x90_baajhd.png" alt="" style="width: 100%; max-height: 90px; object-fit: contain;" /></a>`
         },
         {
-            html: `<a href="https://privadovpn.com/resources/best-vpn-for-gaming#a_aid=1619&a_bid=203d5f79" target="_blank" rel="noopener" onclick="gtag('event', 'ad_click', { ad_name: 'PrivadoVPN', ad_position: 'bottom' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753306325/728x90_c9y6b3.png" alt="" style="width: 100%; max-height: 90px; object-fit: contain;"></a>`
+            html: `<a href="https://privadovpn.com/resources/best-vpn-for-gaming#a_aid=1619&a_bid=203d5f79" target="_blank" rel="noopener sponsored" onclick="gtag('event', 'ad_click', { ad_name: 'PrivadoVPN', ad_position: 'bottom' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753306325/728x90_c9y6b3.png" alt="" style="width: 100%; max-height: 90px; object-fit: contain;"></a>`
         }
+
     ]
 };
 
@@ -399,19 +404,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Set up intervals for rotations
     setInterval(rotateContent, 12000); // Side ads rotation (12 seconds)
-    
+
     // Set up separate interval for bottom ads (every 10 seconds)
     const rotateBottomContent = () => {
         const bottomContainer = document.querySelector('.tool-suggestion .suggestion-content');
         if (!bottomContainer || !window.contentRotation?.bottomContent?.length) return;
-        
+
         if (window.contentRotation.isRotatingBottom) return;
         window.contentRotation.isRotatingBottom = true;
-        
+
         // Fade out
         bottomContainer.style.transition = 'opacity 0.5s ease-out';
         bottomContainer.style.opacity = '0';
-        
+
         // Update content after fade out
         setTimeout(() => {
             const currentContent = window.contentRotation.bottomContent[window.contentRotation.currentBottomIndex];
@@ -421,32 +426,32 @@ document.addEventListener('DOMContentLoaded', function () {
                 bottomContainer.style.transition = 'opacity 0s, transform 0s';
                 bottomContainer.style.opacity = '0';
                 bottomContainer.style.transform = 'translateY(10px)';
-                
+
                 // Force reflow
                 void bottomContainer.offsetHeight;
-                
+
                 // Fade in
                 bottomContainer.style.transition = 'opacity 0.5s ease-in, transform 0.5s ease-in';
                 bottomContainer.style.opacity = '1';
                 bottomContainer.style.transform = 'translateY(0)';
-                
+
                 // Update index for next rotation (loop back to start if we reach the end)
                 // We update it here but after a delay to ensure the current ad is shown
                 setTimeout(() => {
-                    window.contentRotation.currentBottomIndex = 
+                    window.contentRotation.currentBottomIndex =
                         (window.contentRotation.currentBottomIndex + 1) % window.contentRotation.bottomContent.length;
                 }, 100);
             }
-            
+
             window.contentRotation.isRotatingBottom = false;
         }, 500); // Wait for fade out to complete
     };
-    
+
     // Initial bottom rotation
     if (window.contentRotation) {
         rotateBottomContent();
     }
-    
+
     // Set interval for bottom rotation (12 seconds)
     setInterval(rotateBottomContent, 12000);
 });
@@ -456,19 +461,19 @@ document.addEventListener('DOMContentLoaded', function () {
 function createToolCard(tool) {
     const card = document.createElement('div');
     card.className = 'recommended-card';
-    
+
     // Process description
     const description = tool.description.trim();
     const hasNewlines = description.includes('\n');
-    const descriptionHtml = hasNewlines 
+    const descriptionHtml = hasNewlines
         ? description.split('\n').filter(line => line.trim() !== '').join('<br>')
         : description;
-    
+
     card.innerHTML = `
         <div class="recommended-card-inner">
             <div class="recommended-image-container">
                 <div class="recommended-image">
-                    <a href="${tool.link}" target="_blank" rel="noopener">
+                    <a href="${tool.link}" target="_blank" rel="noopener sponsored">
                         <img src="${tool.image}" alt="${tool.header}" loading="lazy">
                     </a>
                 </div>
@@ -478,24 +483,24 @@ function createToolCard(tool) {
                 <div class="recommended-desc">
                     <p class="description">${descriptionHtml}</p>
                 </div>
-                <a href="${tool.link}" target="_blank" rel="noopener noreferrer" class="learn-more-btn">
+                <a href="${tool.link}" target="_blank" rel="noopener sponsored" class="learn-more-btn">
                     Learn More <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
         </div>
     `;
-    
+
     return card;
 }
 
 // Function to render recommended tools
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const recommendedGrid = document.querySelector('.recommended-grid');
-    
+
     if (recommendedGrid) {
         // Clear any existing content
         recommendedGrid.innerHTML = '';
-        
+
         // Create and append cards for each tool
         recommended_tools.forEach(tool => {
             const card = createToolCard(tool);
@@ -512,6 +517,13 @@ const recommended_tools = [
         "description": "Auto subtitles with one click, ready-made templates\nHandy video editing, file conversion, and screen recording\nHundreds of drag-and-drop filters, transitions, titles, and overlays"
     },
     {
+        "header": "Top-Quality Assets for Designers & Video Editors",
+        "link": "https://1.envato.market/WyQOdP",
+        "image": "https://app.impact.com/display-ad/4662-377341?v=3",
+        "description": "Access motion graphics, Premiere Pro templates, royalty-free music, and more.\nCut production time with ready-to-use tools for every project.\nIdeal for freelancers, agencies, and creatives on a deadline."
+
+    },
+    {
         "header": "Transform Your Content with AI Magic",
         "link": "https://akool.com/?via=mh1619",
         "image": "https://pbs.twimg.com/media/GutshQgWUAA21xd?format=jpg&name=large",
@@ -525,7 +537,7 @@ const recommended_tools = [
     },
     {
         "header": "Bring Your Ideas to Life—Animated, Branded & Ready",
-        "link": "https://renderforest.pxf.io/c/6416428/1957251/14885",
+        "link": "https://renderforest.pxf.io/qzvzVj",
         "image": "https://app.impact.com/display-ad/14885-1957252?v=1",
         "description": "Pick a template, type your script, and let AI do the rest.\nCustomize colors, fonts & music with drag‑and‑drop ease.\nExport in HD or 4K with advanced features available on premium plans."
     },
