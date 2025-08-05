@@ -41,13 +41,16 @@
     <link rel="canonical" href="https://videoclipper.online" />
     <!-- Favicon and Site Icon for Search Engines -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <!-- High-res PNG for modern browsers and Google -->
-    <link rel="icon" type="image/png" sizes="512x512" href="/images/icon.png">
 
+    <!-- Multiple PNG sizes for better Google compatibility -->
+    <link rel="icon" type="image/png" sizes="512x512" href="/images/icon.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/images/icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/icon.png">
+
+    <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" sizes="512x512" href="/images/icon.png">
 
-    <link rel="icon" type="image/x-icon" sizes="48x48" href="/favicon.ico">
-
+    <!-- Microsoft Tile -->
     <meta name="msapplication-TileImage" content="/images/icon.png">
     <meta name="msapplication-TileColor" content="#ffffff">
     <link rel="stylesheet" href="css/styles.css">
@@ -535,7 +538,7 @@
                 background: #f8f9fa;
                 margin: 0 auto;
             }
-            
+
             .recommended-card .image-wrapper img {
                 position: absolute;
                 max-width: 100%;
@@ -547,7 +550,7 @@
                 transform: translate(-50%, -50%);
                 object-fit: contain;
             }
-            
+
             @media screen and (max-width: 768px) {
                 .recommended-grid {
                     display: flex !important;
@@ -558,7 +561,7 @@
                     max-width: 400px !important;
                     margin: 0 auto !important;
                 }
-                
+
                 .recommended-card {
                     width: 100% !important;
                     max-width: 320px !important;
@@ -825,7 +828,7 @@
                 document.body.classList.add('is-mobile');
             }
         }
-        
+
         // Run on page load
         document.addEventListener('DOMContentLoaded', detectMobile);
         // Also run on resize in case of orientation change
