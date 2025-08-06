@@ -17,6 +17,10 @@ type response struct {
 
 // SubmitHandler handles the submission of a new video download request
 func SubmitHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 	// Read the request from the client
 	var videoRequest models.VideoRequest
 	if err := json.NewDecoder(r.Body).Decode(&videoRequest); err != nil {

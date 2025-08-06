@@ -11,6 +11,10 @@ import (
 
 // DownloadHandler serves the requested file for download
 func DownloadHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 	// Get the file ID from the URL
 	fileId := strings.TrimPrefix(r.URL.Path, "/download/")
 
