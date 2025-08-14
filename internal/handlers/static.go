@@ -15,7 +15,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ContactPageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/contact/"{
+	if r.URL.Path == "/contact/" {
 		http.Redirect(w, r, "/contact", http.StatusMovedPermanently)
 		return
 	}
@@ -27,7 +27,7 @@ func ContactPageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func TermsPageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/terms/"{
+	if r.URL.Path == "/terms/" {
 		http.Redirect(w, r, "/terms", http.StatusMovedPermanently)
 		return
 	}
@@ -39,7 +39,7 @@ func TermsPageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func PrivacyPageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/privacy/"{
+	if r.URL.Path == "/privacy/" {
 		http.Redirect(w, r, "/privacy", http.StatusMovedPermanently)
 		return
 	}
@@ -51,7 +51,7 @@ func PrivacyPageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SupportedSitesPageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/supported-sites/"{
+	if r.URL.Path == "/supported-sites/" {
 		http.Redirect(w, r, "/supported-sites", http.StatusMovedPermanently)
 		return
 	}
@@ -63,7 +63,7 @@ func SupportedSitesPageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func FAQPageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/faq/"{
+	if r.URL.Path == "/faq/" {
 		http.Redirect(w, r, "/faq", http.StatusMovedPermanently)
 		return
 	}
@@ -90,4 +90,28 @@ func SitemapXMLHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
 	http.ServeFile(w, r, filepath.Join("internal/web/", "sitemap.xml"))
+}
+
+func YouTubeGuideHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/cut-youtube-video-online/" {
+		http.Redirect(w, r, "/cut-youtube-video-online", http.StatusMovedPermanently)
+		return
+	}
+	if r.URL.Path != "/cut-youtube-video-online" {
+		http.NotFound(w, r)
+		return
+	}
+	http.ServeFile(w, r, filepath.Join("internal/web/pages/guides", "cut-youtube-video-online.html"))
+}
+
+func GeneralGuideHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/trim-videos-online/" {
+		http.Redirect(w, r, "/trim-videos-online", http.StatusMovedPermanently)
+		return
+	}
+	if r.URL.Path != "/trim-videos-online" {
+		http.NotFound(w, r)
+		return
+	}
+	http.ServeFile(w, r, filepath.Join("internal/web/pages/guides", "trim-videos-online.html"))
 }

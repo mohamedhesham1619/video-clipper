@@ -42,6 +42,10 @@ func New() *Server {
 	mux.HandleFunc("/supported-sites", handlers.SupportedSitesPageHandler)
 	mux.HandleFunc("/faq", handlers.FAQPageHandler)
 
+	// Guide pages
+	mux.HandleFunc("/cut-youtube-video-online", handlers.YouTubeGuideHandler)
+	mux.HandleFunc("/trim-videos-online", handlers.GeneralGuideHandler)
+
 	// SEO/static root files
 	fs := http.FileServer(http.Dir("internal/web/"))
 	mux.Handle("/css/", fs)
