@@ -12,7 +12,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Learn how to easily cut, trim, and download YouTube videos online for free. Our step-by-step guide shows you how to extract perfect clips from any YouTube video in seconds.">
-    <meta name="keywords" content="online video trimmer, cut video online, video cutter, trim video online, video editor online, clip video, video clipper, online video editor">
+    <meta name="keywords" content="youtube video cutter, cut youtube video, trim youtube video, download youtube video, online video cutter, online video trimmer">
     <meta name="author" content="VideoClipper">
     <meta name="robots" content="index, follow">
 
@@ -101,6 +101,169 @@
     
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Mobile menu styles */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .mobile-menu-toggle span {
+            display: block;
+            width: 25px;
+            height: 2px;
+            background-color: #333;
+            margin: 5px 0;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu-toggle.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu-toggle.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #2d3748;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #4a6cf7;
+        }
+
+        .nav-divider {
+            color: #cbd5e0;
+            padding: 0 0.5rem;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 80%;
+                max-width: 300px;
+                height: 100vh;
+                background: white;
+                flex-direction: column;
+                padding: 6rem 2rem 2rem;
+                box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+                z-index: 999;
+                overflow-y: auto;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links li {
+                width: 100%;
+                text-align: center;
+                margin: 0.5rem 0;
+            }
+
+            .nav-link {
+                display: block;
+                padding: 0.75rem 0;
+                border-bottom: 1px solid #edf2f7;
+                width: 100%;
+            }
+
+            .nav-divider {
+                display: none;
+            }
+
+            /* Overlay for when menu is open */
+            .menu-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 998;
+            }
+
+            .menu-overlay.active {
+                display: block;
+            }
+        }
+    </style>
+    <style>
+        /* Mobile-specific styles */
+        @media screen and (max-width: 768px) {
+            /* Hero section */
+            .hero-container {
+                flex-wrap: wrap !important;
+                padding: 20px 0 !important;
+            }
+            .hero-text {
+                flex: 1 1 100% !important;
+                max-width: 100% !important;
+                padding: 0 15px !important;
+                order: 2 !important;
+            }
+            .hero-image {
+                flex: 1 1 100% !important;
+                max-width: 100% !important;
+                margin: 0 15px 20px !important;
+                order: 1 !important;
+            }
+            
+            /* Step cards */
+            .step-card {
+                margin-bottom: 1.5rem !important;
+            }
+            .step-content {
+                flex-wrap: wrap !important;
+                gap: 1.5rem !important;
+            }
+            .step-text, .step-image {
+                flex: 1 1 100% !important;
+                max-width: 100% !important;
+            }
+            .step-image {
+                min-height: 200px !important;
+            }
+            
+            /* General spacing */
+            .section-padding {
+                padding: 30px 0 !important;
+            }
+            .container-padding {
+                padding: 0 15px !important;
+            }
+        }
+    </style>
 </head>
 <body>
     <header class="main-header" role="banner"
@@ -120,6 +283,7 @@
                     <span></span>
                     <span></span>
                 </button>
+                <div class="menu-overlay"></div>
                 <ul class="nav-links">
                     <li><a href="/" class="nav-link">Home</a></li>
                     <li><a href="/supported-sites" class="nav-link">Supported Sites</a></li>
@@ -130,16 +294,63 @@
                     <li><a href="/privacy" class="nav-link">Privacy</a></li>
                 </ul>
             </nav>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const toggle = document.querySelector('.mobile-menu-toggle');
+                    const nav = document.querySelector('.nav-links');
+                    const overlay = document.querySelector('.menu-overlay');
+                    
+                    if (toggle && nav) {
+                        toggle.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            this.classList.toggle('active');
+                            nav.classList.toggle('active');
+                            if (overlay) overlay.classList.toggle('active');
+                            document.body.style.overflow = this.classList.contains('active') ? 'hidden' : '';
+                        });
+                        
+                        // Close menu when clicking on overlay
+                        if (overlay) {
+                            overlay.addEventListener('click', function() {
+                                toggle.classList.remove('active');
+                                nav.classList.remove('active');
+                                this.classList.remove('active');
+                                document.body.style.overflow = '';
+                            });
+                        }
+                        
+                        // Close menu when clicking on a link
+                        document.querySelectorAll('.nav-link').forEach(link => {
+                            link.addEventListener('click', function() {
+                                toggle.classList.remove('active');
+                                nav.classList.remove('active');
+                                if (overlay) overlay.classList.remove('active');
+                                document.body.style.overflow = '';
+                            });
+                        });
+                        
+                        // Close menu when clicking outside
+                        document.addEventListener('click', function(e) {
+                            if (!nav.contains(e.target) && !toggle.contains(e.target)) {
+                                toggle.classList.remove('active');
+                                nav.classList.remove('active');
+                                if (overlay) overlay.classList.remove('active');
+                                document.body.style.overflow = '';
+                            }
+                        });
+                    }
+                });
+            </script>
         </div>
     </header>
     <div style="width: 100% !important; background-color: #e6f0ff !important; border-radius: 0 0 20px 20px; margin-bottom: 4rem; padding: 100px 0 80px; display: block; position: relative; z-index: 1;">
-        <div style="max-width: 1400px; margin: 0 auto; padding: 0 5%;">
+        <div style="max-width: 1400px; margin: 0 auto; padding: 0 5%;" class="container-padding">
             <!-- Hero Section -->
-            <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto; gap: 2rem; padding: 40px 0;">
-                <div style="flex: 0 0 500px; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto; gap: 2rem; padding: 40px 0;" class="hero-container">
+                <div style="flex: 0 0 500px; text-align: left;" class="hero-text">
                     <h1 style="font-size: 2.5rem; margin-bottom: 1.5rem; color: #2c3e50; line-height: 1.3;">How to Trim or Cut YouTube Videos Online for Free</h1>
                     <p style="font-size: 1.2rem; color: #555; margin-bottom: 2rem; line-height: 1.6;">
-                        Learn how to trim, cut, and download perfect video segments from YouTube in just a few simple steps.
+                        Want to save just the best moments from a YouTube video? Whether it’s a highlight from a tutorial, a funny clip from a vlog, or a key part of a livestream, VideoClipper lets you cut YouTube videos directly in your browser — no software, no signup.
                     </p>
                     <a href="/" class="cta-button" style="display: inline-block; background-color: #4a6cf7; color: white; padding: 12px 30px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 1.1rem; transition: all 0.3s ease;"
                        onmouseover="this.style.backgroundColor='#3a5bd9'" 
@@ -149,8 +360,8 @@
                         Start Trimming Now
                     </a>
                 </div>
-                <div style="flex: 0 0 450px; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                    <img src="https://images.unsplash.com/photo-1545254930-06c375090cbe?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+                <div style="flex: 0 0 500px; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: transform 0.3s ease;" class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1567443024551-f3e3cc2be870?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
                          alt="Video Trimming Example" 
                          style="width: 100%; height: auto; display: block; transition: transform 0.3s ease;"
                          onmouseover="this.style.transform='scale(1.02)'"
@@ -162,36 +373,33 @@
     
     <div class="container" style="max-width: 800px; margin: 0 auto; padding: 0 5%; text-align: center;">
         <section class="guide-section" style="margin-bottom: 4rem;">
-            <h2 style="font-size: 2rem; color: #2c3e50; margin-bottom: 1.5rem; line-height: 1.3;">Get Started with VideoClipper</h2>
+            <h2 style="font-size: 2rem; color: #2c3e50; margin-bottom: 1.5rem; line-height: 1.3;">Get Started with VideoClipper for YouTube</h2>
             <p style="font-size: 1.1rem; color: #4a5568; line-height: 1.7; margin: 0 auto 2rem; max-width: 700px;">
-                Welcome to the definitive guide on using VideoClipper, your go-to online tool for quick and efficient video trimming. 
-                Whether you're a content creator, a student, or simply looking to save a specific part of a video, our platform 
-                offers a seamless experience. Follow these easy steps to start clipping videos from YouTube, Vimeo, and more, 
-                directly from your browser.
+                Trimming a YouTube video doesn't have to be complicated. With VideoClipper, you can go from link to finished clip in seconds. This guide will walk you through copying a YouTube link, loading it into our tool, adjusting your timestamps, and saving your video in crisp HD or 2K.
             </p>
         </section>
     </div>
     
-    <div style="background-color: #f5f7fa; padding: 60px 0; border-radius: 20px 20px 0 0; margin-top: -20px; position: relative; z-index: 0;">
+    <div style="background-color: #f5f7fa; padding: 60px 0; border-radius: 20px 20px 0 0; margin-top: -20px; position: relative; z-index: 0;" class="section-padding">
         <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 5%;">
         <h2 style="text-align: center; font-size: 2.2rem; color: #2c3e50; margin-bottom: 3.5rem; font-weight: 600;">How to Cut Your YouTube Video Instantly</h2>
         
         <!-- Step 1 Card -->
-        <div style="background: white; border-radius: 14px; box-shadow: 0 6px 25px rgba(0,0,0,0.1); margin-bottom: 2.5rem; overflow: hidden; max-width: 1100px; margin-left: auto; margin-right: auto;">
+        <div style="background: white; border-radius: 14px; box-shadow: 0 6px 25px rgba(0,0,0,0.1); margin-bottom: 2.5rem; overflow: hidden; max-width: 1100px; margin-left: auto; margin-right: auto;" class="step-card">
             <div style="padding: 3rem;">
-                <div style="display: flex; align-items: flex-start; gap: 3rem;">
-                    <div style="flex: 1.2;">
+                <div style="display: flex; align-items: flex-start; gap: 3rem;" class="step-content">
+                    <div style="flex: 1.2;" class="step-text">
                         <h3 style="font-size: 1.7rem; color: #000; margin-bottom: 1.2rem; font-weight: 600; line-height: 1.3;">
                             <span style="color: #4a6cf7; display: block; font-size: 1.1rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Step 1</span>
-                            Copy Your YouTube Video URL
+                            Get the YouTube Video Link
                         </h3>
                         <p style="color: #4a5568; line-height: 1.7; margin-bottom: 1.8rem; font-size: 1.1rem;">
-                            Copy the URL of the YouTube video you want to cut.
+                            Open the YouTube video you want to cut. You can copy the link from the browser's address bar or click the Share button under the video to get a clean URL.
                         </p>
                     </div>
-                    <div style="flex: 1; background: #f8fafd; border-radius: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.03);">
+                    <div style="flex: 1; background: #f8fafd; border-radius: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.03);" class="step-image">
                         <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_webp,q_auto/youtube-step1_n88oce.gif"
-                        alt="VideoClipper: Copy YouTube video URL into the tool demonstration"
+                        alt="VideoClipper: Get YouTube video URL demonstration"
                         style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
                     </div>
                 </div>
@@ -199,19 +407,19 @@
         </div>
 
          <!-- Step 2 Card -->
-         <div style="background: white; border-radius: 14px; box-shadow: 0 6px 25px rgba(0,0,0,0.1); margin-bottom: 2.5rem; overflow: hidden; max-width: 1100px; margin-left: auto; margin-right: auto;">
+         <div style="background: white; border-radius: 14px; box-shadow: 0 6px 25px rgba(0,0,0,0.1); margin-bottom: 2.5rem; overflow: hidden; max-width: 1100px; margin-left: auto; margin-right: auto;" class="step-card">
             <div style="padding: 3rem;">
-                <div style="display: flex; align-items: flex-start; gap: 3rem;">
-                    <div style="flex: 1.2;">
+                <div style="display: flex; align-items: flex-start; gap: 3rem;" class="step-content">
+                    <div style="flex: 1.2;" class="step-text">
                         <h3 style="font-size: 1.7rem; color: #000; margin-bottom: 1.2rem; font-weight: 600; line-height: 1.3;">
                             <span style="color: #4a6cf7; display: block; font-size: 1.1rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Step 2</span>
-                            Paste Your YouTube Video URL
+                            Paste the YouTube Link into VideoClipper
                         </h3>
                         <p style="color: #4a5568; line-height: 1.7; margin-bottom: 1.8rem; font-size: 1.1rem;">
-                            Open VideoClipper and paste the URL of the YouTube video you want to cut.
+                            Go to VideoClipper and paste the YouTube link into the Video URL field.
                         </p>
                     </div>
-                    <div style="flex: 1; background: #f8fafd; border-radius: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.03);">
+                    <div style="flex: 1; background: #f8fafd; border-radius: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.03);" class="step-image">
                         <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_webp,q_auto/step2_qc9dei.gif" alt="VideoClipper: Paste YouTube video URL into the tool demonstration" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
                     </div>
                 </div>
@@ -219,19 +427,19 @@
         </div>
         
         <!-- Step 3 Card -->
-        <div style="background: white; border-radius: 14px; box-shadow: 0 6px 25px rgba(0,0,0,0.1); margin-bottom: 2.5rem; overflow: hidden; max-width: 1100px; margin-left: auto; margin-right: auto;">
+        <div style="background: white; border-radius: 14px; box-shadow: 0 6px 25px rgba(0,0,0,0.1); margin-bottom: 2.5rem; overflow: hidden; max-width: 1100px; margin-left: auto; margin-right: auto;" class="step-card">
             <div style="padding: 3rem;">
-                <div style="display: flex; align-items: flex-start; gap: 3rem;">
-                    <div style="flex: 1.2;">
+                <div style="display: flex; align-items: flex-start; gap: 3rem;" class="step-content">
+                    <div style="flex: 1.2;" class="step-text">
                         <h3 style="font-size: 1.7rem; color: #000; margin-bottom: 1.2rem; font-weight: 600; line-height: 1.3;">
                             <span style="color: #4a6cf7; display: block; font-size: 1.1rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Step 3</span>
-                            Set Your Desired Start and End Times
+                            Set Start and End Times
                         </h3>
                         <p style="color: #4a5568; line-height: 1.7; margin-bottom: 1.8rem; font-size: 1.1rem;">
                             Select the desired start and end times in the HH:MM:SS format (e.g., 00:00:15 for 15 seconds, 00:01:30 for one minute and thirty seconds). The interface will provide live feedback on the selected duration, helping you refine your clip.
                         </p>
                     </div>
-                    <div style="flex: 1; background: #f8fafd; border-radius: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.03);">
+                    <div style="flex: 1; background: #f8fafd; border-radius: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.03);" class="step-image">
                         <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_webp,q_auto/step3_yair59.gif" alt="VideoClipper: Set start and end times demonstration" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
                     </div>
                 </div>
@@ -239,19 +447,19 @@
         </div>
         
         <!-- Step 4 Card -->
-        <div style="background: white; border-radius: 14px; box-shadow: 0 6px 25px rgba(0,0,0,0.1); margin-bottom: 2.5rem; overflow: hidden; max-width: 1100px; margin-left: auto; margin-right: auto;">
+        <div style="background: white; border-radius: 14px; box-shadow: 0 6px 25px rgba(0,0,0,0.1); margin-bottom: 2.5rem; overflow: hidden; max-width: 1100px; margin-left: auto; margin-right: auto;" class="step-card">
             <div style="padding: 3rem;">
-                <div style="display: flex; align-items: flex-start; gap: 3rem;">
-                    <div style="flex: 1.2;">
+                <div style="display: flex; align-items: flex-start; gap: 3rem;" class="step-content">
+                    <div style="flex: 1.2;" class="step-text">
                         <h3 style="font-size: 1.7rem; color: #000; margin-bottom: 1.2rem; font-weight: 600; line-height: 1.3;">
                             <span style="color: #4a6cf7; display: block; font-size: 1.1rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Step 4</span>
-                            Select Video Quality
+                            Choose Video Quality
                         </h3>
                         <p style="color: #4a5568; line-height: 1.7; margin-bottom: 1.8rem; font-size: 1.1rem;">
-                            Select the desired video quality from the dropdown menu. VideoClipper offers a range of options, including 360p, 480p, 720p, 1080p, and 2K, allowing you to balance between quality and file size.
+                            Select from YouTube's available resolutions — 360p for smaller file sizes, 720p or 1080p for HD, and up to 1440p (2K) for maximum clarity.
                         </p>
                     </div>
-                    <div style="flex: 1; background: #f8fafd; border-radius: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.03);">
+                    <div style="flex: 1; background: #f8fafd; border-radius: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.03);" class="step-image">
                         <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_webp,q_auto/step4_ahztgo.gif" alt="VideoClipper: Select video quality demonstration" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
                     </div>
                 </div>
@@ -259,19 +467,19 @@
         </div>
         
         <!-- Step 5 Card -->
-        <div style="background: white; border-radius: 14px; box-shadow: 0 6px 25px rgba(0,0,0,0.1); margin-bottom: 2.5rem; overflow: hidden; max-width: 1100px; margin-left: auto; margin-right: auto;">
+        <div style="background: white; border-radius: 14px; box-shadow: 0 6px 25px rgba(0,0,0,0.1); margin-bottom: 2.5rem; overflow: hidden; max-width: 1100px; margin-left: auto; margin-right: auto;" class="step-card">
             <div style="padding: 3rem;">
-                <div style="display: flex; align-items: flex-start; gap: 3rem;">
-                    <div style="flex: 1.2;">
+                <div style="display: flex; align-items: flex-start; gap: 3rem;" class="step-content">
+                    <div style="flex: 1.2;" class="step-text">
                         <h3 style="font-size: 1.7rem; color: #000; margin-bottom: 1.2rem; font-weight: 600; line-height: 1.3;">
                             <span style="color: #4a6cf7; display: block; font-size: 1.1rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Step 5</span>
-                            Download Your Perfect Clip
+                            Download Your Clip
                         </h3>
                         <p style="color: #4a5568; line-height: 1.7; margin-bottom: 1.8rem; font-size: 1.1rem;">
                             Click the "Download" button to start the download process. VideoClipper will begin processing your clip and provide a real-time progress tracking. The download will start automatically after the process is complete, and you can save the file to your device.
                         </p>
                     </div>
-                    <div style="flex: 1; background: #f8fafd; border-radius: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.03);">
+                    <div style="flex: 1; background: #f8fafd; border-radius: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.03);" class="step-image">
                         <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_webp,q_auto/step5_satupr.gif" alt="VideoClipper: Download your clip demonstration" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
                     </div>
                 </div>
@@ -280,10 +488,10 @@
     </div>
     </div>
     
-    <div style="background-color: #ffffff; padding: 80px 0; text-align: center;">
+    <div style="background-color: #ffffff; padding: 80px 0; text-align: center;" class="section-padding">
         <div style="max-width: 800px; margin: 0 auto; padding: 0 5%;">
             <h2 style="font-size: 2.2rem; color: #2c3e50; margin-bottom: 1.5rem; font-weight: 600; line-height: 1.3;">
-                Ready to Trim Your Videos?
+                Ready to Trim Your YouTube Videos?
             </h2>
             <a href="/" class="cta-button" style="display: inline-block; background-color: #4a6cf7; color: white; padding: 14px 32px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 1.1rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(74, 108, 247, 0.3);"
                onmouseover="this.style.backgroundColor='#3a5bd9'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(74, 108, 247, 0.4)';" 
@@ -296,7 +504,7 @@
     </div>
     
     <!-- Why Choose VideoClipper Section -->
-    <div style="background-color: #f5f7fa; padding: 80px 0;">
+    <div style="background-color: #f5f7fa; padding: 80px 0;" class="section-padding">
         <div style="max-width: 1200px; margin: 0 auto; padding: 0 5%;">
             <h2 style="text-align: center; font-size: 2.2rem; color: #2c3e50; margin-bottom: 3.5rem; font-weight: 600;">Why Choose VideoClipper?</h2>
             
