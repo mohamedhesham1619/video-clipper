@@ -23,7 +23,7 @@ func New() *Server {
 	limiterStore := memoryStore.NewStore()
 	rate := limiter.Rate{
 		Limit:  3,
-		Period: 30 * time.Minute,
+		Period: 120 * time.Minute,
 	}
 	limiterInstance := limiter.New(limiterStore, rate)
 	limiterMw := limiterMiddleware.NewMiddleware(limiterInstance)
