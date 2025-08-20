@@ -19,7 +19,7 @@ type Server struct {
 func New() *Server {
 	mux := http.NewServeMux()
 
-	// Rate limiter: 3 requests per 30 minutes per IP for /submit
+	// Rate limiter: 3 requests per 120 minutes per IP for /submit
 	limiterStore := memoryStore.NewStore()
 	rate := limiter.Rate{
 		Limit:  3,
