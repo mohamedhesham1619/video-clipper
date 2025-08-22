@@ -55,7 +55,7 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			slog.Error("Error getting video title", "error", err, "request", videoRequest)
 			
-			progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Failed to get video title"}}
+			progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Failed to get video title, checking for updates..."}}
 
 			close(progressChan)
 
