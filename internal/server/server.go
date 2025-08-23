@@ -33,6 +33,7 @@ func New() *Server {
 	mux.Handle("/submit", limiterMw.Handler(http.HandlerFunc(handlers.SubmitHandler)))
 	mux.HandleFunc("/progress/", handlers.ProgressHandler)
 	mux.HandleFunc("/download/", handlers.DownloadHandler)
+	mux.HandleFunc("/cancel/", handlers.CancelHandler)
 	mux.HandleFunc("/feedback", handlers.FeedbackHandler)
 	mux.HandleFunc("/check-ytdlp-update", handlers.CheckForYtDlpUpdateHandler)
 

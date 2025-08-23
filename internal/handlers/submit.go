@@ -54,14 +54,14 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 		videoTitle, err := utils.GetVideoTitle(videoRequest)
 		if err != nil {
 			slog.Error("Error getting video title", "error", err, "request", videoRequest)
-			
+
 			progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Failed to get video title, checking for updates..."}}
 
 			close(progressChan)
 
 			// Clean up any resources associated with this process
-			data.cleanupAll(fileId) 
-			
+			data.cleanupAll(fileId)
+
 			// The download could fail if yt-dlp is outdated, so we check for updates and rebuild the container if necessary.
 			go utils.CheckForYtDlpUpdate()
 			return

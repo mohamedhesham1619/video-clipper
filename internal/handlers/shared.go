@@ -113,9 +113,7 @@ func (s *sharedData) getDownloadProcess(fileID string) (*exec.Cmd, bool) {
 // StopDownloadProcessAndCleanUp stops the download process if it is still running and cleans up all associated resources.
 // If the download process is not running, it does nothing.
 func (s *sharedData) stopDownloadProcessAndCleanUp(fileID string) error {
-	s.mu.RLock()
-	cmd, exists := s.processes[fileID]
-	s.mu.RUnlock()
+	cmd, exists := s.getDownloadProcess(fileID)
 	if exists {
 		if cmd.ProcessState == nil || !cmd.ProcessState.Exited() {
 			slog.Info("Stopping download process due to client disconnect", "fileID", fileID)
