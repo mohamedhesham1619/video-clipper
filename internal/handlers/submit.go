@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -38,6 +39,12 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 		"quality", videoRequest.Quality,
 		"clip duration", clipDurationFormatted)
 
+	// Check if duration exceeds 30 minutes (1800 seconds)
+	if clipDurationInt, err := strconv.Atoi(clipDuration); err == nil && clipDurationInt > 1800 {
+		http.Error(w, "Clip duration cannot exceed 30 minutes", http.StatusBadRequest)
+		return
+	}
+	
 	// Generate a unique ID for the file and create a progress channel
 	// This ID will be used to track the download process and progress updates.
 	fileId := utils.GenerateID()

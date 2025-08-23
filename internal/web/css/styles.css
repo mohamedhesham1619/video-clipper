@@ -2157,6 +2157,7 @@ header.main-header {
     box-sizing: border-box;
 }
 
+/* Duration display styling */
 .duration-display {
     text-align: left;
     margin: 1.5rem 1rem;
@@ -2171,6 +2172,46 @@ header.main-header {
 .duration-display span {
     font-weight: 600;
     color: #2d3748;
+}
+
+/* Duration warning styling */
+/* Duration warning styling */
+.duration-warning {
+    color: #dc2626 !important; /* Red color for the duration text */
+    font-weight: 600;
+}
+
+.duration-warning-text {
+    display: none;
+    margin-top: 0.5rem;
+    color: #dc2626;
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1.4;
+    padding: 0.5rem 0.75rem;
+    background-color: #fef2f2;
+    border-radius: 0.375rem;
+    border-left: 3px solid #dc2626;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.duration-warning-text.visible {
+    display: block;
+}
+
+.duration-warning-text .contact-link {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 0.25rem;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+}
+
+.duration-warning-text .contact-link:hover {
+    color: #2563eb;
+    text-decoration: underline;
 }
 
 .action-buttons {
