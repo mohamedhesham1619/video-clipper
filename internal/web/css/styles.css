@@ -64,14 +64,15 @@
 
 /* Progress Bar Styles */
 .progress-container {
-    margin: 0.25rem auto 0.5rem;
+    position: relative;
+    margin: 0.5rem auto;
+    padding: 0;
     width: 100%;
     max-width: 600px;
     opacity: 0;
     display: none;
     animation: slideIn 0.3s ease-out forwards;
     text-align: center;
-    padding: 0 1rem;
     box-sizing: border-box;
     overflow: hidden;
 }
@@ -83,7 +84,7 @@
 }
 
 .status-text {
-    margin: 0.25rem auto 0.5rem;
+    margin: 0 auto 0.05rem;
     text-align: center;
     font-weight: 500;
     color: #4b5563;
@@ -92,12 +93,12 @@
     line-height: 1.2;
     width: 100%;
     max-width: 600px;
+    padding: 0 0.5rem;
     position: relative;
     opacity: 0;
     animation: slideIn 0.5s ease-out forwards;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    padding: 0 0.5rem;
     box-sizing: border-box;
 }
 
@@ -177,11 +178,24 @@
     display: none;
 }
 
+/* Progress info container */
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.2rem 0;
+    font-size: 0.875rem;
+    color: #4b5563;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
 .progress-bar-container {
     width: 100%;
     height: 16px !important;
     background-color: #f1f5f9;
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
     position: relative;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -205,24 +219,95 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(
-        90deg,
-        #e2e8f0 0%,
-        #e2e8f0 40%,
-        #f8fafc 50%,
-        #e2e8f0 60%,
-        #e2e8f0 100%
-    );
+    background: linear-gradient(90deg, 
+        rgba(255,255,255,0) 0%, 
+        rgba(255,255,255,0.6) 50%, 
+        rgba(255,255,255,0) 100%);
     background-size: 200% 100%;
-    animation: loadingShine 3s infinite linear;
-    opacity: 0.8;
+    animation: shimmer 1.5s infinite;
+    z-index: 2;
 }
 
-/* Progress state */
+/* Cancel Button */
+.cancel-button {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border: 2px solid #4a6bff;  /* Primary color */
+    border-radius: 50%;
+    background: white;
+    color: #4a6bff;  /* Primary color */
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+    outline: none;
+}
+
+.cancel-button:hover {
+    background: #f0f3ff;  /* Lighter shade of primary */
+    transform: scale(1.1);
+}
+
+.cancel-button:active {
+    transform: scale(0.95);
+    background: #e0e7ff;  /* Slightly darker shade for active state */
+}
+
+/* Progress Container */
+.progress-container {
+    position: relative;
+    margin: 1rem 0;
+    padding: 0.5rem 0;
+    width: 100%;
+}
+
+/* Progress Wrapper */
+.progress-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    gap: 12px;
+}
+
+/* Progress Bar Container */
+.progress-bar-container {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    height: 24px;
+    display: flex;
+    align-items: center;
+}
+
+/* Progress Bar */
+.progress-bar {
+    position: relative;
+    height: 20px !important;
+    width: 100%;
+    background-color: #e5e7eb;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Progress Fill */
 .progress-fill {
     position: absolute;
     top: 0;
     left: 0;
+    height: 100%;
+    background: #4f46e5;
+    transition: width 0.3s ease-out;
+    border-radius: 6px;
     height: 100%;
     width: 0%;
     background: #4f46e5;
@@ -517,9 +602,15 @@ main {
     padding: 0;
 }
 
-/* Reduce space in the content row */
+/* Content row styling */
 .content-row {
-    margin-bottom: 0.5rem !important;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: var(--content-width);
+    margin: 0 auto 0.5rem !important;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 /* Ensure no extra space in the ad container */
@@ -540,6 +631,7 @@ main {
     max-width: var(--content-width);
     margin: 0 auto;
     padding: 0 20px;
+    box-sizing: border-box;
 }
 
 a {
@@ -2017,12 +2109,22 @@ header.main-header {
     z-index: 1;
 }
 
+/* Ad Container */
+.ad-container {
+    clear: both;
+    position: relative;
+    margin: 1rem auto 0;
+    width: 100%;
+}
+
 /* Bottom Suggestion Container */
 .tool-suggestion {
     width: 100%;
     max-width: var(--main-container-width);
     height: 90px;
-    margin: 2rem auto 0;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
 }
 
 
@@ -3262,8 +3364,8 @@ header.main-header {
 /* Status message styles */
 .status-message {
     text-align: center;
-    margin: 0.5rem 0;
-    line-height: 1.4;
+    margin: 0.1rem 0 0.2rem 0;
+    line-height: 1.3;
 }
 
 .truncate-title {

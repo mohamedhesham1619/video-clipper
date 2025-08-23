@@ -10,7 +10,10 @@ const VideoClipper = (function () {
         statusText: null,
         actionButtons: null,
         eventSource: null,
-        downloadUrl: null
+        downloadUrl: null,
+        completeHandled: false,
+        currentProcessId: null,
+        cancelButton: null
     };
 
     // Private methods
@@ -27,9 +30,23 @@ const VideoClipper = (function () {
     function updateProgress(percent) {
         if (state.progressFill && state.progressLoading) {
             const safePercent = Math.min(100, Math.max(0, percent));
+            const roundedPercent = Math.round(safePercent);
 
-            // Update progress fill width
+            // Update progress fill width and bubble position
             state.progressFill.style.width = `${safePercent}%`;
+            
+            // Update bubble position and text
+            if (state.progressBubble) {
+                state.progressBubble.textContent = `${roundedPercent}%`;
+                state.progressBubble.style.right = `${100 - safePercent}%`;
+                
+                // Change bubble color when complete
+                if (safePercent === 100) {
+                    state.progressBubble.style.background = '#10b981';
+                } else {
+                    state.progressBubble.style.background = '#4f46e5';
+                }
+            }
 
             // Update progress state
             if (safePercent === 0) {
@@ -37,17 +54,27 @@ const VideoClipper = (function () {
                 state.progressLoading.style.display = 'block';
                 state.progressFill.style.display = 'none';
                 state.progressFill.classList.remove('progress-complete');
+                if (state.progressBubble) {
+                    state.progressBubble.style.display = 'none';
+                }
             } else if (safePercent === 100) {
                 // Show complete state
                 state.progressLoading.style.display = 'none';
                 state.progressFill.style.display = 'block';
                 state.progressFill.classList.add('progress-complete');
                 state.progressFill.style.width = '100%';
+                if (state.progressBubble) {
+                    state.progressBubble.style.right = '0%';
+                    state.progressBubble.style.background = '#10b981';
+                }
             } else {
                 // Show progress
                 state.progressLoading.style.display = 'none';
                 state.progressFill.style.display = 'block';
                 state.progressFill.classList.remove('progress-complete');
+                if (state.progressBubble) {
+                    state.progressBubble.style.display = 'block';
+                }
             }
 
             // Update ARIA attributes
@@ -79,6 +106,13 @@ const VideoClipper = (function () {
         if (state.progressContainer) {
             state.progressContainer.style.display = 'block';
             state.progressContainer.classList.add('visible');
+            
+            // Show progress info
+            const progressInfo = state.progressContainer.querySelector('.progress-info');
+            if (progressInfo) {
+                progressInfo.style.visibility = 'visible';
+                progressInfo.style.opacity = '1';
+            }
 
             // Set up loading state for progress bar
             if (state.progressLoading && state.progressFill) {
@@ -131,7 +165,7 @@ const VideoClipper = (function () {
             if (state.statusText) {
                 state.statusText.classList.remove('visible');
             }
-        }, 5000); // 5 second delay before showing buttons again
+        }, 3000); // 3 second delay before showing buttons again
     }
 
     function showError(message) {
@@ -141,6 +175,8 @@ const VideoClipper = (function () {
         if (state.statusText) {
             state.statusText.textContent = message || 'An error occurred while processing your request.';
             state.statusText.classList.add('error');
+            state.statusText.style.opacity = '1';
+            state.statusText.style.visibility = 'visible';
 
             // Update progress bar to show error state
             if (state.progressBar) {
@@ -149,15 +185,24 @@ const VideoClipper = (function () {
             }
         }
 
-        // Hide loading state and show buttons again after a delay
-        setTimeout(() => {
-            hideLoading();
+        // Hide loading state immediately
+        hideLoading();
 
-            // Remove error class after hiding
+        // For rate limit errors, show the message longer (15 seconds)
+        const isRateLimitError = message && (
+            message.toLowerCase().includes('too many requests') ||
+            message.includes('You have reached the maximum number of requests')
+        );
+        const hideDelay = isRateLimitError ? 15000 : 5000;
+
+        // Remove error state after delay
+        setTimeout(() => {
             if (state.statusText) {
+                state.statusText.style.opacity = '0';
+                state.statusText.style.visibility = 'hidden';
                 state.statusText.classList.remove('error');
             }
-        }, 5000);
+        }, hideDelay);
     }
 
     function handleTitleEvent(event) {
@@ -202,7 +247,7 @@ const VideoClipper = (function () {
     function handleProgressEvent(event) {
         try {
             const data = JSON.parse(event.data);
-            const progress = parseInt(data.progress || '0', 10);
+            let progress = parseInt(data.progress || '0', 10);
 
             // Ensure progress elements are visible
             if (state.progressContainer && state.progressContainer.style.display === 'none') {
@@ -221,67 +266,181 @@ const VideoClipper = (function () {
     }
 
     function handleCompleteEvent(event) {
-        // Update status to show completion message
+        if (state.completeHandled) return;
+        state.completeHandled = true;
+        
+        // Update status to show processing message
         if (state.statusText) {
-            state.statusText.setAttribute('data-status', 'complete');
+            state.statusText.setAttribute('data-status', 'processing');
         }
-        updateStatus('Process complete, download starting...');
+        updateStatus('Finalizing process...');
 
-        // Force the progress bar to green
-        if (state.progressFill) {
-            state.progressFill.style.background = '#10b981';
-            state.progressFill.style.width = '100%';
-            state.progressFill.style.transition = 'all 0.3s ease-out';
-            if (state.progressLoading) {
-                state.progressLoading.style.display = 'none';
-            }
-        }
-
-        // Start the download automatically
-        try {
-            const data = JSON.parse(event.data);
-            if (data && data.downloadUrl) {
-                // Create a temporary link and trigger download
-                const link = document.createElement('a');
-                link.href = data.downloadUrl;
-                link.download = data.filename || 'video_clip.mp4';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
-                // Keep the UI in the completed state for a moment before hiding
-                setTimeout(() => {
-                    hideLoading();
-                }, 3000);
-            } else {
-                throw new Error('Invalid download URL received');
-            }
-        } catch (error) {
-            console.error('Error handling complete event:', error);
-            showError('Error processing download. ' + (error.message || 'Please try again.'));
-            // Still show completion state even if there was an error with the download
+        // First ensure progress is at 100% before starting download
+        const completeProgress = (callback) => {
+            // Ensure progress elements are visible and updated
             if (state.progressFill) {
-                state.progressFill.style.background = '#10b981';
+                // First update to current progress to ensure smooth transition
+                const currentWidth = parseFloat(state.progressFill.style.width) || 0;
+                state.progressFill.style.transition = 'none';
+                state.progressFill.style.width = `${currentWidth}%`;
+                
+                // Force reflow
+                void state.progressFill.offsetWidth;
+                
+                // Set up smooth transition to 100%
+                state.progressFill.style.transition = 'width 0.5s ease-out, background-color 0.3s ease-out';
                 state.progressFill.style.width = '100%';
-                state.progressFill.style.transition = 'all 0.3s ease-out';
+                state.progressFill.style.background = '#10b981';
+                state.progressFill.classList.add('progress-complete');
+                
+                // Update bubble
+                if (state.progressBubble) {
+                    state.progressBubble.style.display = 'block';
+                    state.progressBubble.textContent = '100%';
+                    state.progressBubble.style.right = '0%';
+                    state.progressBubble.style.background = '#10b981';
+                    state.progressBubble.style.transition = 'all 0.5s ease-out';
+                }
+                
+                // Hide loading indicator
                 if (state.progressLoading) {
                     state.progressLoading.style.display = 'none';
                 }
+                
+                // Wait for the transition to complete
+                setTimeout(() => {
+                    // Update status to show completion message
+                    if (state.statusText) {
+                        state.statusText.setAttribute('data-status', 'complete');
+                    }
+                    updateStatus('Process complete, download starting...');
+                    callback();
+                }, 500);
+            } else {
+                callback();
             }
+        };
+        
+        const startDownload = () => {
+            try {
+                let data;
+                try {
+                    data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+                } catch (e) {
+                    console.warn('Could not parse event data, using empty object');
+                    data = {};
+                }
+
+                if (data && (data.downloadUrl || data.url)) {
+                    updateStatus('Starting download...');
+                    
+                    // Create a temporary link and trigger download
+                    const link = document.createElement('a');
+                    link.href = data.downloadUrl || data.url;
+                    link.download = data.filename || 'video_clip.mp4';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // Keep the UI in the completed state for a moment before hiding
+                    setTimeout(() => {
+                        hideLoading();
+                    }, 3000);
+                } else {
+                throw new Error('Invalid download URL received');
+                }
+            } catch (error) {
+                console.error('Error handling complete event:', error);
+                updateStatus('Error starting download. Please try again.');
+                showError('Error processing download. ' + (error.message || 'Please try again.'));
+                
+                // Still show completion state even if there was an error with the download
+                if (state.progressFill) {
+                state.progressFill.style.background = '#10b981';
+                    state.progressFill.style.width = '100%';
+                    state.progressFill.style.transition = 'all 0.3s ease-out';
+                    if (state.progressLoading) {
+                        state.progressLoading.style.display = 'none';
+                    }
+                }
+            }
+        };
+        
+        // Start the completion sequence - wait for progress to reach 100% before download
+        completeProgress(() => {
+            updateStatus('Starting download...');
+            startDownload();
+        });
+    }
+
+    async function cancelCurrentOperation() {
+        if (!state.currentProcessId) return;
+        
+        try {
+            updateStatus('Cancelling...');
+            const response = await fetch(`/cancel/${state.currentProcessId}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to cancel operation');
+            }
+            
+            // Close the event source if it exists
+            if (state.eventSource) {
+                state.eventSource.close();
+                state.eventSource = null;
+            }
+            
+            // Update UI to show cancellation state
+            updateStatus('Download cancelled');
+            if (state.progressFill) {
+                state.progressFill.style.background = '#6b7280';
+                state.progressFill.style.width = '100%';
+                state.progressFill.style.transition = 'all 0.3s ease-out';
+            }
+            
+            // Hide progress bar after 1 second
+            setTimeout(() => {
+                if (state.progressContainer) {
+                    state.progressContainer.style.opacity = '0';
+                    state.progressContainer.style.transition = 'opacity 0.3s ease-out';
+                    
+                    // Remove from DOM after fade out
+                    setTimeout(() => {
+                        if (state.progressContainer && state.progressContainer.parentNode) {
+                            state.progressContainer.parentNode.removeChild(state.progressContainer);
+                            state.progressContainer = null;
+                        }
+                        hideLoading();
+                    }, 300);
+                } else {
+                    hideLoading();
+                }
+            }, 1000);
+            
+        } catch (error) {
+            console.error('Error cancelling operation:', error);
+            updateStatus('Error cancelling operation');
+            
+            // Still hide the loading state after a delay
             setTimeout(() => {
                 hideLoading();
-            }, 3000);
+            }, 2000);
         }
     }
 
-    function setupSSEConnection(jobId) {
+    function setupSSEConnection(processId) {
         // Close any existing connection
         if (state.eventSource) {
             state.eventSource.close();
             state.eventSource = null;
         }
 
-        const progressUrl = `/progress/${jobId}`;
+        const progressUrl = `/progress/${processId}`;
         state.eventSource = new EventSource(progressUrl);
 
         const onConnectionError = (error) => {
@@ -505,8 +664,9 @@ const VideoClipper = (function () {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
+            let response;
             try {
-                const response = await fetch('/submit', {
+                response = await fetch('/submit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -528,29 +688,28 @@ const VideoClipper = (function () {
                     throw new Error(error.message || `Server error: ${response.status} ${response.statusText}`);
                 }
 
-                const data = await response.json();
-                if (data.status !== 'started' || !data.processId) {
-                    throw new Error('Invalid response from server: Missing process ID');
+                const result = await response.json();
+                if (result.processId) {
+                    state.currentProcessId = result.processId;
+                    setupSSEConnection(result.processId);
+                } else {
+                    throw new Error('No process ID received from server');
                 }
-
-                console.log('Processing started with ID:', data.processId);
-                setupSSEConnection(data.processId);
-
-            } catch (fetchError) {
-                clearTimeout(timeoutId);
-                if (fetchError.name === 'AbortError') {
-                    throw new Error('Request timed out. Please check your connection and try again.');
-                }
-                throw fetchError;
+            } catch (error) {
+                console.error('Error in handleSubmit:', {
+                    error: error.message,
+                    stack: error.stack,
+                    timestamp: new Date().toISOString()
+                });
+                // Only show error message if it's a 429 or another error we want to display
+                const errorMessage = error.message || 'Failed to process your request. Please try again.';
+                showError(errorMessage);
+                hideLoading();
+                // Don't re-throw here as we've already handled the error
             }
-
         } catch (error) {
-            console.error('Error in handleSubmit:', {
-                error: error.message,
-                stack: error.stack,
-                timestamp: new Date().toISOString()
-            });
-            showError(error.message || 'Failed to process your request. Please try again.');
+            console.error('Error in form submission:', error);
+            showError('An unexpected error occurred. Please try again.');
             hideLoading();
         }
     }
@@ -781,35 +940,53 @@ const VideoClipper = (function () {
             // Create progress container
             state.progressContainer = document.createElement('div');
             state.progressContainer.className = 'progress-container';
+            
+            // Create cancel button
+            state.cancelButton = document.createElement('button');
+            state.cancelButton.className = 'cancel-button';
+            state.cancelButton.innerHTML = '✕';
+            state.cancelButton.title = 'Cancel download';
+            
+            state.cancelButton.addEventListener('click', () => {
+                if (state.currentProcessId && !state.completeHandled) {
+                    if (confirm('Are you sure you want to cancel this download?')) {
+                        cancelCurrentOperation();
+                    }
+                }
+            });
 
             // Create status text
             state.statusText = document.createElement('div');
             state.statusText.className = 'status-text';
             state.statusText.style.cssText = `
-                margin-bottom: 0.5rem;
+                margin: 0 auto 0;
                 text-align: center;
                 font-weight: 500;
                 color: #4b5563;
                 opacity: 0;
-                transform: translateY(10px);
-                transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+                font-size: 1rem;
+                line-height: 0.9;
+                padding: 0;
+                position: relative;
+                top: -6px;
+                transform: scale(0.9);
+                transform-origin: center top;
+                margin-top: -2px;
             `;
+
+            // Remove progress info container and its children
+
+            // Create progress bar wrapper
+            const progressWrapper = document.createElement('div');
+            progressWrapper.className = 'progress-wrapper';
 
             // Create progress bar container
             const progressBarContainer = document.createElement('div');
             progressBarContainer.className = 'progress-bar-container';
 
-            // Create progress bar wrapper
+            // Create progress bar
             state.progressBar = document.createElement('div');
             state.progressBar.className = 'progress-bar';
-            state.progressBar.style.cssText = `
-                position: relative;
-                height: 16px;
-                width: 100%;
-                background-color: #f1f5f9;
-                border-radius: 8px;
-                overflow: hidden;
-            `;
 
             // Create loading overlay
             state.progressLoading = document.createElement('div');
@@ -826,6 +1003,35 @@ const VideoClipper = (function () {
             // Create progress fill
             state.progressFill = document.createElement('div');
             state.progressFill.className = 'progress-fill';
+            
+            // Create bubble indicator
+            state.progressBubble = document.createElement('div');
+            state.progressBubble.className = 'progress-bubble';
+            state.progressBubble.textContent = '0%';
+            state.progressBubble.style.cssText = `
+                position: absolute;
+                right: -20px;
+                top: 50%;
+                transform: translateY(-50%) translateX(50%);
+                background: #4f46e5;
+                color: white;
+                border-radius: 12px;
+                padding: 2px 8px;
+                font-size: 0.7rem;
+                font-weight: 600;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                white-space: nowrap;
+                transition: all 0.3s ease-out;
+                z-index: 10;
+                pointer-events: none;
+            `;
+            
+            // Add progress bar to container
+            progressBarContainer.appendChild(state.progressBar);
+            
+            // Add progress bar container and cancel button to wrapper
+            progressWrapper.appendChild(progressBarContainer);
+            progressWrapper.appendChild(state.cancelButton);
             state.progressFill.style.cssText = `
                 position: absolute;
                 top: 0;
@@ -840,11 +1046,11 @@ const VideoClipper = (function () {
             // Assemble the progress bar
             state.progressBar.appendChild(state.progressLoading);
             state.progressBar.appendChild(state.progressFill);
-            progressBarContainer.appendChild(state.progressBar);
+            state.progressBar.appendChild(state.progressBubble);
 
-            // Add elements to container
+            // Add elements to progress container
             state.progressContainer.appendChild(state.statusText);
-            state.progressContainer.appendChild(progressBarContainer);
+            state.progressContainer.appendChild(progressWrapper);
 
             // Add styles for animations
             if (!document.getElementById('progress-bar-styles')) {
@@ -854,6 +1060,21 @@ const VideoClipper = (function () {
                     @keyframes loadingShine {
                         0% { background-position: 200% 0; }
                         100% { background-position: -200% 0; }
+                    }
+                    .progress-bar {
+                        position: relative;
+                        overflow: visible;
+                    }
+                    .progress-bubble::after {
+                        content: '';
+                        position: absolute;
+                        bottom: -4px;
+                        left: 50%;
+                        transform: translateX(-50%) rotate(45deg);
+                        width: 8px;
+                        height: 8px;
+                        background: inherit;
+                        z-index: -1;
                     }
                     @keyframes fadeInUp {
                         from { opacity: 0; transform: translateY(10px); }
