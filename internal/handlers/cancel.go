@@ -8,8 +8,8 @@ import (
 
 func CancelHandler(w http.ResponseWriter, r *http.Request) {
 
-	slog.Info("Request for CancelHandler: ", "processID", r.URL.Path)
 	processID := strings.TrimPrefix(r.URL.Path, "/cancel/")
+	slog.Info("Request for CancelHandler: ", "processID", processID)
 	err := data.stopDownloadProcessAndCleanUp(processID)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

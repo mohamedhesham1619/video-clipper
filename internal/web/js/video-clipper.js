@@ -691,6 +691,8 @@ const VideoClipper = (function () {
                 const result = await response.json();
                 if (result.processId) {
                     state.currentProcessId = result.processId;
+                    // Save processID to sessionStorage
+                    sessionStorage.setItem('ProcessId', result.processId);
                     setupSSEConnection(result.processId);
                 } else {
                     throw new Error('No process ID received from server');
@@ -1101,18 +1103,34 @@ const VideoClipper = (function () {
     // Public API
     return {
         init: function () {
-            state.form = document.getElementById('clip-form');
-            if (!state.form) return;
+            try {
+                // Check for existing processID in sessionStorage and cancel it
+                const savedProcessId = sessionStorage.getItem('ProcessId');
+                if (savedProcessId) {
+                    console.log('Found stored process ID, sending cancel request:', savedProcessId);
+                    // Send cancel request without setting as current process
+                    fetch(`/cancel/${savedProcessId}`, { method: 'GET' })
+                        .catch(error => console.error('Error cancelling stored process:', error));
+                    // Clear the saved process ID
+                    sessionStorage.removeItem('ProcessId');
+                }
 
-            state.actionButtons = state.form.querySelector('.action-buttons');
+                state.form = document.getElementById('clip-form');
+                if (!state.form) return;
 
-            createProgressElements();
-            setupPasteButton();
-            setupTimeInputs();
+                state.actionButtons = state.form.querySelector('.action-buttons');
 
-            state.form.addEventListener('submit', handleSubmit);
+                createProgressElements();
+                setupPasteButton();
+                setupTimeInputs();
 
-            console.log('Video Clipper initialized');
+                state.form.addEventListener('submit', handleSubmit);
+
+                console.log('Video Clipper initialized');
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showError('Failed to initialize the application. Please refresh the page.');
+            }
         }
     };
 })();

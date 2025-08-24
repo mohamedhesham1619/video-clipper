@@ -61,11 +61,12 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/octet-stream")
 
 	fileSize := fileInfo.Size()
+	fileSizeMB := float64(fileSize) / (1024 * 1024)
 	const CloudRunLimit = 32 * 1024 * 1024 // 32MB
 
 	// If the file size is less than or equal to the Cloud Run limit, serve the file directly
 	if fileSize <= CloudRunLimit {
-		slog.Info("Serving file directly", "fileId", fileId, "filePath", filePath, "size", fileSize)
+		slog.Info("Serving file directly", "fileId", fileId, "filePath", filePath, "size_mb", fmt.Sprintf("%.2f", fileSizeMB))
 
 		w.Header().Set("Content-Length", fmt.Sprintf("%d", fileSize))
 
@@ -74,7 +75,7 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// If the file size is greater than the Cloud Run limit, use chunked transfer encoding to serve the file in chunks
-	slog.Info("Serving file in chunks", "fileId", fileId, "filePath", filePath, "size", fileSize)
+	slog.Info("Serving file in chunks", "fileId", fileId, "filePath", filePath, "size_mb", fmt.Sprintf("%.2f", fileSizeMB))
 
 	w.Header().Set("Transfer-Encoding", "chunked")
 
