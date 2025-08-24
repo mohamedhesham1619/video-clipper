@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -58,10 +59,65 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 			safeFileName,
 			url.PathEscape(fileName)))
 	w.Header().Set("Content-Type", "application/octet-stream")
-	w.Header().Set("Content-Length", fmt.Sprintf("%d", fileInfo.Size()))
 
-	slog.Info("Serving file for download", "fileId", fileId, "filePath", filePath, "size", fileInfo.Size())
+	fileSize := fileInfo.Size()
+	const CloudRunLimit = 32 * 1024 * 1024 // 32MB
 
-	// Use http.ServeContent which handles range requests and other HTTP features
-	http.ServeContent(w, r, fileName, fileInfo.ModTime(), file)
+	// If the file size is less than or equal to the Cloud Run limit, serve the file directly
+	if fileSize <= CloudRunLimit {
+		slog.Info("Serving file directly", "fileId", fileId, "filePath", filePath, "size", fileSize)
+
+		w.Header().Set("Content-Length", fmt.Sprintf("%d", fileSize))
+
+		http.ServeContent(w, r, fileName, fileInfo.ModTime(), file)
+		return
+	}
+
+	// If the file size is greater than the Cloud Run limit, use chunked transfer encoding to serve the file in chunks
+	slog.Info("Serving file in chunks", "fileId", fileId, "filePath", filePath, "size", fileSize)
+
+	w.Header().Set("Transfer-Encoding", "chunked")
+
+	if err := streamFileChunked(w, file); err != nil {
+		slog.Error("Error streaming large file", "error", err)
+		return
+	}
+
+}
+
+// streamFileChunked handles streaming files with chunked transfer encoding
+func streamFileChunked(w http.ResponseWriter, file *os.File) error {
+	const chunkSize = 512 * 1024 // 512KB chunks
+	buffer := make([]byte, chunkSize)
+
+	// Get flusher to force chunks to be sent immediately
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		return fmt.Errorf("streaming not supported")
+	}
+
+	for {
+		n, err := file.Read(buffer)
+		if err != nil && err != io.EOF {
+			return fmt.Errorf("error reading file: %w", err)
+		}
+
+		if n == 0 {
+			break // End of file
+		}
+
+		// Write chunk to response
+		if _, writeErr := w.Write(buffer[:n]); writeErr != nil {
+			return fmt.Errorf("error writing chunk: %w", writeErr)
+		}
+
+		// Force chunk to be sent immediately
+		flusher.Flush()
+
+		if err == io.EOF {
+			break
+		}
+	}
+
+	return nil
 }
