@@ -377,16 +377,16 @@ const contentSuggestions = {
             html: `<a rel="noopener sponsored" href="https://renderforest.pxf.io/c/6416428/1957251/14885" target="_blank" id="1957251" onclick="gtag('event', 'ad_click', { ad_name: 'Renderforest', ad_position: 'side' })"><img src="https://a.impactradius-go.com/display-ad/14885-1957251" alt="" style="width: 100%; height: 100%; object-fit: contain;"></a>`
         },
         {
-            html: `<a rel="noopener sponsored" href="https://1.envato.market/c/6416428/847702/4662" target="_blank" id="847702">
+            html: `<a rel="noopener sponsored" href="https://1.envato.market/c/6416428/847702/4662" target="_blank" id="847702" onclick="gtag('event', 'ad_click', { ad_name: 'Envato', ad_position: 'side' })">
  <img src="//a.impactradius-go.com/display-ad/4662-847702" border="0" alt="" width="300" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/847702/4662" style="position:absolute;visibility:hidden;" border="0" />`
         }
     ],
     bottom: [
         {
-            html: `<a href="https://partner.pcloud.com/r/146969" title="pCloud Premium" target="_blank" rel="noopener sponsored" onclick="gtag('event', 'ad_click', { ad_name: 'pCloud', ad_position: 'bottom' })"><img src="https://partner.pcloud.com/media/banners/personal/personal00272890.jpg" alt="pCloud Premium"/></a>`
+            html: `<a href="https://partner.pcloud.com/r/146969" title="pCloud Premium" target="_blank" rel="noopener sponsored" onclick="gtag('event', 'ad_click', { ad_name: 'pCloud', ad_position: 'bottom' })"><img src="https://partner.pcloud.com/media/banners/lifetime/lifetime00772890.jpg" alt="pCloud Premium"/></a>`
         },
         {
-            html: `<a href="https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902" target="_blank" rel="noopener sponsored" onclick="gtag('event', 'ad_click', { ad_name: 'NordVPN', ad_position: 'bottom' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753394990/728x90_baajhd.png" alt="" style="width: 100%; max-height: 90px; object-fit: contain;" /></a>`
+            html: `<a href="https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902" target="_blank" rel="noopener sponsored" onclick="gtag('event', 'ad_click', { ad_name: 'NordVPN', ad_position: 'bottom' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1756161613/nordvpn-728x90-en-us_wc4ng1.png" alt="" style="width: 100%; max-height: 90px; object-fit: contain;" /></a>`
         },
         {
             html: `<a href="https://privadovpn.com/resources/best-vpn-for-gaming#a_aid=1619&a_bid=203d5f79" target="_blank" rel="noopener sponsored" onclick="gtag('event', 'ad_click', { ad_name: 'PrivadoVPN', ad_position: 'bottom' })"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753306325/728x90_c9y6b3.png" alt="" style="width: 100%; max-height: 90px; object-fit: contain;"></a>`
@@ -403,7 +403,7 @@ document.addEventListener('DOMContentLoaded', function () {
     rotateContent();
 
     // Set up intervals for rotations
-    setInterval(rotateContent, 12000); // Side ads rotation (12 seconds)
+    setInterval(rotateContent, 15000); // Side ads rotation (15 seconds)
 
     // Set up separate interval for bottom ads (every 10 seconds)
     const rotateBottomContent = () => {
@@ -452,8 +452,8 @@ document.addEventListener('DOMContentLoaded', function () {
         rotateBottomContent();
     }
 
-    // Set interval for bottom rotation (12 seconds)
-    setInterval(rotateBottomContent, 12000);
+    // Set interval for bottom rotation (15 seconds)
+    setInterval(rotateBottomContent, 15000);
 });
 
 // Recommended tools data
@@ -468,10 +468,12 @@ function createToolCard(tool) {
     const descriptionHtml = hasNewlines
         ? description.split('\n').filter(line => line.trim() !== '').join('<br>')
         : description;
-    
+
+    const trackingOnClick = `onclick="gtag('event', 'ad_click', { ad_name: '${tool.name}', ad_position: 'recommended_tool' })"`;
+
     card.innerHTML = `
         <div class="recommended-card-inner" style="display: flex; flex-direction: column; height: 100%;">
-            <a href="${tool.link}" target="_blank" rel="noopener sponsored" class="image-link">
+            <a href="${tool.link}" target="_blank" rel="noopener sponsored" class="image-link" ${trackingOnClick}>
                 <div class="image-wrapper">
                     <img src="${tool.image}" alt="${tool.header}" loading="lazy">
                 </div>
@@ -496,7 +498,7 @@ function createToolCard(tool) {
                         ${descriptionHtml}
                     </p>
                 </div>
-                <a href="${tool.link}" target="_blank" rel="noopener sponsored" class="learn-more-btn" style="
+                <a href="${tool.link}" target="_blank" rel="noopener sponsored" class="learn-more-btn" ${trackingOnClick} style="
                     display: inline-flex !important;
                     align-items: center !important;
                     justify-content: center !important;
@@ -540,12 +542,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 const recommended_tools = [
     {
+        "name": "Movavi",
         "header": "Your do-it-all video-making bundle",
         "link": "https://www.mvvitrk.com/bDig55",
         "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753291631/300x250_ewu5d8.png",
         "description": "Auto subtitles with one click, ready-made templates\nHandy video editing, file conversion, and screen recording\nHundreds of drag-and-drop filters, transitions, titles, and overlays"
     },
     {
+        "name": "Envato",
         "header": "Top-Quality Assets for Designers & Video Editors",
         "link": "https://1.envato.market/WyQOdP",
         "image": "https://app.impact.com/display-ad/4662-377341?v=3",
@@ -553,40 +557,64 @@ const recommended_tools = [
 
     },
     {
+        "name": "Akool",
         "header": "Transform Your Content with AI Magic",
         "link": "https://akool.com/?via=mh1619",
         "image": "https://pbs.twimg.com/media/GutshQgWUAA21xd?format=jpg&name=large",
         "description": "Realistic face‑swaps, live avatars, and talking photos—just upload & go.\nTranslate & clone your voice into multilingual videos in seconds.\nPerfect for creators, marketers, and global campaigns."
     },
     {
+        "name": "Flixier",
         "header": "Your Cloud-Powered Video Studio",
         "link": "https://flixier.com?fpr=mh1619",
         "image": "https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24602/720x300px.png",
         "description": "AI subtitle, voiceover & translation tools—all built right into your browser.\nCloud rendering delivers full‑HD or 4K videos in minutes, no high-end PC needed.\nCollaborative editing, stock media & templates—team up and produce faster."
     },
     {
+        "name": "Renderforest",
         "header": "Bring Your Ideas to Life—Animated, Branded & Ready",
         "link": "https://renderforest.pxf.io/qzvzVj",
         "image": "https://app.impact.com/display-ad/14885-1957252?v=1",
         "description": "Pick a template, type your script, and let AI do the rest.\nCustomize colors, fonts & music with drag‑and‑drop ease.\nExport in HD or 4K with advanced features available on premium plans."
     },
     {
+        "name": "Pcloud",
         "header": "Smart Virtual Drive—Cloud Storage That Works Like Local",
         "link": "https://partner.pcloud.com/r/146969",
         "image": "https://partner.pcloud.com/media/banners/personal/personal008300250.jpg",
         "description": "Start with free 10GB, expand easily, or lock in lifetime access for one fee.\nEnjoy built-in media streaming, automatic cross‑platform backups, and file previews.\nOptional Crypto encryption gives you exclusive control over sensitive files."
     },
     {
+        "name": "NordVPN",
         "header": "Trusted by Millions, Audited for Privacy – Take your online security to the next level with NordVPN",
         "link": "https://go.nordvpn.net/aff_c?offer_id=15&aff_id=127970&url_id=902",
-        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753303315/300x250_krlpqk.png",
+        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1756161613/nordvpn-480x320-en-us_cgexjk.jpg",
         "description": "Threat Protection Pro blocks malware, trackers, and phishing sites in real-time.\nDark Web Monitor alerts you if your credentials appear in data breaches.\nSplit tunneling, dedicated IP, and Meshnet secure all your devices—even across continents."
     },
     {
+        "name": "PrivadoVPN",
         "header": "Budget VPN Built for Privacy & Streaming",
         "link": "https://privadovpn.com/getprivadovpn/#a_aid=1619",
         "image": "https://affiliates.privadovpn.com/accounts/default1/3abd4o9y/fb34eb50.png?t=1632790058",
         "description": "Deep discounts with long-term plans: ultra-low pricing from $1.11/month*.\nReliable speeds for HD streaming and browsing on global servers.\nPremium features like unlimited devices, streaming unblock & ad blocking."
     }
 ];
+
+
+
+// Function to render recommended tools
+document.addEventListener('DOMContentLoaded', function () {
+    const recommendedGrid = document.querySelector('.recommended-grid');
+
+    if (recommendedGrid) {
+        // Clear any existing content
+        recommendedGrid.innerHTML = '';
+
+        // Create and append cards for each tool
+        recommended_tools.forEach((tool) => {
+            const card = createToolCard(tool);
+            recommendedGrid.appendChild(card);
+        });
+    }
+});
 

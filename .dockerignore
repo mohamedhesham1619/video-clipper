@@ -1,12 +1,9 @@
-*.exe
+ui/
 .gitattributes
 .gitignore
-ui.PNG
 Dockerfile
 .dockerignore
-*.tar
 /build
-/web/static/ads/
-old-web/
 internal/data/
 .env
+cookie.txt

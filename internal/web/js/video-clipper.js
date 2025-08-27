@@ -453,12 +453,6 @@ const VideoClipper = (function () {
             hideLoading();
         };
 
-        // Handle successful connection
-        state.eventSource.onopen = () => {
-            console.log('SSE connection established');
-            updateStatus('Connected to server...');
-        };
-
         // Handle errors
         state.eventSource.onerror = onConnectionError;
 
