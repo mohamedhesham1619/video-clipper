@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"clipper/internal/models"
-	"fmt"
 	"log/slog"
 	"os"
 	"os/exec"
@@ -11,141 +10,89 @@ import (
 
 type sharedData struct {
 
-	// fileIDs maps a unique process ID to the full path of the downloaded file.
-	fileIDs map[string]string
+	// downloadProcesses maps a unique process ID to the download process struct.
+	downloadProcesses map[string]*models.DownloadProcess
 
-	// progressTracker maps process IDs to their progress channels
-	progressTracker map[string]chan models.ProgressEvent
-
-	// processes maps process IDs to their ffmpeg *exec.Cmd
-	// it is used to stop the ffmpeg process if the client disconnects
-	processes map[string]*exec.Cmd
-
-	// watcher will be used to see if the client is still connected and want to receive updates.
-	// The watcher will be created in the submit handler and will be notified in the progress handler.
-	// If the submit handler does not receive a notification from the progress handler within a certain time, it will assume that the client has disconnected and stop the download process.
-	watcher map[string]chan struct{}
-
-	// mu protects concurrent access to fileIDs, progressTracker, and processes.
+	// mu protects concurrent access to downloadProcesses.
 	mu sync.RWMutex
 }
 
-func (s *sharedData) addFileID(fileID, filePath string) {
+func (s *sharedData) addDownloadProcess(processID string, downloadProcess *models.DownloadProcess) {
 	s.mu.Lock()
-	s.fileIDs[fileID] = filePath
+	s.downloadProcesses[processID] = downloadProcess
 	s.mu.Unlock()
 }
 
-func (s *sharedData) getFilePath(fileID string) (string, bool) {
+func (s *sharedData) getDownloadProcess(processID string) (*models.DownloadProcess, bool) {
 	s.mu.RLock()
-	filePath, exists := s.fileIDs[fileID]
+	downloadProcess, exists := s.downloadProcesses[processID]
 	s.mu.RUnlock()
-	return filePath, exists
+	return downloadProcess, exists
 }
 
-func (s *sharedData) addWatcher(fileID string) {
+func (s *sharedData) removeDownloadProcess(processID string) {
 	s.mu.Lock()
-	s.watcher[fileID] = make(chan struct{})
+	delete(s.downloadProcesses, processID)
 	s.mu.Unlock()
 }
 
-func (s *sharedData) getWatcher(fileID string) (chan struct{}, bool) {
+func (s *sharedData) notifyWatcher(processID string) {
 	s.mu.RLock()
-	watcher, exists := s.watcher[fileID]
-	s.mu.RUnlock()
-	return watcher, exists
-}
-
-func (s *sharedData) notifyWatcher(fileID string) {
-	s.mu.RLock()
-	watcher, exists := s.watcher[fileID]
+	downloadProcess, exists := s.downloadProcesses[processID]
 	s.mu.RUnlock()
 	if exists {
 		// Closing the channel will notify the watcher that is listening for the channel
-		close(watcher)
+		close(downloadProcess.Watcher)
 	}
 }
 
-func (s *sharedData) removeWatcher(fileID string) {
-	s.mu.Lock()
-	delete(s.watcher, fileID)
-	s.mu.Unlock()
-}
-
-func (s *sharedData) addProgressChannel(fileID string, channel chan models.ProgressEvent) {
-	s.mu.Lock()
-	s.progressTracker[fileID] = channel
-	s.mu.Unlock()
-}
-
-func (s *sharedData) getProgressChannel(fileID string) (chan models.ProgressEvent, bool) {
-	s.mu.RLock()
-	channel, exists := s.progressTracker[fileID]
-	s.mu.RUnlock()
-	return channel, exists
-}
-
-func (s *sharedData) removeProgressChannel(fileID string) {
-	s.mu.Lock()
-	delete(s.progressTracker, fileID)
-	s.mu.Unlock()
-}
-
-func (s *sharedData) removeFileID(fileID string) {
-	s.mu.Lock()
-	delete(s.fileIDs, fileID)
-	s.mu.Unlock()
-}
-
-func (s *sharedData) addDownloadProcess(fileID string, cmd *exec.Cmd) {
-	s.mu.Lock()
-	s.processes[fileID] = cmd
-	s.mu.Unlock()
-}
-
-func (s *sharedData) getDownloadProcess(fileID string) (*exec.Cmd, bool) {
-	s.mu.RLock()
-	cmd, exists := s.processes[fileID]
-	s.mu.RUnlock()
-	return cmd, exists
-}
-
 // StopDownloadProcessAndCleanUp stops the download process if it is still running and cleans up all associated resources.
-// If the download process is not running, it does nothing.
-func (s *sharedData) stopDownloadProcessAndCleanUp(fileID string) error {
-	cmd, exists := s.getDownloadProcess(fileID)
+func (s *sharedData) stopDownloadProcessAndCleanUp(processID string) {
+	downloadProcess, exists := s.getDownloadProcess(processID)
+	ffmpegProcess := downloadProcess.FFmpegProcess
+	ytdlpProcess := downloadProcess.YtDlpProcess
+
 	if exists {
-		if cmd.ProcessState == nil || !cmd.ProcessState.Exited() {
-			slog.Info("Stopping download process due to client disconnect", "fileID", fileID)
-			if err := cmd.Process.Kill(); err != nil {
-				return fmt.Errorf("failed to kill process for fileID %s: %w", fileID, err)
-			}
-			s.cleanupAll(fileID) // Clean up all resources associated with this process
-			slog.Warn("Download process stopped and resources cleaned up", "fileID", fileID)
+		if err := stopProcessIfRunning(ffmpegProcess); err != nil {
+			slog.Error("Failed to stop ffmpeg process", "error", err, "processID", processID)
 		}
+		if err := stopProcessIfRunning(ytdlpProcess); err != nil {
+			slog.Error("Failed to stop yt-dlp process", "error", err, "processID", processID)
+		}
+		s.cleanUp(processID) // Clean up all resources associated with this process
+		slog.Warn("Download process stopped and resources cleaned up", "processID", processID)
+		return
+	}
+	slog.Warn("Couldn't stop download process because it doesn't exist", "processID", processID)
+}
+
+// StopProcessIfRunning stops the process if it is still running.
+// If the process already finished or is nil, it does nothing.
+func stopProcessIfRunning(process *exec.Cmd) error {
+	if process == nil {
+		return nil
+	}
+	if process.ProcessState == nil || !process.ProcessState.Exited() {
+		return process.Process.Kill()
 	}
 	return nil
 }
 
-func (s *sharedData) removeDownloadProcess(fileID string) {
-	s.mu.Lock()
-	delete(s.processes, fileID)
-	s.mu.Unlock()
-}
-
-func (s *sharedData) cleanupAll(fileID string) {
-	filePath, _ := s.getFilePath(fileID)
-	os.Remove(filePath)
-	s.removeFileID(fileID)
-	s.removeProgressChannel(fileID)
-	s.removeDownloadProcess(fileID)
-	s.removeWatcher(fileID)
+func (s *sharedData) cleanUp(processID string) {
+	downloadProcess, exists := s.getDownloadProcess(processID)
+	if exists {
+		if downloadProcess.FilePath != "" {
+			err := os.Remove(downloadProcess.FilePath)
+			if err != nil {
+				slog.Error("Failed to remove file", "error", err, "processID", processID, "filePath", downloadProcess.FilePath)
+			}
+		}
+		s.removeDownloadProcess(processID)
+		slog.Info("Download process cleaned up", "processID", processID)
+	}
 }
 
 var data = &sharedData{
-	fileIDs:         make(map[string]string),
-	progressTracker: make(map[string]chan models.ProgressEvent),
-	processes:       make(map[string]*exec.Cmd),
-	watcher:         make(map[string]chan struct{}),
-	mu:              sync.RWMutex{},
+	downloadProcesses: make(map[string]*models.DownloadProcess),
+	mu:                sync.RWMutex{},
 }

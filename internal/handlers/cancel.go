@@ -10,10 +10,7 @@ func CancelHandler(w http.ResponseWriter, r *http.Request) {
 
 	processID := strings.TrimPrefix(r.URL.Path, "/cancel/")
 	slog.Info("Request for CancelHandler: ", "processID", processID)
-	err := data.stopDownloadProcessAndCleanUp(processID)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+
+	data.stopDownloadProcessAndCleanUp(processID)
 	w.WriteHeader(http.StatusOK)
 }

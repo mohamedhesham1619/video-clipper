@@ -1,16 +1,26 @@
 package models
 
+import "os/exec"
+
+type DownloadProcess struct {
+	FilePath      string
+	ProgressChan  chan ProgressEvent
+	Watcher       chan struct{}
+	YtDlpProcess  *exec.Cmd
+	FFmpegProcess *exec.Cmd
+}
+
 type EventName string
 
 const (
-	EventTypeTitle EventName = "title"
+	EventTypeTitle    EventName = "title"
 	EventTypeProgress EventName = "progress"
 	EventTypeComplete EventName = "complete"
-	EventTypeError EventName = "error"
+	EventTypeError    EventName = "error"
 )
 
 type ProgressEvent struct {
-	Event EventName           
+	Event EventName
 	Data  map[string]string
 }
 

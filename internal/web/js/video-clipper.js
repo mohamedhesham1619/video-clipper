@@ -477,12 +477,8 @@ const VideoClipper = (function () {
         // Add the global error handler
         window.addEventListener('error', errorHandler);
 
-        // Clean up after connection closes
+        // Clean up error handler when complete
         state.eventSource.addEventListener('complete', () => {
-            if (state.eventSource) {
-                state.eventSource.close();
-                state.eventSource = null;
-            }
             window.removeEventListener('error', errorHandler);
         }, { once: true });
     }

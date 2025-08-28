@@ -19,20 +19,21 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get the file ID from the URL
-	fileId := strings.TrimPrefix(r.URL.Path, "/download/")
-	if fileId == "" {
+	processId := strings.TrimPrefix(r.URL.Path, "/download/")
+	if processId == "" {
 		http.Error(w, "File ID is required", http.StatusBadRequest)
 		return
 	}
 
-	// Get the file name from the map if it exists
-	filePath, exists := data.getFilePath(fileId)
+	// Get the download process
+	downloadProcess, exists := data.getDownloadProcess(processId)
 	if !exists {
 		http.Error(w, "File not found", http.StatusNotFound)
 		return
 	}
 
 	// Open the file
+	filePath := downloadProcess.FilePath
 	file, err := os.Open(filePath)
 	if err != nil {
 		slog.Error("Error opening file", "error", err, "filePath", filePath)
@@ -66,7 +67,7 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 
 	// If the file size is less than or equal to the Cloud Run limit, serve the file directly
 	if fileSize <= CloudRunLimit {
-		slog.Info("Serving file directly", "fileId", fileId, "filePath", filePath, "size_mb", fmt.Sprintf("%.2f", fileSizeMB))
+		slog.Info("Serving file directly", "fileId", processId, "filePath", filePath, "size_mb", fmt.Sprintf("%.2f", fileSizeMB))
 
 		w.Header().Set("Content-Length", fmt.Sprintf("%d", fileSize))
 
@@ -75,7 +76,7 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// If the file size is greater than the Cloud Run limit, use chunked transfer encoding to serve the file in chunks
-	slog.Info("Serving file in chunks", "fileId", fileId, "filePath", filePath, "size_mb", fmt.Sprintf("%.2f", fileSizeMB))
+	slog.Info("Serving file in chunks", "fileId", processId, "filePath", filePath, "size_mb", fmt.Sprintf("%.2f", fileSizeMB))
 
 	w.Header().Set("Transfer-Encoding", "chunked")
 

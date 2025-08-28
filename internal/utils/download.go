@@ -7,61 +7,49 @@ import (
 	"io"
 	"log/slog"
 	"os/exec"
-	"path/filepath"
 	"strconv"
 	"strings"
 )
 
 // DownloadVideo downloads the video and returns the output file path, a progress channel, and the ffmpeg command.
-func DownloadVideo(videoRequest models.VideoRequest, videoTitle string, progressChan chan models.ProgressEvent) (string, *exec.Cmd, error) {
-
-	// Use /tmp as the temp directory (Cloud Run writable directory)
-	downloadPath := filepath.Join("/tmp", videoTitle)
+func DownloadVideo(videoRequest models.VideoRequest, filePath string, progressChan chan models.ProgressEvent) (ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd, err error) {
 
 	// Create the yt-dlp and ffmpeg commands.
-	ytdlpCmd := prepareYtDlpCommand(videoRequest)
-	ffmpegCmd := prepareFfmpegCommand(downloadPath)
+	ytdlpCmd = prepareYtDlpCommand(videoRequest)
+	ffmpegCmd = prepareFfmpegCommand(filePath)
 
-	err := preparePipes(ytdlpCmd, ffmpegCmd)
+	err = preparePipes(ytdlpCmd, ffmpegCmd)
 
 	if err != nil {
-		return "", nil, fmt.Errorf("error preparing pipes: %v", err)
+		return nil, nil, fmt.Errorf("error preparing pipes: %v", err)
 	}
 
 	// Calculate the total clip duration.
 	// This is used to calculate the progress percentage.
 	totalTime, err := calculateClipDuration(videoRequest.ClipStart, videoRequest.ClipEnd)
 	if err != nil {
-		return "", nil, fmt.Errorf("error calculating clip duration in microseconds: %v", err)
+		return nil, nil, fmt.Errorf("error calculating clip duration in microseconds: %v", err)
 	}
 
 	// Create pipes for ffmpeg's output.
 	// This pipe will be used to read progress updates.
 	ffmpegStdout, err := ffmpegCmd.StdoutPipe()
 	if err != nil {
-		return "", nil, fmt.Errorf("error creating ffmpeg stdout pipe: %v", err)
+		return nil, nil, fmt.Errorf("error creating ffmpeg stdout pipe: %v", err)
 	}
 	go readProgress(ffmpegStdout, progressChan, totalTime)
 
-	// Start both commands.
+	// Start both commands and do not wait for them to finish.
 	if err := ytdlpCmd.Start(); err != nil {
-		return "", nil, fmt.Errorf("failed to start yt-dlp: %w", err)
+		return nil, nil, fmt.Errorf("failed to start yt-dlp: %w", err)
 	}
 	if err := ffmpegCmd.Start(); err != nil {
 		// If ffmpeg fails to start, we must kill the lingering yt-dlp process.
 		_ = ytdlpCmd.Process.Kill()
-		return "", nil, fmt.Errorf("failed to start ffmpeg: %w", err)
+		return nil, nil, fmt.Errorf("failed to start ffmpeg: %w", err)
 	}
 
-	// This goroutine will release yt-dlp's resources once it's done and will log any errors.
-	// The caller of this function will handle the ffmpeg process so we don't need to wait for it here.
-	go func() {
-		if err := ytdlpCmd.Wait(); err != nil {
-			slog.Debug("yt-dlp process finished", "error", err)
-		}
-	}()
-
-	return downloadPath, ffmpegCmd, nil
+	return ytdlpCmd, ffmpegCmd, nil
 }
 
 // isYouTubeURL returns true if the URL is a YouTube link.

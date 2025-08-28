@@ -490,10 +490,14 @@ function createToolCard(tool) {
                 </h3>
                 <div class="recommended-desc">
                     <p class="recommended-description" style="
-                        font-size: 0.9rem !important;
-                        color: #4b5563 !important;
-                        margin: 0 0 1.25rem 0 !important;
-                        line-height: 1.5 !important;
+                        font-size: 1.05rem !important;
+                        color: #1f2937 !important;
+                        margin: 0.5rem 0 1.5rem 0 !important;
+                        line-height: 1.7 !important;
+                        font-weight: 420 !important;
+                        letter-spacing: 0.02em !important;
+                        text-rendering: optimizeLegibility !important;
+                        -webkit-font-smoothing: antialiased !important;
                     ">
                         ${descriptionHtml}
                     </p>
@@ -545,7 +549,7 @@ const recommended_tools = [
         "name": "Movavi",
         "header": "Your do-it-all video-making bundle",
         "link": "https://www.mvvitrk.com/bDig55",
-        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753291631/300x250_ewu5d8.png",
+        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1756326278/336x280-v3_ciesw3.png",
         "description": "Auto subtitles with one click, ready-made templates\nHandy video editing, file conversion, and screen recording\nHundreds of drag-and-drop filters, transitions, titles, and overlays"
     },
     {
