@@ -24,7 +24,6 @@ WORKDIR /app
 
 COPY --from=builder /app/internal/web ./internal/web
 COPY --from=builder /app/build/clipper .
-COPY cookie.txt ./cookie.txt
 
 EXPOSE 8080
 
