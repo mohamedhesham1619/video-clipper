@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"os"
 	"os/exec"
 	"strings"
+
 	cloudbuild "cloud.google.com/go/cloudbuild/apiv1/v2"
 	buildpb "cloud.google.com/go/cloudbuild/apiv1/v2/cloudbuildpb"
 )
@@ -51,8 +53,12 @@ func triggerRebuild() error{
     }
     defer client.Close()
 
+	// Get the trigger ID and project ID from the environment variables
+	triggerID := os.Getenv("TRIGGER_ID")
+	projectID := os.Getenv("PROJECT_ID")
+	
     req := &buildpb.RunBuildTriggerRequest{
-        Name: "projects/projectID/locations/global/triggers/triggerID",
+        Name: fmt.Sprintf("projects/%s/locations/global/triggers/%s", projectID, triggerID),
     }
     _, err = client.RunBuildTrigger(ctx, req)
     if err != nil {

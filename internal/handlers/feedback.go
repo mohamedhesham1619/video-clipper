@@ -2,14 +2,13 @@ package handlers
 
 import (
 	"clipper/internal/models"
+	"clipper/internal/utils"
 	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"net/smtp"
 	"os"
-	"clipper/internal/utils"
-	"github.com/joho/godotenv"
 )
 
 func FeedbackHandler(w http.ResponseWriter, r *http.Request) {
@@ -36,11 +35,6 @@ func FeedbackHandler(w http.ResponseWriter, r *http.Request) {
 		"timestamp", utils.GetEgyptTime(),
 		"userAgent", r.UserAgent(),
 		"ip", r.RemoteAddr)
-
-	// Load env variable from .env
-	if err := godotenv.Load(); err != nil {
-		slog.Warn("Failed to load .env file", "error", err)
-	}
 
 	// Send email if SMTP is configured
 	if os.Getenv("SMTP_HOST") != "" {

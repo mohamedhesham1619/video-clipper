@@ -48,9 +48,11 @@ func ProgressHandler(w http.ResponseWriter, r *http.Request) {
 			return
 
 		case progress, ok := <-progressChannel:
+			// If the channel is closed, it means the download process has finished.
 			if !ok {
 				return
 			}
+			// Send the progress update to the client.
 			jsonData, _ := json.Marshal(progress.Data)
 			fmt.Fprintf(w, "event: %s\ndata: %s\n\n", progress.Event, jsonData)
 			flusher.Flush()

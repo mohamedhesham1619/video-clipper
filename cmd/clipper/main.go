@@ -6,6 +6,8 @@ import (
 	"flag"
 	"log/slog"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -24,6 +26,11 @@ func main() {
 	}
 	handler := slog.NewTextHandler(os.Stdout, opts)
 	slog.SetDefault(slog.New(handler))
+
+	// Load env variables from .env
+	if err := godotenv.Load(); err != nil {
+		slog.Warn("Failed to load .env file", "error", err)
+	}
 
 	if err := utils.CopyCookieToTmp(); err != nil {
 		slog.Error("Failed to copy cookie to tmp", "error", err)
