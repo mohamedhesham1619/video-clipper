@@ -81,7 +81,7 @@ func prepareYtDlpCommand(videoRequest models.VideoRequest) *exec.Cmd {
 		"-o", "-", // Output to stdout
 	}
 	if isYouTubeURL(videoRequest.VideoURL) {
-		args = append(args, "--cookies", "/secrets/cookie.txt")
+		args = append(args, "--cookies", "/tmp/cookie.txt")
 	}
 	args = append(args, videoRequest.VideoURL)
 	return exec.Command("yt-dlp", args...)
@@ -144,7 +144,7 @@ func GetVideoTitle(videoRequest models.VideoRequest) (string, error) {
 		"--retries", "2",
 	}
 	if isYouTubeURL(videoRequest.VideoURL) {
-		args = append(args, "--cookies", "/secrets/cookie.txt")
+		args = append(args, "--cookies", "/tmp/cookie.txt")
 	}
 	args = append(args, videoRequest.VideoURL)
 	infoCmd := exec.Command("yt-dlp", args...)

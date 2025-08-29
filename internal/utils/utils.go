@@ -2,7 +2,9 @@ package utils
 
 import (
 	"fmt"
+	"io"
 	"math/rand/v2"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -145,4 +147,28 @@ func GetEgyptTime() string {
 		location = time.FixedZone("EET", 2*60*60) // fallback to UTC+2
 	}
 	return time.Now().In(location).Format("2006-01-02 3:04:05 PM")
+}
+
+// CopyCookieToTmp copies the cookie file to /tmp so yt-dlp can write to it.
+func CopyCookieToTmp() error {
+	srcPath := "/secrets/cookie.txt"
+	dstPath := "/tmp/cookie.txt"
+
+	src, err := os.Open(srcPath)
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	dst, err := os.Create(dstPath)
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+
+	_, err = io.Copy(dst, src)
+	if err != nil {
+		return err
+	}
+	return nil
 }
