@@ -168,8 +168,20 @@ const VideoClipper = (function () {
         }, 3000); // 3 second delay before showing buttons again
     }
 
+    function clearProcessId() {
+        state.currentProcessId = null;
+        try {
+            sessionStorage.removeItem('ProcessId');
+        } catch (e) {
+            console.warn('Failed to clear process ID from session storage:', e);
+        }
+    }
+
     function showError(message) {
         console.error('Error:', message);
+        
+        // Clear the process ID on error
+        clearProcessId();
 
         // Show error message in the status text
         if (state.statusText) {
@@ -369,6 +381,7 @@ const VideoClipper = (function () {
         // Start the completion sequence - wait for progress to reach 100% before download
         completeProgress(() => {
             updateStatus('Starting download...');
+            clearProcessId();
             startDownload();
         });
     }
@@ -389,11 +402,12 @@ const VideoClipper = (function () {
                 throw new Error('Failed to cancel operation');
             }
             
-            // Close the event source if it exists
+            // Close the event source if it exists and clear process ID
             if (state.eventSource) {
                 state.eventSource.close();
                 state.eventSource = null;
             }
+            clearProcessId();
             
             // Update UI to show cancellation state
             updateStatus('Download cancelled');
@@ -449,7 +463,8 @@ const VideoClipper = (function () {
                 state.eventSource.close();
                 state.eventSource = null;
             }
-            showError(error.message);
+            clearProcessId();
+            showError(error.message || 'Connection to server was lost');
             hideLoading();
         };
 
@@ -464,11 +479,12 @@ const VideoClipper = (function () {
         // Add a global error handler for uncaught errors
         const errorHandler = (event) => {
             console.error('SSE Error Event:', event);
-            showError('An error occurred while processing your request');
             if (state.eventSource) {
                 state.eventSource.close();
                 state.eventSource = null;
             }
+            clearProcessId();
+            showError('An error occurred while processing your request');
             hideLoading();
             // Remove this listener after it's been called
             window.removeEventListener('error', errorHandler);
