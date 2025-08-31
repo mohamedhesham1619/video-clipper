@@ -13,7 +13,10 @@ const VideoClipper = (function () {
         downloadUrl: null,
         completeHandled: false,
         currentProcessId: null,
-        cancelButton: null
+        cancelButton: null,
+        connectionClosedIntentionally: false,
+        completeEventReceived: false,
+        errorEventReceived: false
     };
 
     // Private methods
@@ -90,6 +93,20 @@ const VideoClipper = (function () {
     }
 
     function showLoading() {
+        // Reset completion flag for new download
+        state.completeHandled = false;
+        
+        // Reset connection flags
+        state.connectionClosedIntentionally = false;
+        state.completeEventReceived = false;
+        state.errorEventReceived = false;
+        
+        // Clear any existing error timeouts
+        if (errorTimeout) {
+            clearTimeout(errorTimeout);
+            errorTimeout = null;
+        }
+        
         // Hide action buttons and quality selector
         const actionButtons = document.querySelector('.action-buttons');
         const qualitySelector = document.querySelector('.quality-selector');
@@ -114,19 +131,40 @@ const VideoClipper = (function () {
                 progressInfo.style.opacity = '1';
             }
 
-            // Set up loading state for progress bar
-            if (state.progressLoading && state.progressFill) {
-                // Show loading animation
-                state.progressLoading.style.display = 'block';
-                state.progressFill.style.display = 'none';
-                // Reset progress
+            // Reset progress bar state completely
+            if (state.progressFill) {
+                // Reset all progress bar properties
                 state.progressFill.style.width = '0%';
+                state.progressFill.style.background = '#4f46e5'; // Reset to normal color
+                state.progressFill.style.transition = 'width 0.3s ease-out';
                 state.progressFill.classList.remove('progress-complete');
+                state.progressFill.style.display = 'none';
+            }
+            
+            if (state.progressLoading) {
+                state.progressLoading.style.display = 'block';
+            }
+            
+            if (state.progressBubble) {
+                state.progressBubble.style.display = 'none';
+                state.progressBubble.style.background = '#4f46e5';
+                state.progressBubble.textContent = '0%';
+            }
+            
+            // Reset progress bar container state
+            if (state.progressBar) {
+                state.progressBar.removeAttribute('aria-valuenow');
+                state.progressBar.removeAttribute('aria-valuetext');
             }
         }
 
-        // Show status text with animation
+        // Reset status text state
         if (state.statusText) {
+            // Remove any error state
+            state.statusText.classList.remove('error');
+            state.statusText.style.opacity = '1';
+            state.statusText.style.visibility = 'visible';
+            
             state.statusText.setAttribute('data-status', 'loading');
             state.statusText.innerHTML = `
                 <div class="status-message">
@@ -141,7 +179,13 @@ const VideoClipper = (function () {
         updateProgress(0);
     }
 
-    function hideLoading() {
+    function hideLoading(force = false) {
+        // Don't hide loading if there's an error showing, unless forced
+        if (!force && state.statusText && state.statusText.classList.contains('error')) {
+            console.log(`[${currentErrorId || 'no-error'}] Not hiding loading - error is showing`);
+            return;
+        }
+        
         // Show action buttons and quality selector again after a delay
         setTimeout(() => {
             const actionButtons = document.querySelector('.action-buttons');
@@ -172,57 +216,272 @@ const VideoClipper = (function () {
         state.currentProcessId = null;
         try {
             sessionStorage.removeItem('ProcessId');
+            
+            // Reset status text if it exists
+            if (state.statusText) {
+                // Only clear if there's an error state
+                if (state.statusText.classList.contains('error')) {
+                    state.statusText.innerHTML = '';
+                    state.statusText.classList.remove('error');
+                    state.statusText.style.opacity = '0';
+                    state.statusText.style.visibility = 'hidden';
+                }
+            }
+            
+            // Reset progress bar completely
+            resetProgressBar();
+            
         } catch (e) {
-            console.warn('Failed to clear process ID from session storage:', e);
+            console.error('Error clearing process state:', e);
         }
     }
 
-    function showError(message) {
-        console.error('Error:', message);
+    function resetProgressBar() {
+        if (state.progressBar) {
+            state.progressBar.style.background = '';
+            state.progressBar.style.animation = '';
+            state.progressBar.style.width = '0%';
+            state.progressBar.removeAttribute('aria-valuenow');
+            state.progressBar.removeAttribute('aria-valuetext');
+            state.progressBar.classList.remove('error');
+        }
+        
+        // Reset progress bar container styling
+        const progressBarContainer = state.progressBar?.parentElement;
+        if (progressBarContainer) {
+            progressBarContainer.style.backgroundColor = '';
+            progressBarContainer.style.border = '';
+        }
+        if (state.progressFill) {
+            // Reset to original inline styles
+            state.progressFill.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 0%;
+                background: #4f46e5;
+                transition: width 0.3s ease-out;
+                display: none;
+            `;
+            state.progressFill.classList.remove('progress-complete');
+            state.progressFill.classList.remove('error');
+        }
+        if (state.progressBubble) {
+            state.progressBubble.style.display = 'none';
+            state.progressBubble.style.background = '#4f46e5';
+            state.progressBubble.textContent = '0%';
+        }
+        if (state.progressLoading) {
+            state.progressLoading.style.display = 'block';
+        }
+    }
+
+    let errorTimeout;
+    let currentErrorId = 0;
+    
+    function showError(message, isRateLimit = false) {
+        // Generate a new error ID and get the current timestamp
+        currentErrorId++;
+        const errorId = currentErrorId;
+        const errorTimestamp = Date.now();
+        const hideDelay = isRateLimit ? 15000 : 10000; // 15s for rate limits, 10s for others
+        
+        console.log(`[${errorId}] Showing error (${isRateLimit ? 'rate-limited' : 'regular'}) at ${new Date(errorTimestamp).toISOString()} for ${hideDelay}ms:`, message);
+        
+        // Clear any existing timeout to prevent premature hiding
+        if (errorTimeout) {
+            console.log(`[${errorId}] Clearing previous error timeout`);
+            clearTimeout(errorTimeout);
+            errorTimeout = null;
+        }
         
         // Clear the process ID on error
         clearProcessId();
 
-        // Show error message in the status text
+        // Error display logic remains the same, but we'll track the ID
+
+        // Show error message in the status text with close button
         if (state.statusText) {
-            state.statusText.textContent = message || 'An error occurred while processing your request.';
+            const errorMessage = message || 'An error occurred while processing your request.';
+            state.statusText.innerHTML = `
+                <div class="status-message">
+                    <div style="color: #dc2626; font-weight: 600;">${errorMessage}</div>
+                    <button class="close-status" aria-label="Close message">OK</button>
+                </div>
+            `;
             state.statusText.classList.add('error');
             state.statusText.style.opacity = '1';
             state.statusText.style.visibility = 'visible';
+            
+            // Add click handler for close button
+            const closeBtn = state.statusText.querySelector('.close-status');
+            if (closeBtn) {
+                // Remove any existing event listeners to prevent duplicates
+                closeBtn.replaceWith(closeBtn.cloneNode(true));
+                const newCloseBtn = state.statusText.querySelector('.close-status');
+                
+                newCloseBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    console.log(`[${errorId}] Close button clicked, hiding error manually`);
+                    
+                    // Clear any pending timeout
+                    if (errorTimeout) {
+                        clearTimeout(errorTimeout);
+                        errorTimeout = null;
+                    }
+                    
+                    // Increment error ID to prevent auto-hide from interfering
+                    currentErrorId++;
+                    
+                    // Show action buttons immediately
+                    const actionButtons = document.querySelector('.action-buttons');
+                    const qualitySelector = document.querySelector('.quality-selector');
+                    if (actionButtons) actionButtons.classList.remove('hidden');
+                    if (qualitySelector) qualitySelector.classList.remove('hidden');
+                    
+                    // Reset progress bar and UI immediately
+                    resetProgressBar();
+                    
+                    // Reset progress container immediately
+                    if (state.progressContainer) {
+                        state.progressContainer.classList.remove('visible');
+                        state.progressContainer.style.display = 'none';
+                    }
+                    
+                    // Reset error state flags
+                    state.errorEventReceived = false;
+                    
+                    // Fade out the error message
+                    state.statusText.style.opacity = '0';
+                    setTimeout(() => {
+                        if (state.statusText) {
+                            state.statusText.style.visibility = 'hidden';
+                            state.statusText.classList.remove('error');
+                            console.log(`[${errorId}] Error manually closed, UI reset`);
+                        }
+                    }, 300); // Wait for opacity transition
+                });
+            }
 
             // Update progress bar to show error state
+            console.log('Setting progress bar to error state');
+            if (state.progressFill) {
+                // Override inline styles completely for error state
+                state.progressFill.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    height: 100%;
+                    width: 100%;
+                    background: #ff4444 !important;
+                    transition: all 0.3s ease-out;
+                    display: block;
+                    z-index: 1;
+                `;
+                console.log('Progress fill styled for error with red background');
+                console.log('Progress fill computed styles:', window.getComputedStyle(state.progressFill).background);
+            }
+            
+            // Add error class to progress bar for CSS styling
             if (state.progressBar) {
-                state.progressBar.style.background = 'linear-gradient(90deg, #ef4444, #f87171, #ef4444)';
-                state.progressBar.style.animation = 'progress-pulse 1.5s ease-in-out infinite';
+                state.progressBar.classList.add('error');
+                console.log('Error class added to progress bar');
+                
+                // Also add error class to progress fill for additional styling
+                if (state.progressFill) {
+                    state.progressFill.classList.add('error');
+                    console.log('Error class added to progress fill');
+                }
             }
+            
+            // Also style the progress bar container for error state
+            const progressBarContainer = state.progressBar?.parentElement;
+            if (progressBarContainer) {
+                progressBarContainer.style.backgroundColor = '#fee2e2';
+                progressBarContainer.style.border = '2px solid #ef4444';
+                console.log('Progress bar container styled for error');
+            }
+            
+            // Hide loading indicator during error
+            if (state.progressLoading) {
+                state.progressLoading.style.display = 'none';
+                console.log('Loading indicator hidden');
+            }
+            
+            // Ensure progress container is visible during error
+            if (state.progressContainer) {
+                state.progressContainer.style.display = 'block';
+                state.progressContainer.classList.add('visible');
+                console.log('Progress container made visible for error');
+            }
+            
+            // Store the current error ID in a closure for the timeout
+            const hideError = () => {
+                // Double check this is still the current error
+                if (errorId !== currentErrorId) {
+                    console.log(`[${errorId}] Ignoring hide - newer error (${currentErrorId}) is active`);
+                    return;
+                }
+                
+                const elapsed = Date.now() - errorTimestamp;
+                const remaining = Math.max(0, hideDelay - elapsed);
+                
+                if (remaining > 0) {
+                    console.log(`[${errorId}] Still need to wait ${remaining}ms before hiding`);
+                    errorTimeout = setTimeout(hideError, remaining);
+                    return;
+                }
+                
+                console.log(`[${errorId}] Hiding error after ${elapsed}ms (${isRateLimit ? 'rate-limited' : 'regular'})`);
+                if (state.statusText && state.statusText.classList.contains('error')) {
+                    // Show action buttons immediately
+                    const actionButtons = document.querySelector('.action-buttons');
+                    const qualitySelector = document.querySelector('.quality-selector');
+                    if (actionButtons) actionButtons.classList.remove('hidden');
+                    if (qualitySelector) qualitySelector.classList.remove('hidden');
+                    
+                    // Reset progress bar and UI immediately
+                    resetProgressBar();
+                    
+                    // Reset progress container immediately
+                    if (state.progressContainer) {
+                        state.progressContainer.classList.remove('visible');
+                        state.progressContainer.style.display = 'none';
+                    }
+                    
+                    // Reset error state flags
+                    state.errorEventReceived = false;
+                    
+                    // Fade out the error message
+                    state.statusText.style.opacity = '0';
+                    setTimeout(() => {
+                        if (state.statusText && state.statusText.classList.contains('error') && errorId === currentErrorId) {
+                            state.statusText.style.visibility = 'hidden';
+                            state.statusText.classList.remove('error');
+                            console.log(`[${errorId}] Error auto-hidden at ${new Date().toISOString()}`);
+                        }
+                    }, 300);
+                }
+                errorTimeout = null;
+            };
+            
+            console.log(`[${errorId}] Setting auto-hide for ${hideDelay}ms`);
+            errorTimeout = setTimeout(hideError, hideDelay);
         }
-
-        // Hide loading state immediately
-        hideLoading();
-
-        // For rate limit errors, show the message longer (15 seconds)
-        const isRateLimitError = message && (
-            message.toLowerCase().includes('too many requests') ||
-            message.includes('You have reached the maximum number of requests')
-        );
-        const hideDelay = isRateLimitError ? 15000 : 5000;
-
-        // Remove error state after delay
-        setTimeout(() => {
-            if (state.statusText) {
-                state.statusText.style.opacity = '0';
-                state.statusText.style.visibility = 'hidden';
-                state.statusText.classList.remove('error');
-            }
-        }, hideDelay);
-    }
-
+    };
+    
     function handleTitleEvent(event) {
         try {
-            const data = JSON.parse(event.data);
-            let title = data.title || 'the video';
+            let data;
+            try {
+                data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+            } catch (e) {
+                console.warn('Could not parse event data, using empty object');
+                data = {};
+            }
             // Clean up the title from any HTML entities or special characters
-            title = title.replace(/&[^;]+;/g, '').trim();
+            const title = (data.title || '').replace(/&[^;]+;/g, '').trim();
 
             // Create status message with title
             state.statusText.setAttribute('data-status', 'extracting');
@@ -280,6 +539,10 @@ const VideoClipper = (function () {
     function handleCompleteEvent(event) {
         if (state.completeHandled) return;
         state.completeHandled = true;
+        state.completeEventReceived = true;
+        
+        // Mark that we're completing successfully to prevent connection error messages
+        errorShown = true;
         
         // Update status to show processing message
         if (state.statusText) {
@@ -321,11 +584,35 @@ const VideoClipper = (function () {
                 
                 // Wait for the transition to complete
                 setTimeout(() => {
-                    // Update status to show completion message
+                    // Update status to show completion message with close button
                     if (state.statusText) {
                         state.statusText.setAttribute('data-status', 'complete');
+                        const message = 'Process complete, download starting...';
+                        state.statusText.innerHTML = `
+                            <div class="status-message">
+                                <div>${message}</div>
+                                <button class="close-status" aria-label="Close message">OK</button>
+                            </div>
+                        `;
+                        
+                        // Add click handler for close button
+                        const closeBtn = state.statusText.querySelector('.close-status');
+                        if (closeBtn) {
+                            closeBtn.addEventListener('click', () => {
+                                state.statusText.style.opacity = '0';
+                                state.statusText.style.visibility = 'hidden';
+                            });
+                        }
                     }
-                    updateStatus('Process complete, download starting...');
+                    
+                    // Auto-hide after 10 seconds
+                    setTimeout(() => {
+                        if (state.statusText) {
+                            state.statusText.style.opacity = '0';
+                            state.statusText.style.visibility = 'hidden';
+                        }
+                    }, 10000);
+                    
                     callback();
                 }, 500);
             } else {
@@ -356,8 +643,10 @@ const VideoClipper = (function () {
                     
                     // Keep the UI in the completed state for a moment before hiding
                     setTimeout(() => {
-                        hideLoading();
-                    }, 3000);
+                        hideLoading(true); // Force hide loading even if error is showing
+                        // Reset progress bar after hiding loading state
+                        resetProgressBar();
+                    }, 5000);
                 } else {
                 throw new Error('Invalid download URL received');
                 }
@@ -381,6 +670,16 @@ const VideoClipper = (function () {
         // Start the completion sequence - wait for progress to reach 100% before download
         completeProgress(() => {
             updateStatus('Starting download...');
+            
+            // Mark that we're closing the connection intentionally
+            state.connectionClosedIntentionally = true;
+            
+            // Close the SSE connection since we're done
+            if (state.eventSource) {
+                state.eventSource.close();
+                state.eventSource = null;
+            }
+            
             clearProcessId();
             startDownload();
         });
@@ -404,6 +703,8 @@ const VideoClipper = (function () {
             
             // Close the event source if it exists and clear process ID
             if (state.eventSource) {
+                // Mark that we're closing the connection intentionally
+                state.connectionClosedIntentionally = true;
                 state.eventSource.close();
                 state.eventSource = null;
             }
@@ -429,10 +730,10 @@ const VideoClipper = (function () {
                             state.progressContainer.parentNode.removeChild(state.progressContainer);
                             state.progressContainer = null;
                         }
-                        hideLoading();
+                        hideLoading(true); // Force hide loading
                     }, 300);
                 } else {
-                    hideLoading();
+                    hideLoading(true); // Force hide loading
                 }
             }, 1000);
             
@@ -442,7 +743,7 @@ const VideoClipper = (function () {
             
             // Still hide the loading state after a delay
             setTimeout(() => {
-                hideLoading();
+                hideLoading(true); // Force hide loading
             }, 2000);
         }
     }
@@ -456,48 +757,113 @@ const VideoClipper = (function () {
 
         const progressUrl = `/progress/${processId}`;
         state.eventSource = new EventSource(progressUrl);
+        let errorShown = false;
+        state.connectionClosedIntentionally = false;
 
-        const onConnectionError = (error) => {
-            console.error('SSE Connection Error:', error);
+        const showConnectionError = (message) => {
+            if (errorShown || state.completeHandled) return;
+            errorShown = true;
+            
+            // Mark that we've received an error event to prevent connection error messages
+            state.errorEventReceived = true;
+            
             if (state.eventSource) {
                 state.eventSource.close();
                 state.eventSource = null;
             }
+            
             clearProcessId();
-            showError(error.message || 'Connection to server was lost');
-            hideLoading();
+            
+            // For rate limit errors, show the message longer (15 seconds)
+            const isRateLimitError = message && (
+                message.toLowerCase().includes('too many requests') ||
+                message.includes('You have reached the maximum number of requests, please try again later')
+            );
+            
+            showError(message, isRateLimitError);
+            // Don't call hideLoading here - showError will handle it
         };
 
-        // Handle errors
-        state.eventSource.onerror = onConnectionError;
+        // Handle connection errors
+        state.eventSource.onerror = () => {
+            console.log('Connection error event fired');
+            console.log('Error state:', {
+                errorShown,
+                completeHandled: state.completeHandled,
+                connectionClosedIntentionally: state.connectionClosedIntentionally,
+                completeEventReceived: state.completeEventReceived,
+                errorEventReceived: state.errorEventReceived
+            });
+            
+            // Add a small delay to allow server error events to be processed first
+            setTimeout(() => {
+                // Only show connection error if we haven't completed successfully
+                // and we haven't already shown an error
+                // and the connection wasn't closed intentionally
+                // and we haven't received the complete event
+                // and we haven't received an error event from the server
+                if (!errorShown && !state.completeHandled && !state.connectionClosedIntentionally && !state.completeEventReceived && !state.errorEventReceived) {
+                    console.log('Showing connection error message');
+                    showConnectionError('Connection to server was lost');
+                } else {
+                    console.log('Skipping connection error message due to state flags');
+                }
+            }, 100); // 100ms delay to allow server events to be processed
+        };
 
         // Set up event listeners
         state.eventSource.addEventListener('title', handleTitleEvent);
         state.eventSource.addEventListener('progress', handleProgressEvent);
-        state.eventSource.addEventListener('complete', handleCompleteEvent);
+        state.eventSource.addEventListener('complete', (event) => {
+            window.removeEventListener('error', errorHandler);
+            handleCompleteEvent(event);
+        });
+        
+        // Handle server-sent error messages
+        state.eventSource.addEventListener('error', (event) => {
+            console.log('Received error event from server:', event.data);
+            try {
+                const data = JSON.parse(event.data);
+                if (data.message) {
+                    console.log('Showing server error message:', data.message);
+                    showConnectionError(data.message);
+                } else {
+                    console.log('No message in error event, showing generic error');
+                    showConnectionError('An error occurred during processing');
+                }
+            } catch (e) {
+                console.error('Error parsing server error event:', e);
+                showConnectionError('An error occurred during processing');
+            }
+        });
+        
+        // Handle generic messages (fallback)
+        state.eventSource.addEventListener('message', (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.error) {
+                    showConnectionError(data.error);
+                }
+            } catch (e) {
+                console.error('Error parsing server message:', e);
+            }
+        });
 
         // Add a global error handler for uncaught errors
         const errorHandler = (event) => {
-            console.error('SSE Error Event:', event);
-            if (state.eventSource) {
-                state.eventSource.close();
-                state.eventSource = null;
+            console.error('Global error:', event);
+            if (!errorShown && !state.completeHandled && !state.completeEventReceived && !state.errorEventReceived) {
+                showConnectionError('An unexpected error occurred');
             }
-            clearProcessId();
-            showError('An error occurred while processing your request');
-            hideLoading();
-            // Remove this listener after it's been called
-            window.removeEventListener('error', errorHandler);
         };
 
-        // Add the global error handler
         window.addEventListener('error', errorHandler);
 
         // Clean up error handler when complete
         state.eventSource.addEventListener('complete', () => {
             window.removeEventListener('error', errorHandler);
         }, { once: true });
-    }
+    };
 
     function validateTimeFormat(timeStr) {
         return /^(\d{1,2}:)?\d{1,2}:\d{1,2}$/.test(timeStr);
@@ -638,6 +1004,12 @@ const VideoClipper = (function () {
 
         try {
             const videoUrl = getFormElement('video-url').value.trim();
+            
+            // Check if it's a YouTube playlist URL
+            if ((videoUrl.includes('youtube') || videoUrl.includes('youtu.be')) && videoUrl.includes('list=')) {
+                throw new Error('It looks like you used a playlist link. Please copy the video link from the Share button instead.');
+            }
+            
             const clipStart = getFormElement('start-time').value;
             const clipEnd = getFormElement('end-time').value;
             const quality = getFormElement('video-quality').value;
@@ -687,11 +1059,18 @@ const VideoClipper = (function () {
                 clearTimeout(timeoutId);
 
                 if (!response.ok) {
+                    // For 429 errors, we know it's a rate limit without needing to parse the body
                     if (response.status === 429) {
                         throw new Error('You have reached the maximum number of requests. Please try again later.');
                     }
-                    const error = await response.json().catch(() => ({}));
-                    throw new Error(error.message || `Server error: ${response.status} ${response.statusText}`);
+                    // For other errors, try to get the error message from the response
+                    try {
+                        const error = await response.json();
+                        throw new Error(error.message || `Server error: ${response.status} ${response.statusText}`);
+                    } catch (e) {
+                        // If we can't parse the error response, use a generic message
+                        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+                    }
                 }
 
                 const result = await response.json();
@@ -709,22 +1088,43 @@ const VideoClipper = (function () {
                     stack: error.stack,
                     timestamp: new Date().toISOString()
                 });
-                // Only show error message if it's a 429 or another error we want to display
+                // Check if this is a rate limit error (429) or contains rate limit message
+                const isRateLimit = error.message && (
+                    error.message.includes('429') ||
+                    error.message.toLowerCase().includes('rate limit') ||
+                    error.message.toLowerCase().includes('too many requests') ||
+                    error.message.toLowerCase().includes('maximum number of requests')
+                );
+                
                 const errorMessage = error.message || 'Failed to process your request. Please try again.';
-                showError(errorMessage);
-                hideLoading();
+                showError(errorMessage, isRateLimit);
+                // Don't call hideLoading here - showError will handle it
                 // Don't re-throw here as we've already handled the error
             }
         } catch (error) {
             console.error('Error in form submission:', error);
             showError('An unexpected error occurred. Please try again.');
-            hideLoading();
+            // Don't call hideLoading here - showError will handle it
         }
     }
 
     function setupPasteButton() {
         const pasteButton = document.getElementById('paste-url');
         const videoUrlInput = document.getElementById('video-url');
+        // Create error message element
+        const urlErrorElement = document.createElement('div');
+        urlErrorElement.className = 'url-error';
+        urlErrorElement.style.display = 'none';
+        
+        // Find the form group and insert the error message right after the label
+        const formGroup = videoUrlInput.closest('.form-group');
+        if (formGroup) {
+            const label = formGroup.querySelector('label[for="video-url"]');
+            if (label) {
+                // Insert the error message right after the label
+                label.insertAdjacentElement('afterend', urlErrorElement);
+            }
+        }
 
         if (!pasteButton || !videoUrlInput) return;
 
@@ -834,6 +1234,19 @@ const VideoClipper = (function () {
 
         // Add event listeners
         pasteButton.addEventListener('click', handlePaste);
+        
+        // Add input event listener for live URL validation
+        videoUrlInput.addEventListener('input', function() {
+            const url = this.value.trim().toLowerCase();
+            if ((url.includes('youtube') || url.includes('youtu.be')) && url.includes('list=')) {
+                urlErrorElement.textContent = 'It looks like you used a playlist link. Please copy the video link from the Share button instead.';
+                urlErrorElement.style.display = 'block';
+                this.setCustomValidity('Please use a video link, not a playlist link');
+            } else {
+                urlErrorElement.style.display = 'none';
+                this.setCustomValidity('');
+            }
+        });
 
         // Make input focusable
         videoUrlInput.addEventListener('click', function () {
@@ -1106,6 +1519,25 @@ const VideoClipper = (function () {
         }
     }
 
+    // Test function to manually trigger error state
+    function testErrorState() {
+        console.log('Testing error state...');
+        if (state.progressFill) {
+            state.progressFill.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 100%;
+                background: #ff4444 !important;
+                transition: all 0.3s ease-out;
+                display: block;
+                z-index: 1;
+            `;
+            console.log('Test: Progress fill should now be red');
+        }
+    }
+
     // Public API
     return {
         init: function () {
@@ -1137,7 +1569,8 @@ const VideoClipper = (function () {
                 console.error('Initialization error:', error);
                 showError('Failed to initialize the application. Please refresh the page.');
             }
-        }
+        },
+        testError: testErrorState
     };
 })();
 

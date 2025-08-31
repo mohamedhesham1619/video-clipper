@@ -157,6 +157,15 @@
     font-weight: 600;
 }
 
+.status-text.error .status-message {
+    color: #dc2626;
+}
+
+.status-text.error .status-message div {
+    color: #dc2626 !important;
+    font-weight: 600;
+}
+
 .truncate-title {
     display: block;
     width: 100%;
@@ -386,6 +395,19 @@
 .progress-bar.error {
     background: linear-gradient(90deg, #ef4444, #f87171, #ef4444);
     animation: progress-pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+.progress-bar.error .progress-fill {
+    background: #ff4444 !important;
+    animation: progress-pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
+}
+
+.progress-fill.error {
+    background: #ff4444 !important;
+    animation: progress-pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
 }
 
 /* Error Message Styling */
@@ -429,6 +451,12 @@
     0% { opacity: 0.6; }
     50% { opacity: 1; }
     100% { opacity: 0.6; }
+}
+
+@keyframes progress-pulse {
+    0% { opacity: 0.8; }
+    50% { opacity: 1; }
+    100% { opacity: 0.8; }
 }
 
 /* Main content styles */
@@ -2260,6 +2288,27 @@ header.main-header {
 }
 
 /* Duration display styling */
+/* URL Error Message Styling */
+.url-error {
+    color: #e53e3e;
+    font-size: 0.875rem;
+    margin: 0.25rem 0 0.5rem 0;
+    line-height: 1.25;
+    display: block;
+    width: 100%;
+}
+
+/* Ensure the form group has proper spacing */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+/* Style the label for better spacing */
+.form-group > label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
 .duration-display {
     text-align: left;
     margin: 1.5rem 1rem;
@@ -3366,6 +3415,48 @@ header.main-header {
     text-align: center;
     margin: 0.1rem 0 0.2rem 0;
     line-height: 1.3;
+    position: relative;
+    padding: 0.5rem 3.5rem 0.5rem 1.5rem;
+    min-height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Close button for status messages */
+.status-message .close-status {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.375rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.status-message .close-status:hover {
+    background-color: #2563eb;
+}
+
+.status-message .close-status:active {
+    transform: translateY(-50%) scale(0.98);
+}
+
+.status-message .close-status:focus {
+    outline: 2px solid #93c5fd;
+    outline-offset: 2px;
+}
+
+/* Adjust positioning when there's a title */
+.status-message .truncate-title {
+    padding-right: 1.5rem;
 }
 
 .truncate-title {
