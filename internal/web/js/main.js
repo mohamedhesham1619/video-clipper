@@ -377,8 +377,7 @@ const contentSuggestions = {
             html: `<a rel="noopener sponsored" href="https://renderforest.pxf.io/c/6416428/1957251/14885" target="_blank" id="1957251" onclick="gtag('event', 'ad_click', { ad_name: 'Renderforest', ad_position: 'side' })"><img src="https://a.impactradius-go.com/display-ad/14885-1957251" alt="" style="width: 100%; height: 100%; object-fit: contain;"></a>`
         },
         {
-            html: `<a rel="noopener sponsored" href="https://1.envato.market/c/6416428/847702/4662" target="_blank" id="847702" onclick="gtag('event', 'ad_click', { ad_name: 'Envato', ad_position: 'side' })">
- <img src="//a.impactradius-go.com/display-ad/4662-847702" border="0" alt="" width="300" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/847702/4662" style="position:absolute;visibility:hidden;" border="0" />`
+            html: `<a rel="noopener sponsored" href="https://1.envato.market/c/6416428/3249424/4662?subId1=ULVG" target="_blank" id="3249424" onclick="gtag('event', 'ad_click', { ad_name: 'Envato', ad_position: 'side' })"><img src="https://a.impactradius-go.com/display-ad/4662-3249424" border="0" alt="" width="300" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/3249424/4662" style="position:absolute;visibility:hidden;" border="0" />`
         }
     ],
     bottom: [
