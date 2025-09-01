@@ -60,25 +60,25 @@ func (s *sharedData) stopDownloadProcessAndCleanUp(processID string) {
 	ffmpegProcess := downloadProcess.FFmpegProcess
 	ytdlpProcess := downloadProcess.YtDlpProcess
 
-	stopped, err := stopProcessIfRunning(ffmpegProcess)
-	if !stopped {
-		slog.Warn("Couldn't stop ffmpeg process, process is already finished or nil", "error", err, "processID", processID)
-		return // Don't clean up resources if the process is already finished or nil
-	}else if err != nil {
+	ffmpegStopped, err := stopProcessIfRunning(ffmpegProcess)
+	if err != nil {
 		slog.Error("Failed to stop ffmpeg process", "error", err, "processID", processID)
 	}
-	
-	stopped, err = stopProcessIfRunning(ytdlpProcess)
-	if !stopped {
-		slog.Warn("Couldn't stop yt-dlp process, process is already finished or nil", "error", err, "processID", processID)
-		return // Don't clean up resources if the process is already finished or nil
-	}else if err != nil {
+
+	ytdlpStopped, err := stopProcessIfRunning(ytdlpProcess)
+	if err != nil {
 		slog.Error("Failed to stop yt-dlp process", "error", err, "processID", processID)
 	}
-	
-	// If both processes were running and were stopped, clean up resources.
-	s.cleanUp(processID) 
-	slog.Warn("Download process stopped and resources cleaned up", "processID", processID)
+
+	// If either process was running and was stopped, it's a true cancellation, so clean up.
+	// If neither was running, the download process was already complete, so we let the submit handler clean up.
+	if ffmpegStopped || ytdlpStopped {
+		s.cleanUp(processID)
+		slog.Warn("Download process stopped and resources cleaned up", "processID", processID)
+	} else {
+		slog.Info("Download process already finished; no need to stop or clean up", "processID", processID)
+	}
+
 }
 
 // StopProcessIfRunning stops the process if it is still running.
