@@ -549,7 +549,7 @@ const recommended_tools = [
         "header": "Your do-it-all video-making bundle",
         "link": "https://www.mvvitrk.com/bDig55",
         "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1756326278/336x280-v3_ciesw3.png",
-        "description": "Auto subtitles with one click, ready-made templates\nHandy video editing, file conversion, and screen recording\nHundreds of drag-and-drop filters, transitions, titles, and overlays"
+        "description": "Auto subtitles with one click, ready-made templates\nHandy video editing, file conversion, and screen recording\nHundreds of drag-and-drop filters, transitions, titles, and overlays\nUse code (PTNAFFDIS010925ALLAFS15) for 15% discount on yearly subscription (valid till 15th October 2025)"
     },
     {
         "name": "Envato",

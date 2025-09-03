@@ -36,6 +36,7 @@ func New() *Server {
 	mux.HandleFunc("/cancel/", handlers.CancelHandler)
 	mux.HandleFunc("/feedback", handlers.FeedbackHandler)
 	mux.HandleFunc("/check-ytdlp-update", handlers.CheckForYtDlpUpdateHandler)
+	mux.HandleFunc("/stats/clips", handlers.StatsHandler)
 
 	// Static page routes
 	mux.HandleFunc("/contact", handlers.ContactPageHandler)

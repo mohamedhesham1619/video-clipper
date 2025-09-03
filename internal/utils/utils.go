@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"math/rand/v2"
@@ -10,6 +11,8 @@ import (
 	"strings"
 	"time"
 	"unicode"
+
+	"cloud.google.com/go/firestore"
 )
 
 func GenerateID() string {
@@ -171,4 +174,14 @@ func CopyCookieToTmp() error {
 		return err
 	}
 	return nil
+}
+
+func IncrementClipCount(ctx context.Context, client *firestore.Client) error {
+	_, err := client.Collection("stats").Doc("clips").Update(ctx, []firestore.Update{
+		{
+			Path:  "count",
+			Value: firestore.Increment(1),
+		},
+	})
+	return err
 }

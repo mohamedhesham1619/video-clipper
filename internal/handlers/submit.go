@@ -7,9 +7,12 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"time"
+
+	firestore "cloud.google.com/go/firestore"
 )
 
 type response struct {
@@ -116,15 +119,29 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 
 		close(progressChan)
 
+		// Increment clip count in Firestore
+		projectID := os.Getenv("GC_PROJECT_ID")
+		firestoreClient, err := firestore.NewClient(r.Context(), projectID)
+		if err != nil {
+			slog.Error("Error creating Firestore client, cannot increment clip count", "error", err)
+			return
+		}
+		defer firestoreClient.Close()
+		
+		err = utils.IncrementClipCount(r.Context(), firestoreClient)
+		if err != nil {
+			slog.Error("Error incrementing clip count", "error", err)
+		}
+
 		// wait for a while to ensure the client can download the file then clean up
 		time.Sleep(15 * time.Minute)
 		data.cleanUp(processID)
 		slog.Info("cleanup completed for process", "processId", processID)
 	}()
 
-	// If the client didn't request the progress handler within 5 seconds, we assume that the client disconnected and stop the download process.
+	// If the client didn't request the progress handler within 10 seconds, we assume that the client disconnected and stop the download process.
 	// This will not block the submit handler, as it runs in a separate goroutine.
-	time.AfterFunc(5*time.Second, func() {
+	time.AfterFunc(10*time.Second, func() {
 
 		select {
 		case <-watcher:
