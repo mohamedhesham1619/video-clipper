@@ -6,6 +6,7 @@ toolchain go1.23.11
 
 require (
 	cloud.google.com/go/cloudbuild v1.23.0
+	cloud.google.com/go/firestore v1.18.0
 	github.com/joho/godotenv v1.5.1
 	github.com/ulule/limiter/v3 v3.11.2
 )
@@ -15,7 +16,6 @@ require (
 	cloud.google.com/go/auth v0.16.3 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.7.0 // indirect
-	cloud.google.com/go/firestore v1.18.0 // indirect
 	cloud.google.com/go/longrunning v0.6.7 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect

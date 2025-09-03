@@ -3,6 +3,7 @@ package handlers
 import (
 	"clipper/internal/models"
 	"clipper/internal/utils"
+	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -121,14 +122,15 @@ func SubmitHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Increment clip count in Firestore
 		projectID := os.Getenv("GC_PROJECT_ID")
-		firestoreClient, err := firestore.NewClient(r.Context(), projectID)
+		ctx := context.Background()
+		firestoreClient, err := firestore.NewClient(ctx, projectID)
 		if err != nil {
 			slog.Error("Error creating Firestore client, cannot increment clip count", "error", err)
 			return
 		}
 		defer firestoreClient.Close()
 		
-		err = utils.IncrementClipCount(r.Context(), firestoreClient)
+		err = utils.IncrementClipCount(ctx, firestoreClient)
 		if err != nil {
 			slog.Error("Error incrementing clip count", "error", err)
 		}
