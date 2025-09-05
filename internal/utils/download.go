@@ -3,22 +3,26 @@ package utils
 import (
 	"bufio"
 	"clipper/internal/models"
+	"context"
 	"fmt"
 	"io"
 	"log/slog"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	storage "cloud.google.com/go/storage"
 )
 
 // DownloadVideo downloads the video and returns the output file path, a progress channel, and the ffmpeg command.
-func DownloadVideo(videoRequest models.VideoRequest, filePath string, progressChan chan models.ProgressEvent) (ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd, err error) {
+func DownloadVideo(videoRequest models.VideoRequest, videoTitle string, bucket *storage.BucketHandle, progressChan chan models.ProgressEvent) (ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd, err error) {
 
 	// Create the yt-dlp and ffmpeg commands.
 	ytdlpCmd = prepareYtDlpCommand(videoRequest)
-	ffmpegCmd = prepareFfmpegCommand(filePath)
+	ffmpegCmd = prepareFfmpegCommand()
 
-	err = preparePipes(ytdlpCmd, ffmpegCmd)
+	// Prepare the pipes for yt-dlp, ffmpeg and GCS writer.
+	err = preparePipes(ytdlpCmd, ffmpegCmd, bucket, videoTitle)
 
 	if err != nil {
 		return nil, nil, fmt.Errorf("error preparing pipes: %v", err)
@@ -31,13 +35,14 @@ func DownloadVideo(videoRequest models.VideoRequest, filePath string, progressCh
 		return nil, nil, fmt.Errorf("error calculating clip duration in microseconds: %v", err)
 	}
 
-	// Create pipes for ffmpeg's output.
+	// Create a pipe for ffmpeg's stderr.
 	// This pipe will be used to read progress updates.
-	ffmpegStdout, err := ffmpegCmd.StdoutPipe()
+	// stderr is used for progress updates because stdout is used for the GCS writer.
+	ffmpegStderr, err := ffmpegCmd.StderrPipe()
 	if err != nil {
-		return nil, nil, fmt.Errorf("error creating ffmpeg stdout pipe: %v", err)
+		return nil, nil, fmt.Errorf("error creating ffmpeg stderr pipe: %v", err)
 	}
-	go readProgress(ffmpegStdout, progressChan, totalTime)
+	go parseAndSendProgress(ffmpegStderr, progressChan, totalTime)
 
 	// Start both commands and do not wait for them to finish.
 	if err := ytdlpCmd.Start(); err != nil {
@@ -87,83 +92,57 @@ func prepareYtDlpCommand(videoRequest models.VideoRequest) *exec.Cmd {
 	return exec.Command("yt-dlp", args...)
 }
 
-func prepareFfmpegCommand(downloadPath string) *exec.Cmd {
+func prepareFfmpegCommand() *exec.Cmd {
 	return exec.Command("ffmpeg",
 		"-hide_banner", // Quieter logs
 		"-i", "pipe:0", // Read from stdin
-		"-progress", "pipe:1", // Progress to stdout
+		"-progress", "pipe:2", // Progress to stderr
 		"-c", "copy", // Just copy the stream yt-dlp provides.
 		"-avoid_negative_ts", "make_zero", // Avoid negative timestamps.
 		"-fflags", "+genpts", // Generate missing timestamps.
 		"-f", "mp4", // Force the output format to mp4.
-		"-y",         // Overwrite output file without asking.
-		downloadPath, // Output file path
+		"pipe:1", // Output to stdout
 	)
 }
 
 // preparePipes sets up the necessary pipes for yt-dlp and ffmpeg commands.
-func preparePipes(ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd) error {
+func preparePipes(ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd, bucket *storage.BucketHandle, fileName string) error {
 
-	// Set the stdin of ffmpeg to read from yt-dlp's stdout.
-	// This allows ffmpeg to process the video data streamed by yt-dlp.
+	// pipe yt-dlp stdout -> ffmpeg stdin
 	var err error
 	ffmpegCmd.Stdin, err = ytdlpCmd.StdoutPipe()
 	if err != nil {
 		return fmt.Errorf("error connecting yt-dlp stdout to ffmpeg stdin: %v", err)
 	}
 
-	// This pipe will be used to log ffmpeg's stderr output.
-	// It's useful for debugging any issues with the ffmpeg command.
-	ffmpegStderr, err := ffmpegCmd.StderrPipe()
-	if err != nil {
-		return fmt.Errorf("error creating stderr pipe: %v", err)
-	}
-	go logPipe(ffmpegStderr, "ffmpeg")
-
-	// Also log yt-dlp's stderr for debugging any download-specific issues.
+	// log yt-dlp's stderr for debugging any download-specific issues.
 	ytdlpStderr, err := ytdlpCmd.StderrPipe()
 	if err != nil {
 		return fmt.Errorf("error creating yt-dlp stderr pipe: %v", err)
 	}
 	go logPipe(ytdlpStderr, "yt-dlp")
 
-	return nil
-}
-
-// getVideoTitle retrieves the video title using yt-dlp.
-func GetVideoTitle(videoRequest models.VideoRequest) (string, error) {
-	args := []string{
-		"-f", fmt.Sprintf("bv*[height<=%[1]v]+ba/b[height<=%[1]v]/best", videoRequest.Quality),
-		"--print", "%(title).220s-%(height)sp.mp4",
-		"--no-playlist",
-		"--no-download",
-		"--no-warnings",
-		"--ignore-errors",        // Prevents crashes on format issues
-		"--no-abort-on-error",    // Continues trying other formats
-		"--socket-timeout", "20", // Prevents hanging
-		"--retries", "2",
-	}
-	if isYouTubeURL(videoRequest.VideoURL) {
-		args = append(args, "--cookies", "/tmp/cookie.txt")
-	}
-	args = append(args, videoRequest.VideoURL)
-	infoCmd := exec.Command("yt-dlp", args...)
-
-	infoOutput, err := infoCmd.CombinedOutput()
-
+	// create GCS writer
+	ctx := context.Background()
+	gcsWriter := bucket.Object(fileName).NewWriter(ctx)
+	
+	// pipe ffmpeg stdout -> GCS writer
+	ffmpegStdout, err := ffmpegCmd.StdoutPipe()
 	if err != nil {
-		slog.Error("yt-dlp failed to get video info", "error", err, "output", string(infoOutput))
-		return "", fmt.Errorf("failed to get video info: %w", err)
+		return fmt.Errorf("error creating ffmpeg stdout pipe: %v", err)
 	}
-	if len(infoOutput) == 0 {
-		slog.Error("yt-dlp returned empty output for video info", "videoURL", videoRequest.VideoURL)
-		return "", fmt.Errorf("yt-dlp returned empty output for video info: %w", err)
-	}
-	slog.Debug("yt-dlp video title", "title", string(infoOutput))
+	
+	// Write the ffmpeg stdout to GCS bucket object.
+	// This is done in a separate goroutine to avoid blocking DownloadVideo function.
+	go func() {
+		defer gcsWriter.Close()
+		_, err := io.Copy(gcsWriter, ffmpegStdout)
+		if err != nil {
+			slog.Error("error writing to GCS", "error", err, "fileName", fileName)
+		}
+	}()
 
-	// Sanitize the video title to create a valid filename.
-	videoTitle := SanitizeName(strings.TrimSpace(string(infoOutput)), nil)
-	return videoTitle, nil
+	return nil
 }
 
 // logPipe reads from a process's output pipe and logs each line for debugging.
@@ -174,8 +153,8 @@ func logPipe(pipe io.ReadCloser, prefix string) {
 	}
 }
 
-// readProgress reads from ffmpeg's progress pipe, parses the progress, and sends it to a channel.
-func readProgress(pipe io.ReadCloser, progressChan chan models.ProgressEvent, totalTime int64) {
+// parseAndSendProgress reads from ffmpeg's progress pipe, parses the progress, and sends it to the progress channel.
+func parseAndSendProgress(pipe io.ReadCloser, progressChan chan models.ProgressEvent, totalTime int64) {
 	scanner := bufio.NewScanner(pipe)
 	for scanner.Scan() {
 		line := scanner.Text()

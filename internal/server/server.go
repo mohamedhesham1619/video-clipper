@@ -7,16 +7,17 @@ import (
 	"os"
 	"time"
 
+	storage "cloud.google.com/go/storage"
 	"github.com/ulule/limiter/v3"
 	limiterMiddleware "github.com/ulule/limiter/v3/drivers/middleware/stdlib"
 	memoryStore "github.com/ulule/limiter/v3/drivers/store/memory"
 )
 
 type Server struct {
-	mux *http.ServeMux
+	mux    *http.ServeMux
 }
 
-func New() *Server {
+func New(bucket *storage.BucketHandle) *Server {
 	mux := http.NewServeMux()
 
 	// Rate limiter: 5 requests per 120 minutes per IP for /submit
@@ -30,9 +31,8 @@ func New() *Server {
 
 	// Main app routes
 	mux.HandleFunc("/", handlers.HomeHandler)
-	mux.Handle("/submit", limiterMw.Handler(http.HandlerFunc(handlers.SubmitHandler)))
+	mux.Handle("/submit", limiterMw.Handler(handlers.SubmitHandler(bucket)))
 	mux.HandleFunc("/progress/", handlers.ProgressHandler)
-	mux.HandleFunc("/download/", handlers.DownloadHandler)
 	mux.HandleFunc("/cancel/", handlers.CancelHandler)
 	mux.HandleFunc("/feedback", handlers.FeedbackHandler)
 	mux.HandleFunc("/check-ytdlp-update", handlers.CheckForYtDlpUpdateHandler)

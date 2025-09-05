@@ -3,10 +3,13 @@ package main
 import (
 	"clipper/internal/server"
 	"clipper/internal/utils"
+	"context"
 	"flag"
+	"log"
 	"log/slog"
 	"os"
 
+	storage "cloud.google.com/go/storage"
 	"github.com/joho/godotenv"
 )
 
@@ -36,8 +39,18 @@ func main() {
 		slog.Error("Failed to copy cookie to tmp", "error", err)
 	}
 
+	// Initialize GCS client and bucket
+	ctx := context.Background()
+	storageClient, err := storage.NewClient(ctx)
+	if err != nil {
+		log.Fatal("Failed to create storage client", "error", err)
+	}
+	defer storageClient.Close()
+
+	bucket := storageClient.Bucket(os.Getenv("GCS_BUCKET_NAME"))
+
 	// --- Server Initialization ---
-	srv := server.New()
+	srv := server.New(bucket)
 
 	if err := srv.Start(); err != nil {
 		slog.Error("Server error", "error", err)

@@ -3,7 +3,6 @@ package models
 import "os/exec"
 
 type DownloadProcess struct {
-	FilePath      string
 	ProgressChan  chan ProgressEvent
 	Watcher       chan struct{}
 	YtDlpProcess  *exec.Cmd

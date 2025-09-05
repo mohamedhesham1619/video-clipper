@@ -1,11 +1,14 @@
 package utils
 
 import (
+	"clipper/internal/models"
 	"context"
 	"fmt"
 	"io"
+	"log/slog"
 	"math/rand/v2"
 	"os"
+	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
@@ -86,6 +89,43 @@ func SanitizeName(name string, opts *SanitizeOptions) string {
 	}
 
 	return sanitized
+}
+
+
+// getVideoTitle retrieves the video title using yt-dlp.
+func GetVideoTitle(videoRequest models.VideoRequest) (string, error) {
+	args := []string{
+		"-f", fmt.Sprintf("bv*[height<=%[1]v]+ba/b[height<=%[1]v]/best", videoRequest.Quality),
+		"--print", "%(title).220s-%(height)sp.mp4",
+		"--no-playlist",
+		"--no-download",
+		"--no-warnings",
+		"--ignore-errors",        // Prevents crashes on format issues
+		"--no-abort-on-error",    // Continues trying other formats
+		"--socket-timeout", "20", // Prevents hanging
+		"--retries", "2",
+	}
+	if isYouTubeURL(videoRequest.VideoURL) {
+		args = append(args, "--cookies", "/tmp/cookie.txt")
+	}
+	args = append(args, videoRequest.VideoURL)
+	infoCmd := exec.Command("yt-dlp", args...)
+
+	infoOutput, err := infoCmd.CombinedOutput()
+
+	if err != nil {
+		slog.Error("yt-dlp failed to get video info", "error", err, "output", string(infoOutput))
+		return "", fmt.Errorf("failed to get video info: %w", err)
+	}
+	if len(infoOutput) == 0 {
+		slog.Error("yt-dlp returned empty output for video info", "videoURL", videoRequest.VideoURL)
+		return "", fmt.Errorf("yt-dlp returned empty output for video info: %w", err)
+	}
+	slog.Debug("yt-dlp video title", "title", string(infoOutput))
+
+	// Sanitize the video title to create a valid filename.
+	videoTitle := SanitizeName(strings.TrimSpace(string(infoOutput)), nil)
+	return videoTitle, nil
 }
 
 // calculate the clip duration in microseconds
