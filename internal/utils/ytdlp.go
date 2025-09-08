@@ -49,20 +49,28 @@ func triggerRebuild() error{
 
     client, err := cloudbuild.NewClient(ctx)
     if err != nil {
-        return fmt.Errorf("Failed to create Cloud Build client: %v", err)
+        return fmt.Errorf("failed to create Cloud Build client: %v", err)
     }
     defer client.Close()
 
 	// Get the trigger ID and project ID from the environment variables
-	triggerID := os.Getenv("TRIGGER_ID")
-	projectID := os.Getenv("PROJECT_ID")
+	triggerID := os.Getenv("GC_TRIGGER_ID")
+	if triggerID == "" {
+		slog.Error("GC_TRIGGER_ID environment variable is not set, cannot trigger rebuild")
+		return fmt.Errorf("GC_TRIGGER_ID environment variable is not set")
+	}
+	projectID := os.Getenv("GC_PROJECT_ID")
+	if projectID == "" {
+		slog.Error("PROJECT_ID environment variable is not set, cannot trigger rebuild")
+		return fmt.Errorf("PROJECT_ID environment variable is not set")
+	}
 	
     req := &buildpb.RunBuildTriggerRequest{
         Name: fmt.Sprintf("projects/%s/locations/global/triggers/%s", projectID, triggerID),
     }
     _, err = client.RunBuildTrigger(ctx, req)
     if err != nil {
-        return fmt.Errorf("Failed to run trigger: %v", err)
+        return fmt.Errorf("failed to run trigger: %v", err)
     }
 
     return nil

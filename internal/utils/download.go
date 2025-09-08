@@ -3,26 +3,28 @@ package utils
 import (
 	"bufio"
 	"clipper/internal/models"
-	"context"
 	"fmt"
 	"io"
 	"log/slog"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
-
-	storage "cloud.google.com/go/storage"
 )
 
-// DownloadVideo downloads the video and returns the output file path, a progress channel, and the ffmpeg command.
-func DownloadVideo(videoRequest models.VideoRequest, videoTitle string, bucket *storage.BucketHandle, progressChan chan models.ProgressEvent) (ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd, err error) {
+// StartVideoDownloadProcesses starts the video download processes and returns the running commands.
+func StartVideoDownloadProcesses(videoRequest models.VideoRequest, videoTitle string, downloadProcess *models.DownloadProcess) (ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd, err error) {
+
+	// Set the download path.
+	downloadPath := filepath.Join("/tmp", videoTitle)
+	downloadProcess.DownloadPath = downloadPath
 
 	// Create the yt-dlp and ffmpeg commands.
 	ytdlpCmd = prepareYtDlpCommand(videoRequest)
-	ffmpegCmd = prepareFfmpegCommand()
+	ffmpegCmd = prepareFfmpegCommand(downloadPath)
 
-	// Prepare the pipes for yt-dlp, ffmpeg and GCS writer.
-	err = preparePipes(ytdlpCmd, ffmpegCmd, bucket, videoTitle)
+	// Prepare the pipes for yt-dlp, ffmpeg.
+	err = preparePipes(ytdlpCmd, ffmpegCmd)
 
 	if err != nil {
 		return nil, nil, fmt.Errorf("error preparing pipes: %v", err)
@@ -35,14 +37,13 @@ func DownloadVideo(videoRequest models.VideoRequest, videoTitle string, bucket *
 		return nil, nil, fmt.Errorf("error calculating clip duration in microseconds: %v", err)
 	}
 
-	// Create a pipe for ffmpeg's stderr.
+	// Create a pipe for ffmpeg's stdout.
 	// This pipe will be used to read progress updates.
-	// stderr is used for progress updates because stdout is used for the GCS writer.
-	ffmpegStderr, err := ffmpegCmd.StderrPipe()
+	ffmpegStdout, err := ffmpegCmd.StdoutPipe()
 	if err != nil {
-		return nil, nil, fmt.Errorf("error creating ffmpeg stderr pipe: %v", err)
+		return nil, nil, fmt.Errorf("error creating ffmpeg stdout pipe: %v", err)
 	}
-	go parseAndSendProgress(ffmpegStderr, progressChan, totalTime)
+	go parseAndSendProgress(ffmpegStdout, downloadProcess.ProgressChan, totalTime)
 
 	// Start both commands and do not wait for them to finish.
 	if err := ytdlpCmd.Start(); err != nil {
@@ -80,7 +81,6 @@ func prepareYtDlpCommand(videoRequest models.VideoRequest) *exec.Cmd {
 		"--ignore-errors",
 		"--no-abort-on-error",
 		"--audio-quality", "0",
-		"--prefer-free-formats",
 		"--socket-timeout", "20",
 		"--retries", "2",
 		"-o", "-", // Output to stdout
@@ -92,21 +92,23 @@ func prepareYtDlpCommand(videoRequest models.VideoRequest) *exec.Cmd {
 	return exec.Command("yt-dlp", args...)
 }
 
-func prepareFfmpegCommand() *exec.Cmd {
+func prepareFfmpegCommand(downloadPath string) *exec.Cmd {
+	
 	return exec.Command("ffmpeg",
 		"-hide_banner", // Quieter logs
 		"-i", "pipe:0", // Read from stdin
-		"-progress", "pipe:2", // Progress to stderr
+		"-progress", "pipe:1", // Progress to stdout
 		"-c", "copy", // Just copy the stream yt-dlp provides.
 		"-avoid_negative_ts", "make_zero", // Avoid negative timestamps.
 		"-fflags", "+genpts", // Generate missing timestamps.
 		"-f", "mp4", // Force the output format to mp4.
-		"pipe:1", // Output to stdout
+		"-y", // Overwrite the output file if it exists.
+		downloadPath,
 	)
 }
 
 // preparePipes sets up the necessary pipes for yt-dlp and ffmpeg commands.
-func preparePipes(ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd, bucket *storage.BucketHandle, fileName string) error {
+func preparePipes(ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd) error {
 
 	// pipe yt-dlp stdout -> ffmpeg stdin
 	var err error
@@ -122,25 +124,12 @@ func preparePipes(ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd, bucket *storage.Bucke
 	}
 	go logPipe(ytdlpStderr, "yt-dlp")
 
-	// create GCS writer
-	ctx := context.Background()
-	gcsWriter := bucket.Object(fileName).NewWriter(ctx)
-	
-	// pipe ffmpeg stdout -> GCS writer
-	ffmpegStdout, err := ffmpegCmd.StdoutPipe()
+	// log ffmpeg' stderr for debugging
+	ffmpegStderr, err := ffmpegCmd.StderrPipe()
 	if err != nil {
-		return fmt.Errorf("error creating ffmpeg stdout pipe: %v", err)
+		return fmt.Errorf("error creating ffmpeg stderr pipe: %v", err)
 	}
-	
-	// Write the ffmpeg stdout to GCS bucket object.
-	// This is done in a separate goroutine to avoid blocking DownloadVideo function.
-	go func() {
-		defer gcsWriter.Close()
-		_, err := io.Copy(gcsWriter, ffmpegStdout)
-		if err != nil {
-			slog.Error("error writing to GCS", "error", err, "fileName", fileName)
-		}
-	}()
+	go logPipe(ffmpegStderr, "ffmpeg")
 
 	return nil
 }

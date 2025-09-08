@@ -5,16 +5,20 @@ import (
 	"clipper/internal/utils"
 	"context"
 	"encoding/json"
+	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"time"
 
 	firestore "cloud.google.com/go/firestore"
 	iamcredentials "cloud.google.com/go/iam/credentials/apiv1"
+	credentialspb "cloud.google.com/go/iam/credentials/apiv1/credentialspb"
 	"cloud.google.com/go/storage"
-	credentialspb "google.golang.org/genproto/googleapis/iam/credentials/v1"
+	"golang.org/x/oauth2/google"
 )
 
 type response struct {
@@ -93,18 +97,24 @@ func SubmitHandler(bucket *storage.BucketHandle) http.HandlerFunc {
 				Data:  map[string]string{"title": videoTitle},
 			}
 
-			// Start the download process
-			ytdlpCmd, ffmpegCmd, err := utils.DownloadVideo(videoRequest, videoTitle, bucket, progressChan)
+			// StartVideoDownloadProcesses function start the download processes and doesn't wait for them to finish instead it returns the running commands
+			ytdlpCmd, ffmpegCmd, err := utils.StartVideoDownloadProcesses(videoRequest, videoTitle, &downloadProcess)
 
 			// If there was an error during the download, send an error message on the channel and clean up.
 			if err != nil {
 				slog.Error("Error downloading video", "error", err, "request", videoRequest)
 				progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Failed to download video"}}
 				close(progressChan)
+				data.removeDownloadProcess(processID)
 				return
 			}
 
-			// If the download fails, send an error message on the channel and clean up.
+			// Save the running commands so they can be cancelled if the client disconnect
+			downloadProcess.YtDlpProcess = ytdlpCmd
+			downloadProcess.FFmpegProcess = ffmpegCmd
+
+			// Wait for both processes to finish
+			// If any process fails, send an error message on the channel and clean up.
 			if err := ffmpegCmd.Wait(); err != nil {
 				handleProcessError("ffmpeg", err, progressChan, processID)
 				return
@@ -114,16 +124,43 @@ func SubmitHandler(bucket *storage.BucketHandle) http.HandlerFunc {
 				return
 			}
 
-			// If both processes succeed, generate a download URL and send it to the progress channel.
-			slog.Info("Download process finished successfully", "processId", processID, "videoTitle", videoTitle)
+			// Upload the downloaded file to GCS
+			if err := uploadFileToGCS(bucket, videoTitle, downloadProcess.DownloadPath); err != nil {
+				slog.Error("Error uploading file to GCS", "error", err, "request", videoRequest)
+				progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Failed to upload file to GCS"}}
+				close(progressChan)
+				data.removeDownloadProcess(processID)
+				return
+			}
 
-			// generate download url
-			downloadUrl, err := generateSignedURL(os.Getenv("CS_BUCKET_NAME"), videoTitle, os.Getenv("GC_ACCOUNT_EMAIL"))
+			// If everything went well, generate a download URL and send it to the client
+			slog.Info("Download process finished successfully", "processId", processID, "videoTitle", videoTitle)
+			
+			bucketName := os.Getenv("GCS_BUCKET_NAME")
+			if bucketName == "" {
+				slog.Error("GCS_BUCKET_NAME environment variable is not set")
+				progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Failed to generate download URL"}}
+				close(progressChan)
+				data.removeDownloadProcess(processID)
+				return
+			}
+
+			accountEmail := os.Getenv("GC_ACCOUNT_EMAIL")
+			if accountEmail == "" {
+				slog.Error("GC_ACCOUNT_EMAIL environment variable is not set")
+				progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Failed to generate download URL"}}
+				close(progressChan)
+				data.removeDownloadProcess(processID)
+				return
+			}
+
+			downloadUrl, err := generateSignedURL(bucketName, videoTitle, accountEmail)
 
 			if err != nil {
 				slog.Error("Error generating download URL", "error", err)
 				progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Failed to generate download URL"}}
 				close(progressChan)
+				data.removeDownloadProcess(processID)
 				return
 			}
 
@@ -136,10 +173,17 @@ func SubmitHandler(bucket *storage.BucketHandle) http.HandlerFunc {
 
 			// Increment clip count in Firestore
 			projectID := os.Getenv("GC_PROJECT_ID")
+			if projectID == "" {
+				slog.Error("GC_PROJECT_ID environment variable is not set, cannot increment clip count")
+				data.removeDownloadProcess(processID)
+				return
+			}
+
 			ctx := context.Background()
 			firestoreClient, err := firestore.NewClient(ctx, projectID)
 			if err != nil {
 				slog.Error("Error creating Firestore client, cannot increment clip count", "error", err)
+				data.removeDownloadProcess(processID)
 				return
 			}
 			defer firestoreClient.Close()
@@ -147,6 +191,11 @@ func SubmitHandler(bucket *storage.BucketHandle) http.HandlerFunc {
 			err = utils.IncrementClipCount(ctx, firestoreClient)
 			if err != nil {
 				slog.Error("Error incrementing clip count", "error", err)
+			}
+
+			// Remove the downloaded file
+			if err = os.Remove(downloadProcess.DownloadPath); err != nil {
+				slog.Error("Error removing download file", "error", err, "filePath", downloadProcess.DownloadPath)
 			}
 
 			data.removeDownloadProcess(processID)
@@ -172,7 +221,62 @@ func SubmitHandler(bucket *storage.BucketHandle) http.HandlerFunc {
 	}
 }
 
+// uploadFileToGCS uploads a file to Google Cloud Storage bucket.
+func uploadFileToGCS(bucket *storage.BucketHandle, objectName, filePath string) error {
+	
+	// Open the file
+	f, err := os.Open(filePath)
+	if err != nil{
+		return err
+	}
+	defer f.Close()
+
+	// Create GCS object writer
+	ctx := context.Background()
+	object := bucket.Object(objectName)
+	writer := object.NewWriter(ctx)
+	defer writer.Close()
+
+	// Copy the file to GCS
+	if _, err := io.Copy(writer, f); err != nil {
+		return err
+	}
+	return nil
+}
+
+// generateSignedURL generates a signed URL for a file in Google Cloud Storage bucket.
 func generateSignedURL(bucketName, objectName, serviceAccountEmail string) (string, error) {
+
+	// If running locally, use the service account key file
+	if os.Getenv("ENV") == "local" {
+		keyFile := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")
+		if keyFile == "" {
+			return "", fmt.Errorf("GOOGLE_APPLICATION_CREDENTIALS must be set for local environment")
+		}
+		keyBytes, err := os.ReadFile(keyFile)
+		if err != nil {
+			return "", fmt.Errorf("failed to read key file: %v", err)
+		}
+
+		cfg, err := google.JWTConfigFromJSON(keyBytes)
+		if err != nil {
+			return "", fmt.Errorf("failed to create JWT config: %v", err)
+		}
+
+		opts := &storage.SignedURLOptions{
+			Scheme:         storage.SigningSchemeV4,
+			Method:         "GET",
+			Expires:        time.Now().Add(2 * time.Hour),
+			GoogleAccessID: cfg.Email,
+			PrivateKey:     cfg.PrivateKey,
+			QueryParameters: url.Values{
+				"response-content-disposition": []string{fmt.Sprintf("attachment; filename=\"%s\"", objectName)},
+			},
+		}
+		return storage.SignedURL(bucketName, objectName, opts)
+	}
+
+	// If running in GCP environment, use the default credentials provided by GCP
 	ctx := context.Background()
 
 	// IAM client for signing
@@ -200,6 +304,9 @@ func generateSignedURL(bucketName, objectName, serviceAccountEmail string) (stri
 		Expires:        time.Now().Add(2 * time.Hour),
 		GoogleAccessID: serviceAccountEmail,
 		SignBytes:      signBytes,
+		QueryParameters: url.Values{
+			"response-content-disposition": []string{fmt.Sprintf("attachment; filename=\"%s\"", objectName)},
+		},
 	}
 
 	// Generate the signed URL

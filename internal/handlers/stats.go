@@ -12,10 +12,15 @@ import (
 
 func StatsHandler(w http.ResponseWriter, r *http.Request) {
 	projectID := os.Getenv("GC_PROJECT_ID")
+	if projectID == "" {
+		slog.Error("GC_PROJECT_ID environment variable is not set")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	firestoreClient, err := firestore.NewClient(r.Context(), projectID)
 
 	if err != nil {
-		slog.Error("Error creating Firestore client, cannot get stats", "error", err)
+		slog.Error("error creating firestore client, cannot get stats", "error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
