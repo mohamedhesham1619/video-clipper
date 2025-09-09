@@ -228,11 +228,30 @@ const VideoClipper = (function () {
                 }
             }
             
-            // Reset progress bar completely
-            resetProgressBar();
-            
         } catch (e) {
             console.error('Error clearing process state:', e);
+        }
+    }
+    
+    function clearFormValues() {
+        if (state.form) {
+            // Reset the form
+            state.form.reset();
+            
+            // Clear any custom state or UI elements if needed
+            const urlInput = getFormElement('url');
+            if (urlInput) {
+                urlInput.value = '';
+            }
+            
+            // Clear time input fields
+            const startTimeInput = getFormElement('start-time');
+            const endTimeInput = getFormElement('end-time');
+            if (startTimeInput) startTimeInput.value = '';
+            if (endTimeInput) endTimeInput.value = '';
+            
+            // Clear any duration display
+            updateDurationDisplay();
         }
     }
 
@@ -601,6 +620,7 @@ const VideoClipper = (function () {
                             closeBtn.addEventListener('click', () => {
                                 state.statusText.style.opacity = '0';
                                 state.statusText.style.visibility = 'hidden';
+                                clearFormValues();
                             });
                         }
                     }
@@ -610,6 +630,7 @@ const VideoClipper = (function () {
                         if (state.statusText) {
                             state.statusText.style.opacity = '0';
                             state.statusText.style.visibility = 'hidden';
+                            clearFormValues();
                         }
                     }, 10000);
                     
