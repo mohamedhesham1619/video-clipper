@@ -1,11 +1,6 @@
-<h1 align="center" style="display: flex; justify-content: center; align-items: center; gap: 10px;">
-  <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/v1756842129/icon_hgyps0.png" 
-       alt="Video Clipper Logo" 
-       width="50" 
-       style="vertical-align: middle;" />
-  Video Clipper
-</h1>
-
+<div align="center">
+  <h1 >✂️ Video Clipper</h1>
+</div>
 
 <p align="center">
   Free, fast, and simple tool to download only the parts you need from online videos.  
@@ -30,9 +25,11 @@
 - [Tech Stack](#tech-stack)
 - [System Workflow Diagram](#system-workflow-diagram)
 - [Key Design Decisions](#key-design-decisions)
-  - [Why FFmpeg is Used?](#why-ffmpeg-is-used)
+  - [Why `FFmpeg` is Used?](#why-ffmpeg-is-used)
   - [Why Google Cloud Storage (GCS) Instead of Local Disk?](#why-google-cloud-storage-gcs-instead-of-local-disk)
   - [Why Save Locally Before Uploading to GCS?](#why-save-locally-before-uploading-to-gcs)
+  - [How `yt-dlp` Frequent Updates Are Handled](#how-yt-dlp-frequent-updates-are-handled)
+
 
 
 ## Features
@@ -101,7 +98,7 @@ sequenceDiagram
 ```
 ## Key Design Decisions
 
-### Why FFmpeg is Used?
+### Why `FFmpeg` is Used?
 
 While **`yt-dlp`** can handle the entire download-and-clip process by itself, the **progress information it exposes is limited**. Its `-progress` flag provides meaningful updates for full downloads, but when clipping, the output is too sparse to support real-time progress reporting to the client.  
 
@@ -128,7 +125,7 @@ Switching to **Google Cloud Storage** solved this problem:
 - Lets clients download files directly via signed URLs, reducing backend bandwidth.  
 - Simplifies file management and cleanup.
 
-> *Fun fact: before moving to GCS, one user somehow managed to download 3 GB of clips in 5 minutes.*    
+> *Fun fact: before moving to GCS, one user somehow managed to download 3 GB of clips in just 5 minutes.*    
 ![Screenshot](https://res.cloudinary.com/ddozq3vu5/image/upload/v1757452871/brave_screenshot_console.cloud.google.com_ka9q7o.png)
 
 
@@ -142,4 +139,22 @@ The safer approach was to **write the file to disk first** and then upload it to
 
 Because both Google Cloud Run and Google Cloud Storage are in the same region, the upload step is extremely fast. The data moves within Google’s internal network, so even large files transfer almost instantly.
 
+---
 
+### How `yt-dlp` Frequent Updates Are Handled?
+
+`yt-dlp` updates often to adapt to changes on video platforms, and an outdated version can cause downloads to fail. To handle this:
+
+- The **Dockerfile always downloads the latest** `yt-dlp` when building the container.
+
+- The system includes a **function that manages `yt-dlp` updates**:
+  - It **checks if a new `yt-dlp` version is available**.
+  - If a new version is available, it **triggers a container rebuild**.
+
+- This function is **called when a download fails (because it may have failed due to an outdated** `yt-dlp`).
+
+- Also, there is a **public endpoint** `/check-ytdlp-update` that runs this function, which is called daily via [cron-job](https://cron-job.org/en/)
+
+  > **Safety note**: Exposing this endpoint publicly is safe because **it only triggers a rebuild if a `yt-dlp` update is detected**, with no other side effects.
+
+This setup ensures the **system automatically stays up-to-date with `yt-dlp`**, minimizing downtime caused by outdated versions.
