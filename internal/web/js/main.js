@@ -1,3 +1,32 @@
+// Cache DOM elements
+const domCache = {
+    headerLogo: null,
+    navLinks: null,
+    sidePanels: {
+        left: null,
+        right: null
+    },
+    bottomContainer: null,
+    mobileMenu: {
+        toggle: null,
+        nav: null
+    }
+};
+
+// Throttle function
+function throttle(func, limit) {
+    let inThrottle;
+    return function() {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+            func.apply(context, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
+}
+
 // Function to update paths in the header
 function updateHeaderPaths() {
     const isInPagesDir = window.location.pathname.includes('/pages/');
@@ -55,60 +84,96 @@ function setActiveLink() {
 
 // Mobile menu toggle
 function setupMobileMenu() {
-    const toggle = document.querySelector('.mobile-menu-toggle');
-    const nav = document.querySelector('.nav-links');
+    domCache.mobileMenu.toggle = document.querySelector('.mobile-menu-toggle');
+    domCache.mobileMenu.nav = document.querySelector('.nav-links');
 
-    if (!toggle || !nav) return;
+    if (!domCache.mobileMenu.toggle || !domCache.mobileMenu.nav) return;
 
-    // Remove any existing event listeners to prevent duplicates
-    const newToggle = toggle.cloneNode(true);
-    const newNav = nav.cloneNode(true);
-
-    toggle.parentNode.replaceChild(newToggle, toggle);
-    nav.parentNode.replaceChild(newNav, nav);
-
-    // Add click handler to toggle button
-    newToggle.addEventListener('click', (e) => {
+    // Store references to clean up later
+    const handleClick = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        newNav.classList.toggle('active');
-        newToggle.classList.toggle('active');
+        domCache.mobileMenu.nav.classList.toggle('active');
+        domCache.mobileMenu.toggle.classList.toggle('active');
         document.body.classList.toggle('menu-open');
+    };
+
+    const closeMenu = () => {
+        domCache.mobileMenu.nav.classList.remove('active');
+        domCache.mobileMenu.toggle.classList.remove('active');
+        document.body.classList.remove('menu-open');
+    };
+
+    // Add event listeners
+    domCache.mobileMenu.toggle.addEventListener('click', handleClick);
+    
+    // Close when clicking on nav links
+    const menuLinks = domCache.mobileMenu.nav.querySelectorAll('a');
+    menuLinks.forEach(link => {
+        link.addEventListener('click', closeMenu);
     });
 
-    // Close menu when clicking on nav links
-    const navLinks = newNav.querySelectorAll('a');
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            newNav.classList.remove('active');
-            newToggle.classList.remove('active');
-            document.body.classList.remove('menu-open');
-        });
-    });
-
-    // Close menu when clicking outside
+    // Close when clicking outside
     document.addEventListener('click', (e) => {
-        if (newNav.classList.contains('active') &&
-            !newToggle.contains(e.target) &&
-            !newNav.contains(e.target)) {
-            newNav.classList.remove('active');
-            newToggle.classList.remove('active');
-            document.body.classList.remove('menu-open');
+        if (domCache.mobileMenu.nav.classList.contains('active') &&
+            !domCache.mobileMenu.toggle.contains(e.target) &&
+            !domCache.mobileMenu.nav.contains(e.target)) {
+            closeMenu();
         }
     });
+
+    // Cleanup function
+    return () => {
+        domCache.mobileMenu.toggle.removeEventListener('click', handleClick);
+        menuLinks.forEach(link => {
+            link.removeEventListener('click', closeMenu);
+        });
+    };
+
+    // Removed duplicate event listener setup
 }
+
+// Track intervals for cleanup
+const activeIntervals = [];
 
 // Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', function () {
+    // Cache header elements
+    domCache.headerLogo = document.getElementById('header-logo');
+    domCache.navLinks = document.querySelectorAll('.nav-links .nav-link');
+
     // Update paths in the header
     updateHeaderPaths();
 
-    // Setup mobile menu
-    setupMobileMenu();
+    // Setup mobile menu with cleanup
+    const cleanupMobileMenu = setupMobileMenu();
 
     // Set active link in navigation
     setActiveLink();
+
+    // Add throttled scroll handler
+    const throttledScroll = throttle(handleScroll, 100);
+    window.addEventListener('scroll', throttledScroll);
+
+    // Cleanup function
+    return () => {
+        // Clear intervals
+        activeIntervals.forEach(clearInterval);
+        activeIntervals.length = 0;
+        
+        // Cleanup mobile menu
+        if (cleanupMobileMenu) cleanupMobileMenu();
+        
+        // Remove scroll listener
+        window.removeEventListener('scroll', throttledScroll);
+    };
 });
+
+// Throttled scroll handler
+function handleScroll() {
+    // Add any scroll-related logic here
+    // This is throttled to improve performance
+}
 
 // Smooth scrolling for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -133,22 +198,32 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Function to shuffle an array using Fisher-Yates algorithm
+// Function to shuffle an array in place using Fisher-Yates algorithm
 function shuffleArray(array) {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
+    for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        [array[i], array[j]] = [array[j], array[i]];
     }
-    return newArray;
+    return array;
+}
+
+// Cache DOM elements for rotation
+function initRotationElements() {
+    if (!domCache.sidePanels.left) {
+        domCache.sidePanels.left = document.querySelector('.box-left');
+        domCache.sidePanels.right = document.querySelector('.box-right');
+        domCache.bottomContainer = document.querySelector('.tool-suggestion .suggestion-content');
+    }
+    return {
+        leftPanel: domCache.sidePanels.left,
+        rightPanel: domCache.sidePanels.right,
+        bottomContainer: domCache.bottomContainer
+    };
 }
 
 // Function to rotate content
 function rotateContent() {
-    // Get DOM elements
-    const leftPanel = document.querySelector('.box-left');
-    const rightPanel = document.querySelector('.box-right');
-    const bottomContainer = document.querySelector('.tool-suggestion .suggestion-content');
+    const { leftPanel, rightPanel, bottomContainer } = initRotationElements();
 
     // Initialize content arrays if they don't exist
     if (!window.contentRotation) {
