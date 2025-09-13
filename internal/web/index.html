@@ -166,9 +166,17 @@
             }
     
             // --- INITIALIZATION ---
-            // Run the detection after the page has had a moment to settle.
+            // Only run detection on desktop devices
             document.addEventListener('DOMContentLoaded', () => {
-                setTimeout(runDetection, 500);
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                if (!isMobile) {
+                    // Only run detection on desktop
+                    setTimeout(runDetection, 500);
+                } else {
+                    // Ensure overlay is removed on mobile
+                    const overlay = document.getElementById('adblock-overlay');
+                    if (overlay) overlay.remove();
+                }
             });
     
         })();
