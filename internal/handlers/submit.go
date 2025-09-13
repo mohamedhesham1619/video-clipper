@@ -124,6 +124,10 @@ func SubmitHandler(bucket *storage.BucketHandle) http.HandlerFunc {
 				return
 			}
 
+			// At this point the video is downloaded and ready to be uploaded to GCS
+			// Send a final progress event to the client to indicate that the download process is complete and the server is generating the download URL
+			progressChan <- models.ProgressEvent{Event: models.EventTypeProgress, Data: map[string]string{"progress": "100"}}
+
 			// Upload the downloaded file to GCS
 			if err := uploadFileToGCS(bucket, videoTitle, downloadProcess.DownloadPath); err != nil {
 				slog.Error("Error uploading file to GCS", "error", err, "request", videoRequest)

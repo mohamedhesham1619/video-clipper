@@ -550,6 +550,32 @@ const VideoClipper = (function () {
             requestAnimationFrame(() => {
                 updateProgress(progress);
             });
+
+            // Handle 100% progress case
+            if (progress === 100) {
+                // Update progress to 100% which will handle the UI updates
+                updateProgress(100);
+                
+                // Update status to show processing message with animation
+                if (state.statusText) {
+                    // Set status to 'loading' to get the loading animation
+                    state.statusText.setAttribute('data-status', 'loading');
+                    
+                    // Create the status message with both lines
+                    state.statusText.innerHTML = `
+                        <div class="status-message">
+                            <div>Process complete</div>
+                            <div class="status-subtext">Generating download URL...</div>
+                        </div>
+                    `;
+                    
+                    // Match the exact style from showLoading
+                    state.statusText.style.display = 'block';
+                    state.statusText.classList.add('visible');
+                    state.statusText.style.opacity = '1';
+                    state.statusText.style.visibility = 'visible';
+                }
+            }
         } catch (e) {
             console.error('Error parsing progress event:', e);
         }
@@ -563,37 +589,34 @@ const VideoClipper = (function () {
         // Mark that we're completing successfully to prevent connection error messages
         errorShown = true;
         
-        // Update status to show processing message
-        if (state.statusText) {
-            state.statusText.setAttribute('data-status', 'processing');
-        }
-        updateStatus('Finalizing process...');
-
         // First ensure progress is at 100% before starting download
         const completeProgress = (callback) => {
             // Ensure progress elements are visible and updated
             if (state.progressFill) {
-                // First update to current progress to ensure smooth transition
-                const currentWidth = parseFloat(state.progressFill.style.width) || 0;
-                state.progressFill.style.transition = 'none';
-                state.progressFill.style.width = `${currentWidth}%`;
-                
-                // Force reflow
-                void state.progressFill.offsetWidth;
-                
-                // Set up smooth transition to 100%
-                state.progressFill.style.transition = 'width 0.5s ease-out, background-color 0.3s ease-out';
-                state.progressFill.style.width = '100%';
-                state.progressFill.style.background = '#10b981';
-                state.progressFill.classList.add('progress-complete');
-                
-                // Update bubble
-                if (state.progressBubble) {
-                    state.progressBubble.style.display = 'block';
-                    state.progressBubble.textContent = '100%';
-                    state.progressBubble.style.right = '0%';
-                    state.progressBubble.style.background = '#10b981';
-                    state.progressBubble.style.transition = 'all 0.5s ease-out';
+                // If we're not already at 100%, update to 100%
+                if (parseFloat(state.progressFill.style.width) < 100) {
+                    // First update to current progress to ensure smooth transition
+                    const currentWidth = parseFloat(state.progressFill.style.width) || 0;
+                    state.progressFill.style.transition = 'none';
+                    state.progressFill.style.width = `${currentWidth}%`;
+                    
+                    // Force reflow
+                    void state.progressFill.offsetWidth;
+                    
+                    // Set up smooth transition to 100%
+                    state.progressFill.style.transition = 'width 0.5s ease-out, background-color 0.3s ease-out';
+                    state.progressFill.style.width = '100%';
+                    state.progressFill.style.background = '#10b981';
+                    state.progressFill.classList.add('progress-complete');
+                    
+                    // Update bubble
+                    if (state.progressBubble) {
+                        state.progressBubble.style.display = 'block';
+                        state.progressBubble.textContent = '100%';
+                        state.progressBubble.style.right = '0%';
+                        state.progressBubble.style.background = '#10b981';
+                        state.progressBubble.style.transition = 'all 0.5s ease-out';
+                    }
                 }
                 
                 // Hide loading indicator
@@ -1132,22 +1155,29 @@ const VideoClipper = (function () {
     function setupPasteButton() {
         const pasteButton = document.getElementById('paste-url');
         const videoUrlInput = document.getElementById('video-url');
+        
+        if (!pasteButton) {
+            console.error('Paste button not found!');
+            return;
+        }
+        if (!videoUrlInput) {
+            console.error('Video URL input not found!');
+            return;
+        }
+        
         // Create error message element
         const urlErrorElement = document.createElement('div');
         urlErrorElement.className = 'url-error';
         urlErrorElement.style.display = 'none';
+        urlErrorElement.style.color = 'red';
+        urlErrorElement.style.marginTop = '5px';
+        urlErrorElement.style.fontSize = '0.9em';
         
-        // Find the form group and insert the error message right after the label
+        // Find the form group and insert the error message right after the input
         const formGroup = videoUrlInput.closest('.form-group');
         if (formGroup) {
-            const label = formGroup.querySelector('label[for="video-url"]');
-            if (label) {
-                // Insert the error message right after the label
-                label.insertAdjacentElement('afterend', urlErrorElement);
-            }
+            formGroup.appendChild(urlErrorElement);
         }
-
-        if (!pasteButton || !videoUrlInput) return;
 
         // Store original button state
         const originalHTML = pasteButton.innerHTML;
@@ -1202,34 +1232,59 @@ const VideoClipper = (function () {
                 e.stopPropagation();
             }
 
-            // Focus the input first
-            videoUrlInput.focus();
-
-            // On mobile, just show instructions
-            if (isMobile) {
-                showError('Tap and hold in the input field, then select "Paste"');
-                return;
-            }
-
-            // For desktop, try to read from clipboard
-            showLoading();
-
             try {
+                // Focus the input first
+                videoUrlInput.focus();
+
+                // On mobile, show instructions
+                if (isMobile) {
+                    urlErrorElement.textContent = 'Tap and hold in the input field, then select "Paste"';
+                    urlErrorElement.style.display = 'block';
+                    return;
+                }
+
+                // Show loading state
+                showLoading();
+
+                // Try to read from clipboard
                 if (navigator.clipboard && navigator.clipboard.readText) {
-                    const text = await navigator.clipboard.readText();
-                    if (!handlePasteSuccess(text)) {
-                        showError('Clipboard is empty');
+                    try {
+                        const permission = await navigator.permissions.query({ name: 'clipboard-read' });
+                        if (permission.state === 'denied') {
+                            throw new Error('Clipboard permission denied');
+                        }
+                        
+                        const text = await navigator.clipboard.readText();
+                        if (text && text.trim()) {
+                            handlePasteSuccess(text);
+                        } else {
+                            throw new Error('Clipboard is empty');
+                        }
+                    } catch (err) {
+                        console.error('Clipboard access error:', err);
+                        // Fallback to document.execCommand for older browsers
+                        videoUrlInput.select();
+                        const success = document.execCommand('paste');
+                        if (!success) {
+                            throw new Error('Could not access clipboard');
+                        }
                     }
                 } else {
-                    showError('Please paste manually (Ctrl+V)');
+                    // Fallback for older browsers
+                    videoUrlInput.select();
+                    const success = document.execCommand('paste');
+                    if (!success) {
+                        throw new Error('Clipboard API not supported');
+                    }
                 }
             } catch (err) {
-                console.error('Clipboard access error:', err);
-                showError('Please paste manually (Ctrl+V)');
+                console.error('Paste error:', err);
+                urlErrorElement.textContent = 'Please paste manually (Ctrl+V) or type the URL';
+                urlErrorElement.style.display = 'block';
+            } finally {
+                // Reset the button after a short delay
+                setTimeout(resetButton, 1000);
             }
-
-            // Reset the button after a short delay
-            setTimeout(resetButton, 1000);
         };
 
         // Initialize input field for mobile
