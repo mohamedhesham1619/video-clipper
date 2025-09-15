@@ -16,7 +16,7 @@ const domCache = {
 // Throttle function
 function throttle(func, limit) {
     let inThrottle;
-    return function() {
+    return function () {
         const args = arguments;
         const context = this;
         if (!inThrottle) {
@@ -106,7 +106,7 @@ function setupMobileMenu() {
 
     // Add event listeners
     domCache.mobileMenu.toggle.addEventListener('click', handleClick);
-    
+
     // Close when clicking on nav links
     const menuLinks = domCache.mobileMenu.nav.querySelectorAll('a');
     menuLinks.forEach(link => {
@@ -160,10 +160,10 @@ document.addEventListener('DOMContentLoaded', function () {
         // Clear intervals
         activeIntervals.forEach(clearInterval);
         activeIntervals.length = 0;
-        
+
         // Cleanup mobile menu
         if (cleanupMobileMenu) cleanupMobileMenu();
-        
+
         // Remove scroll listener
         window.removeEventListener('scroll', throttledScroll);
     };
@@ -616,7 +616,7 @@ function createToolCard(tool) {
                     margin-right: auto !important;
                     width: fit-content !important;
                 ">
-                    Learn More <i class="fas fa-arrow-right"></i>
+                    Learn more about ${tool.name} <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
         </div>

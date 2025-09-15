@@ -3,8 +3,10 @@ package server
 import (
 	"clipper/internal/handlers"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	storage "cloud.google.com/go/storage"
@@ -14,7 +16,7 @@ import (
 )
 
 type Server struct {
-	mux    *http.ServeMux
+	mux *http.ServeMux
 }
 
 func New(bucket *storage.BucketHandle) *Server {
@@ -27,7 +29,27 @@ func New(bucket *storage.BucketHandle) *Server {
 		Period: 120 * time.Minute,
 	}
 	limiterInstance := limiter.New(limiterStore, rate)
-	limiterMw := limiterMiddleware.NewMiddleware(limiterInstance)
+
+	// Custom key getter: use CF-Connecting-IP (or fallback to RemoteAddr)
+	keyGetter := func(r *http.Request) string {
+		if ip := r.Header.Get("CF-Connecting-IP"); ip != "" {
+			return ip
+		}
+		if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
+			parts := strings.Split(xff, ",")
+			return strings.TrimSpace(parts[0])
+		}
+		host, _, err := net.SplitHostPort(r.RemoteAddr)
+		if err == nil {
+			return host
+		}
+		return r.RemoteAddr
+	}
+
+	limiterMw := limiterMiddleware.NewMiddleware(
+		limiterInstance,
+		limiterMiddleware.WithKeyGetter(keyGetter),
+	)
 
 	// Main app routes
 	mux.HandleFunc("/", handlers.HomeHandler)
