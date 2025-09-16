@@ -442,29 +442,54 @@ const contentSuggestions = {
         {
             html: `<a href="https://www.mvvitrk.com/bDig55" 
             rel="noopener sponsored" 
-            onclick="gtag('event', 'ad_click', { ad_name: 'Movavi', ad_position: 'side' }); setTimeout(() => { window.open(this.href, '_blank'); }, 100); return false;">
+            target="_blank"
+            onclick="gtag('event', 'ad_click', {
+                ad_name: 'Movavi',
+                ad_position: 'side'
+            });">
             <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753699762/300x600_tazs11.png" alt="Movavi Video Editor" style="width: 100%; height: 100%; object-fit: contain;"></a>`
         },
         {
             html: `<a href="https://flixier.com?fpr=mh1619"
             rel="noopener sponsored"
-            onclick="gtag('event', 'ad_click', { ad_name: 'Flixier', ad_position: 'side' }); setTimeout(() => { window.open(this.href, '_blank'); }, 100); return false;">
+            target="_blank"
+            onclick="gtag('event', 'ad_click', {
+                ad_name: 'Flixier',
+                ad_position: 'side'
+            });">
             <img src="https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24623/120x600px-4.png" alt="Flixier Video Editor" style="width: 100%; height: 100%; object-fit: contain;"></a>`
         },
         {
-            html: `<a rel="sponsored"
-           href="https://renderforest.pxf.io/c/6416428/1957251/14885"
-            target="_blank" id="1957251"
-            onclick="gtag('event', 'ad_click', { ad_name: 'Renderforest', ad_position: 'side' })">
-            <img src="//a.impactradius-go.com/display-ad/14885-1957251" border="0" alt="" width="300" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/1957251/14885" style="position:absolute;visibility:hidden;" border="0" />`
+            html: `<a rel="noopener sponsored"
+            href="https://renderforest.pxf.io/c/6416428/1957251/14885"
+            target="_blank" 
+            id="1957251"
+            onclick="gtag('event', 'ad_click', {
+                ad_name: 'Renderforest',
+                ad_position: 'side'
+            });">
+            <img src="//a.impactradius-go.com/display-ad/14885-1957251" border="0" alt="" width="300" height="600"/>
+            </a>
+            <img height="0" width="0" src="https://imp.pxf.io/i/6416428/1957251/14885" style="position:absolute;visibility:hidden;" border="0" />
+            `
         },
         {
-            html: `<a rel="sponsored"
-           href="https://1.envato.market/c/6416428/3249424/4662?subId1=ULVG" 
-           target="_blank" 
-           id="3249424"
-           onclick="gtag('event', 'ad_click', { ad_name: 'Envato', ad_position: 'side' })"> 
-<img src="//a.impactradius-go.com/display-ad/4662-3249424" border="0" alt="" width="300" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/3249424/4662" style="position:absolute;visibility:hidden;" border="0" />`
+            html: `<a rel="noopener sponsored"
+            href="https://1.envato.market/c/6416428/3249424/4662?subId1=ULVG"
+            target="_blank"
+            id="3249424"
+            onclick="gtag('event', 'ad_click', {
+                ad_name: 'Envato',
+                ad_position: 'side'
+            });">
+            <img src="//a.impactradius-go.com/display-ad/4662-3249424"
+                    border="0" alt="" width="300" height="600"/>
+            </a>
+            <img height="0" width="0"
+                src="https://1.envato.market/i/6416428/3249424/4662"
+                style="position:absolute;visibility:hidden;" border="0" />
+
+`
         }
     ],
     bottom: [
@@ -472,20 +497,32 @@ const contentSuggestions = {
             html: `<a href="https://partner.pcloud.com/r/146969" 
             title="pCloud Premium" 
             rel="sponsored"
-            onclick="gtag('event', 'ad_click', { ad_name: 'Pcloud', ad_position: 'bottom' }); setTimeout(() => { window.open(this.href, '_blank'); }, 100); return false;">
+            target="_blank"
+            onclick="gtag('event', 'ad_click', {
+                ad_name: 'Pcloud',
+                ad_position: 'bottom'
+            });">
             <img src="https://partner.pcloud.com/media/banners/lifetime/lifetime00772890.jpg" alt="pCloud Premium"/></a>`
         },
         {
             html: `<a href="https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902"
     
             rel="noopener sponsored"
-            onclick="gtag('event', 'ad_click', { ad_name: 'NordVPN', ad_position: 'bottom' }); setTimeout(() => { window.open(this.href, '_blank'); }, 100); return false;">
+            target="_blank"
+            onclick="gtag('event', 'ad_click', {
+                ad_name: 'NordVPN',
+                ad_position: 'bottom'
+            });">
                <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1756161613/nordvpn-728x90-en-us_wc4ng1.png" alt="NordVPN" style="width: 100%; max-height: 90px; object-fit: contain;" /></a>`
         },
         {
             html: `<a href="https://privadovpn.com/resources/best-vpn-for-gaming#a_aid=1619&a_bid=203d5f79"
             rel="noopener sponsored"
-            onclick="gtag('event', 'ad_click', { ad_name: 'PrivadoVPN', ad_position: 'bottom' }); setTimeout(() => { window.open(this.href, '_blank'); }, 100); return false;">
+            target="_blank"
+            onclick="gtag('event', 'ad_click', {
+                ad_name: 'PrivadoVPN',
+                ad_position: 'bottom'
+            });">
                <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753306325/728x90_c9y6b3.png" alt="PrivadoVPN" style="width: 100%; max-height: 90px; object-fit: contain;"></a>`
         }
 
@@ -566,11 +603,14 @@ function createToolCard(tool) {
         ? description.split('\n').filter(line => line.trim() !== '').join('<br>')
         : description;
 
-    const trackingOnClick = `onclick="gtag('event', 'ad_click', { ad_name: '${tool.name}', ad_position: 'recommended_tool' }); setTimeout(() => { window.open(this.href, '_blank'); }, 100); return false;"`;
+    const trackingOnClick = `onclick="gtag('event', 'ad_click', {
+        ad_name: '${tool.name}',
+        ad_position: 'recommended_tool'
+    });"`;
 
     card.innerHTML = `
         <div class="recommended-card-inner" style="display: flex; flex-direction: column; height: 100%;">
-            <a href="${tool.link}" rel="noopener sponsored" class="image-link" ${trackingOnClick}>
+            <a href="${tool.link}" rel="noopener sponsored" target="_blank" class="image-link" ${trackingOnClick}>
                 <div class="image-wrapper">
                     <img src="${tool.image}" alt="${tool.header}" loading="lazy">
                 </div>
@@ -599,7 +639,7 @@ function createToolCard(tool) {
                         ${descriptionHtml}
                     </p>
                 </div>
-                <a href="${tool.link}" rel="noopener sponsored" class="learn-more-btn" ${trackingOnClick} style="
+                <a href="${tool.link}" rel="noopener sponsored" target="_blank" class="learn-more-btn" ${trackingOnClick} style="
                     display: inline-flex !important;
                     align-items: center !important;
                     justify-content: center !important;
