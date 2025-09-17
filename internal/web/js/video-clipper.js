@@ -239,8 +239,14 @@ const VideoClipper = (function () {
         }, 3000);
     }
 
-    function clearProcessId() {
+    function clearProcessId(force = false) {
+        const currentProcessId = state.currentProcessId;
         state.currentProcessId = null;
+        
+        if (isPageUnloading && !force) {
+            return;
+        }
+        
         try {
             sessionStorage.removeItem('ProcessId');
             
@@ -347,10 +353,13 @@ const VideoClipper = (function () {
             errorTimeout = null;
         }
         
-        // Clear the process ID on error
-        clearProcessId();
-
-        // Error display logic remains the same, but we'll track the ID
+        // Only clear the process ID for actual errors, not during page unload
+        if (isPageUnloading || !navigator.onLine || !document.hasFocus()) {
+            console.log(`[${errorId}] Not clearing ProcessId - page is unloading or connection lost`);
+        } else {
+            console.log(`[${errorId}] Clearing ProcessId due to error`);
+            clearProcessId();
+        }
 
         // Show error message in the status text with close button
         if (state.statusText) {
@@ -732,7 +741,7 @@ const VideoClipper = (function () {
         
         try {
             updateStatus('Cancelling...');
-            const response = await fetch(`/cancel/${state.currentProcessId}`, {
+            const response = await fetch(`/cancel/${state.currentProcessId}?reason=cancel-button-click`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json'
@@ -837,20 +846,25 @@ const VideoClipper = (function () {
                 errorEventReceived: state.errorEventReceived
             });
             
-            // Add a small delay to allow server error events to be processed first
-            setTimeout(() => {
-                // Only show connection error if we haven't completed successfully
-                // and we haven't already shown an error
-                // and the connection wasn't closed intentionally
-                // and we haven't received the complete event
-                // and we haven't received an error event from the server
-                if (!errorShown && !state.completeHandled && !state.connectionClosedIntentionally && !state.completeEventReceived && !state.errorEventReceived) {
-                    console.log('Showing connection error message');
-                    showConnectionError('Connection to server was lost');
-                } else {
-                    console.log('Skipping connection error message due to state flags');
-                }
-            }, 100); // 100ms delay to allow server events to be processed
+            // Only handle connection errors if the page is still focused, online, and not unloading
+            if (!isPageUnloading && document.hasFocus() && navigator.onLine) {
+                // Add a small delay to allow server error events to be processed first
+                setTimeout(() => {
+                    // Only show connection error if we haven't completed successfully
+                    // and we haven't already shown an error
+                    // and the connection wasn't closed intentionally
+                    // and we haven't received the complete event
+                    // and we haven't received an error event from the server
+                    if (!errorShown && !state.completeHandled && !state.connectionClosedIntentionally && !state.completeEventReceived && !state.errorEventReceived) {
+                        console.log('Showing connection error message');
+                        showConnectionError('Connection to server was lost');
+                    } else {
+                        console.log('Skipping connection error message due to state flags');
+                    }
+                }, 100); // 100ms delay to allow server events to be processed
+            } else {
+                console.log('Skipping connection error handling - page is unloading or browser is offline');
+            }
         };
 
         // Set up event listeners
@@ -863,12 +877,20 @@ const VideoClipper = (function () {
         
         // Handle server-sent error messages
         state.eventSource.addEventListener('error', (event) => {
-            console.log('Received error event from server:', event.data);
+            if (!event.data) {
+                // No data in the event, just log it
+                console.log('Received error event with no data');
+                return;
+            }
+            
             try {
-                const data = JSON.parse(event.data);
-                if (data.message) {
-                    console.log('Showing server error message:', data.message);
-                    showConnectionError(data.message);
+                let data;
+                if (typeof event.data === 'string' && event.data.trim() !== '') {
+                    data = JSON.parse(event.data);
+                    if (data && data.message) {
+                        console.log('Showing server error message:', data.message);
+                        showConnectionError(data.message);
+                    }
                 } else {
                     console.log('No message in error event, showing generic error');
                     showConnectionError('An error occurred during processing');
@@ -881,10 +903,14 @@ const VideoClipper = (function () {
         
         // Handle generic messages (fallback)
         state.eventSource.addEventListener('message', (event) => {
+            if (!event.data) return;
+            
             try {
-                const data = JSON.parse(event.data);
-                if (data.error) {
-                    showConnectionError(data.error);
+                if (typeof event.data === 'string' && event.data.trim() !== '') {
+                    const data = JSON.parse(event.data);
+                    if (data && data.error) {
+                        showConnectionError(data.error);
+                    }
                 }
             } catch (e) {
                 console.error('Error parsing server message:', e);
@@ -1119,7 +1145,9 @@ const VideoClipper = (function () {
                 if (result.processId) {
                     state.currentProcessId = result.processId;
                     // Save processID to sessionStorage
+                    console.log('Setting ProcessId in sessionStorage:', result.processId);
                     sessionStorage.setItem('ProcessId', result.processId);
+                    console.log('Current sessionStorage:', JSON.stringify({...sessionStorage}));
                     setupSSEConnection(result.processId);
                 } else {
                     throw new Error('No process ID received from server');
@@ -1640,12 +1668,11 @@ const VideoClipper = (function () {
                 // Check for existing processID in sessionStorage and cancel it
                 const savedProcessId = sessionStorage.getItem('ProcessId');
                 if (savedProcessId) {
-                    console.log('Found stored process ID, sending cancel request:', savedProcessId);
                     // Send cancel request without setting as current process
-                    fetch(`/cancel/${savedProcessId}`, { method: 'GET' })
+                    fetch(`/cancel/${savedProcessId}?reason=page-refresh`, { method: 'GET' })
                         .catch(error => console.error('Error cancelling stored process:', error));
-                    // Clear the saved process ID
-                    sessionStorage.removeItem('ProcessId');
+                    // Keep the process ID in sessionStorage to track the process
+                    // It will be cleared when the process completes or fails
                 }
 
                 state.form = document.getElementById('clip-form');
@@ -1668,6 +1695,13 @@ const VideoClipper = (function () {
         testError: testErrorState
     };
 })();
+
+// Add page unload detection
+let isPageUnloading = false;
+
+window.addEventListener('beforeunload', () => {
+    isPageUnloading = true;
+});
 
 // Initialize when DOM is loaded
 if (document.readyState === 'loading') {
