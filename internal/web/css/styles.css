@@ -3255,6 +3255,7 @@ header.main-header {
         object-fit: cover;
         object-position: center;
         display: block;
+        border-radius: 12px;
     }
 
     /* Bottom ad container */

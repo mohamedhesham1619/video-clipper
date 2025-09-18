@@ -2,23 +2,35 @@
 <html lang="en" itemscope itemtype="https://schema.org/WebApplication">
 
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3TYZ3E3FGY"></script>
     <script>
+        // Prepare GA queue immediately so events aren't lost
         window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
+        function gtag(){ dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'G-3TYZ3E3FGY');
-    </script>
-
-    <script type="text/javascript">
-        (function (c, l, a, r, i, t, y) {
-            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
-            t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
-            y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
-        })(window, document, "clarity", "script", "t30r3h39vs");
-    </script>
+      
+        // Function to load GA + Clarity
+        function loadAnalytics() {
+          // ---- Google Analytics ----
+          const gtagScript = document.createElement('script');
+          gtagScript.async = true;
+          gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-3TYZ3E3FGY';
+          document.head.appendChild(gtagScript);
+      
+          // ---- Microsoft Clarity ----
+          (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+          })(window, document, "clarity", "script", "t30r3h39vs");
+        }
+      
+        // Load analytics after the *first* user interaction
+        ['click','scroll','keydown','mousemove','touchstart'].forEach(evt => {
+          window.addEventListener(evt, loadAnalytics, { once: true, passive: true });
+        });
+      </script>
+      
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
@@ -407,14 +419,13 @@
                             <i class="fas fa-video"></i>
                         </div>
                         <h1 style="white-space: nowrap;">Free Online Video Trimmer & Cutter</h1>
-                        <p class="subtitle">Paste any video URL, trim your perfect clip, and download instantly - no
-                            watermarks, no registration.</p>
+                        <p class="subtitle">Paste any video URL, set start and end time, and download exactly the part you want.</p>
                         <form id="clip-form" class="clip-form">
                             <div class="form-group">
                                 <label for="video-url">Video URL</label>
                                 <div class="input-with-paste">
                                     <input type="url" id="video-url" name="video-url"
-                                        placeholder="https://example.com/video" required>
+                                        placeholder="Paste YouTube, Facebook, or other supported link" required>
                                     <button type="button" id="paste-url" class="paste-button"
                                         title="Paste from clipboard">
                                         <i class="fas fa-paste"></i>
