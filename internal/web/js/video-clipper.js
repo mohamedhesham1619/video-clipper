@@ -1668,11 +1668,13 @@ const VideoClipper = (function () {
                 // Check for existing processID in sessionStorage and cancel it
                 const savedProcessId = sessionStorage.getItem('ProcessId');
                 if (savedProcessId) {
-                    // Send cancel request without setting as current process
+                    // Send cancel request and clear the process ID
                     fetch(`/cancel/${savedProcessId}?reason=page-refresh`, { method: 'GET' })
+                        .finally(() => {
+                            // Clear the process ID after sending the cancel request
+                            sessionStorage.removeItem('ProcessId');
+                        })
                         .catch(error => console.error('Error cancelling stored process:', error));
-                    // Keep the process ID in sessionStorage to track the process
-                    // It will be cleared when the process completes or fails
                 }
 
                 state.form = document.getElementById('clip-form');
