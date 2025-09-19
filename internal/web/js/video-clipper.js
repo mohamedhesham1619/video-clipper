@@ -937,11 +937,20 @@ const VideoClipper = (function () {
         return /^(\d{1,2}:)?\d{1,2}:\d{1,2}$/.test(timeStr);
     }
 
+    // Cache for time string formatting
+    const timeStringCache = new Map();
+    const timeCache = new Map();
+    
+    // Cache warning element and state
+    let warningElement = null;
+    const maxDuration = 30 * 60; // 30 minutes in seconds
+    let lastWarningState = null;
+    
     function createDurationWarning() {
         const durationSpan = document.getElementById('duration-value');
         if (!durationSpan) return null;
 
-        let warningElement = document.getElementById('duration-warning');
+        warningElement = document.getElementById('duration-warning');
         if (!warningElement) {
             warningElement = document.createElement('div');
             warningElement.id = 'duration-warning';
@@ -951,83 +960,181 @@ const VideoClipper = (function () {
         }
         return warningElement;
     }
-
+    
     function updateDurationWarning(duration) {
-        const maxDuration = 30 * 60; // 30 minutes in seconds
-        const durationSpan = document.getElementById('duration-value');
-        const warningElement = document.getElementById('duration-warning') || createDurationWarning();
-
-        if (!durationSpan || !warningElement) return;
-
-        if (duration > maxDuration) {
-            durationSpan.classList.add('duration-warning');
-            warningElement.classList.add('visible');
-            return false; // Invalid duration
-        } else {
-            durationSpan.classList.remove('duration-warning');
-            warningElement.classList.remove('visible');
-            return true; // Valid duration
+        // Lazy initialization
+        if (!warningElement) {
+            warningElement = createDurationWarning();
+            if (!warningElement) return false;
         }
+        
+        // Determine warning state
+        let warningState;
+        if (duration > maxDuration) {
+            warningState = 'long';
+        } else if (duration <= 0) {
+            warningState = 'invalid';
+        } else {
+            warningState = 'none';
+        }
+        
+        // Only update if state changed
+        if (warningState !== lastWarningState) {
+            lastWarningState = warningState;
+            
+            if (warningState === 'long') {
+                warningElement.style.display = 'block';
+                warningElement.textContent = 'Maximum clip duration is 30 minutes. Please choose a shorter clip.';
+                return false;
+            } else if (warningState === 'invalid') {
+                warningElement.style.display = 'block';
+                warningElement.textContent = 'Please enter a valid time range.';
+                return false;
+            } else {
+                warningElement.style.display = 'none';
+                return true;
+            }
+        }
+        
+        return warningState === 'none';
     }
-
+    
     function timeToSeconds(timeStr) {
         if (!timeStr) return 0;
-        // Convert HH:MM:SS or MM:SS to seconds
-        const parts = timeStr.split(':').map(Number);
-        if (parts.length === 3) {
-            return parts[0] * 3600 + parts[1] * 60 + parts[2];
-        } else if (parts.length === 2) {
-            return parts[0] * 60 + parts[1];
+        
+        // Check cache first
+        if (timeCache.has(timeStr)) {
+            return timeCache.get(timeStr);
         }
-        return 0;
+        
+        // Fast path for common formats
+        let seconds = 0;
+        const parts = timeStr.split(':');
+        const len = parts.length;
+        
+        if (len === 3) {
+            // HH:MM:SS format
+            seconds = (+parts[0] * 3600) + (+parts[1] * 60) + (+parts[2]);
+        } else if (len === 2) {
+            // MM:SS format
+            seconds = (+parts[0] * 60) + (+parts[1]);
+        }
+        
+        // Cache result if valid
+        if (len === 2 || len === 3) {
+            timeCache.set(timeStr, seconds);
+            // Limit cache size to prevent memory leaks
+            if (timeCache.size > 100) {
+                const firstKey = timeCache.keys().next().value;
+                timeCache.delete(firstKey);
+            }
+        }
+        
+        return seconds;
     }
-
+    
     function secondsToTimeString(seconds) {
+        // Check cache first
+        if (timeStringCache.has(seconds)) {
+            return timeStringCache.get(seconds);
+        }
+        
+        // Fast path for common values
+        if (seconds === 0) {
+            timeStringCache.set(0, '0 sec');
+            return '0 sec';
+        }
+        
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
-
+        let result;
+        
         if (mins === 0) {
-            return `${secs} sec`;
+            result = `${secs} sec`;
         } else if (secs === 0) {
-            return `${mins} min`;
+            result = `${mins} min`;
         } else {
-            return `${mins} min ${secs} sec`;
+            result = `${mins} min ${secs} sec`;
         }
+        
+        // Cache result
+        timeStringCache.set(seconds, result);
+        
+        // Limit cache size
+        if (timeStringCache.size > 100) {
+            const firstKey = timeStringCache.keys().next().value;
+            timeStringCache.delete(firstKey);
+        }
+        
+        return result;
     }
 
+    // Cache DOM elements at module level
+    let durationDisplayCache = {
+        startTimeInput: null,
+        endTimeInput: null,
+        durationSpan: null,
+        lastStartTime: '',
+        lastEndTime: '',
+        lastDuration: ''
+    };
+
     function updateDurationDisplay() {
-        const startTime = getFormElement('start-time').value;
-        const endTime = getFormElement('end-time').value;
-        const durationSpan = document.getElementById('duration-value');
+        // Initialize cache on first run
+        if (!durationDisplayCache.durationSpan) {
+            durationDisplayCache.startTimeInput = getFormElement('start-time');
+            durationDisplayCache.endTimeInput = getFormElement('end-time');
+            durationDisplayCache.durationSpan = document.getElementById('duration-value');
+            if (!durationDisplayCache.durationSpan) return;
+        }
 
-        if (!durationSpan) return;
+        const { startTimeInput, endTimeInput, durationSpan } = durationDisplayCache;
+        const startTime = startTimeInput.value;
+        const endTime = endTimeInput.value;
 
-        if (!startTime || !endTime) {
-            durationSpan.textContent = '00:00:00';
-            updateDurationWarning(0);
+        // Skip if no change in inputs
+        if (startTime === durationDisplayCache.lastStartTime && 
+            endTime === durationDisplayCache.lastEndTime) {
             return;
         }
 
-        try {
-            const start = timeToSeconds(startTime);
-            const end = timeToSeconds(endTime);
+        // Update cache
+        durationDisplayCache.lastStartTime = startTime;
+        durationDisplayCache.lastEndTime = endTime;
 
-            if (end <= start) {
+        if (!startTime || !endTime) {
+            if (durationDisplayCache.lastDuration !== '00:00:00') {
+                durationDisplayCache.lastDuration = '00:00:00';
                 durationSpan.textContent = '00:00:00';
                 updateDurationWarning(0);
-                return;
             }
-
-            const duration = end - start;
-            durationSpan.textContent = secondsToTimeString(duration);
-            updateDurationWarning(duration);
-        } catch (e) {
-            console.error('Error calculating duration:', e);
-            durationSpan.textContent = '00:00:00';
-            updateDurationWarning(0);
+            return;
         }
-    }
 
+        // Use requestAnimationFrame to batch DOM updates
+        requestAnimationFrame(() => {
+            try {
+                const start = timeToSeconds(startTime);
+                const end = timeToSeconds(endTime);
+                const duration = Math.max(0, end - start);
+                const durationStr = secondsToTimeString(duration);
+                
+                if (durationDisplayCache.lastDuration !== durationStr) {
+                    durationDisplayCache.lastDuration = durationStr;
+                    durationSpan.textContent = durationStr;
+                    updateDurationWarning(duration);
+                }
+            } catch (e) {
+                console.error('Error calculating duration:', e);
+                if (durationDisplayCache.lastDuration !== '00:00:00') {
+                    durationDisplayCache.lastDuration = '00:00:00';
+                    durationSpan.textContent = '00:00:00';
+                    updateDurationWarning(0);
+                }
+            }
+        });
+    }
+    
     function getFormElement(id) {
         const element = document.getElementById(id);
         if (!element) {
@@ -1392,11 +1499,29 @@ const VideoClipper = (function () {
 
     function setupTimeInputs() {
         const timeInputs = document.querySelectorAll('input[type="text"][pattern]');
+        let debounceTimer;
+        let rafId;
+        
+        // Use passive event listeners for better scrolling performance
+        const passiveOptions = { passive: true };
+        
+        // Cache DOM elements at module level
+        if (!durationDisplayCache.startTimeInput) {
+            durationDisplayCache.startTimeInput = getFormElement('start-time');
+            durationDisplayCache.endTimeInput = getFormElement('end-time');
+            durationDisplayCache.durationSpan = document.getElementById('duration-value');
+            
+            if (!durationDisplayCache.startTimeInput || 
+                !durationDisplayCache.endTimeInput || 
+                !durationDisplayCache.durationSpan) {
+                return;
+            }
+        }
 
         // Simple format function that only runs on blur
         const formatTimeOnBlur = (input) => {
-            let value = input.value || '';
-
+            const value = input.value || '';
+            
             // If empty, set to default
             if (!value.trim()) {
                 input.value = '00:00:00';
@@ -1410,20 +1535,27 @@ const VideoClipper = (function () {
             if (match) {
                 let [_, hh = '00', mm = '00', ss = '00'] = match;
 
-                // Pad with leading zeros
-                hh = hh.padStart(2, '0');
-                mm = mm.padStart(2, '0');
-                ss = ss.padStart(2, '0');
-
-                // Limit values
+                // Pad with leading zeros and limit values in one operation
                 hh = Math.min(99, parseInt(hh) || 0).toString().padStart(2, '0');
                 mm = Math.min(59, parseInt(mm) || 0).toString().padStart(2, '0');
                 ss = Math.min(59, parseInt(ss) || 0).toString().padStart(2, '0');
 
                 input.value = `${hh}:${mm}:${ss}`;
             }
-
-            updateDurationDisplay();
+        };
+        
+        // Optimized debounced update with RAF and microtask batching
+        const debouncedUpdate = () => {
+            clearTimeout(debounceTimer);
+            cancelAnimationFrame(rafId);
+            
+            // Use microtask to batch updates
+            debounceTimer = setTimeout(() => {
+                rafId = requestAnimationFrame(() => {
+                    // Use a microtask to batch multiple updates in the same frame
+                    Promise.resolve().then(updateDurationDisplay);
+                });
+            }, 50); // Reduced debounce time for better responsiveness
         };
 
         // Initialize time inputs
@@ -1433,8 +1565,11 @@ const VideoClipper = (function () {
             input.style.MozAppearance = 'textfield';
             input.style.appearance = 'none';
 
-            // Format on blur
-            input.addEventListener('blur', () => formatTimeOnBlur(input));
+            // Format on blur and update display
+            input.addEventListener('blur', (e) => {
+                formatTimeOnBlur(e.target);
+                updateDurationDisplay();
+            });
 
             // Initialize if empty on focus
             input.addEventListener('focus', (e) => {
@@ -1443,17 +1578,20 @@ const VideoClipper = (function () {
                 }
             });
 
-            // Allow any input - we'll format on blur
-            input.addEventListener('input', updateDurationDisplay);
+            // Debounced input handler
+            input.addEventListener('input', debouncedUpdate);
 
-            // Only allow numbers and colons
-            input.addEventListener('keypress', (e) => {
-                if (!/[0-9:]/.test(e.key)) {
+            // Optimized keydown handler with passive event
+            input.addEventListener('keydown', (e) => {
+                if (!/[0-9:]|Backspace|Delete|Arrow(?:Left|Right|Up|Down)|Home|End|Tab|Control|Meta|Alt|Shift|Escape|Enter/.test(e.key)) {
                     e.preventDefault();
                 }
-            });
+            }, { passive: true });
+            
+            // Add inputmode for better mobile keyboard experience
+            input.setAttribute('inputmode', 'numeric');
         });
-
+        
         // Initial update
         updateDurationDisplay();
     }

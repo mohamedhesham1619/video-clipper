@@ -281,7 +281,7 @@
     flex: 1;
     min-width: 0;
     position: relative;
-    height: 24px !important;
+    height: 22px !important;
     display: flex;
     align-items: center;
 }
@@ -289,7 +289,7 @@
 /* Progress Bar */
 .progress-bar {
     position: relative;
-    height: 24px !important;
+    height: 22px !important;
     width: 100%;
     background-color: #e5e7eb;
     border-radius: 8px;
