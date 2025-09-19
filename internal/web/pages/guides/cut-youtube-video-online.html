@@ -92,15 +92,25 @@
     
     <!-- Favicon and Site Icon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="512x512" href="/images/icon.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/images/icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/images/icon.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="/images/icon.png">
-    <meta name="msapplication-TileImage" content="/images/icon.png">
+    
+    <!-- Modern Favicon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/icon-16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/icon-32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/images/icon-48.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/images/icon-96.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/images/icon-512.png">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/icon-180.png">
+    
+    <!-- Microsoft Tile -->
+    <meta name="msapplication-TileImage" content="/images/icon-144.png">
     <meta name="msapplication-TileColor" content="#ffffff">
     
     <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Load Font Awesome with media="print" to make it non-render-blocking -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     <style>
         /* Mobile menu styles */
         .mobile-menu-toggle {
@@ -272,7 +282,7 @@
             <div class="logo" style="display: flex; align-items: center;">
                 <a href="/" class="logo-link" aria-label="VideoClipper Home"
                     style="display: flex; align-items: center;">
-                    <img src="/images/icon.png" alt="VideoClipper Logo" class="logo-img"
+                    <img src="/images/icon-96.png" alt="VideoClipper Logo" class="logo-img"
                         style="width: 60px; height: 60px; object-fit: contain;">
                     <span style="font-size: 1.6rem; margin-left: 1px;">VideoClipper</span>
                 </a>
@@ -361,7 +371,7 @@
                     </a>
                 </div>
                 <div style="flex: 0 0 500px; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: transform 0.3s ease;" class="hero-image">
-                    <img src="https://images.unsplash.com/photo-1567443024551-f3e3cc2be870?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+                    <img src="https://images.unsplash.com/photo-1567443024551-f3e3cc2be870?q=80&w=500&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
                          alt="Video Trimming Example" 
                          style="width: 100%; height: auto; display: block; transition: transform 0.3s ease;"
                          onmouseover="this.style.transform='scale(1.02)'"
@@ -398,8 +408,9 @@
                         </p>
                     </div>
                     <div style="flex: 1; background: #f8fafd; border-radius: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.03);" class="step-image">
-                        <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_webp,q_auto/youtube-step1_n88oce.gif"
+                        <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_webp,q_auto,w_336,h_280,c_fit/youtube-step1_n88oce.gif"
                         alt="VideoClipper: Get YouTube video URL demonstration"
+                        loading="lazy"
                         style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
                     </div>
                 </div>
@@ -420,7 +431,7 @@
                         </p>
                     </div>
                     <div style="flex: 1; background: #f8fafd; border-radius: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.03);" class="step-image">
-                        <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_webp,q_auto/step2_qc9dei.gif" alt="VideoClipper: Paste YouTube video URL into the tool demonstration" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+                        <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_webp,q_auto,w_336,h_280,c_fit/step2_qc9dei.gif" loading="lazy" alt="VideoClipper: Paste YouTube video URL into the tool demonstration" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
                     </div>
                 </div>
             </div>
@@ -440,7 +451,7 @@
                         </p>
                     </div>
                     <div style="flex: 1; background: #f8fafd; border-radius: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.03);" class="step-image">
-                        <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_webp,q_auto/step3_yair59.gif" alt="VideoClipper: Set start and end times demonstration" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+                        <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_webp,q_auto,w_336,h_280,c_fit/step3_yair59.gif" loading="lazy" alt="VideoClipper: Set start and end times demonstration" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
                     </div>
                 </div>
             </div>
@@ -460,7 +471,7 @@
                         </p>
                     </div>
                     <div style="flex: 1; background: #f8fafd; border-radius: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.03);" class="step-image">
-                        <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_webp,q_auto/step4_ahztgo.gif" alt="VideoClipper: Select video quality demonstration" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+                        <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_webp,q_auto,w_336,h_280,c_fit/step4_ahztgo.gif" loading="lazy" alt="VideoClipper: Select video quality demonstration" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
                     </div>
                 </div>
             </div>
@@ -480,7 +491,7 @@
                         </p>
                     </div>
                     <div style="flex: 1; background: #f8fafd; border-radius: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.03);" class="step-image">
-                        <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_webp,q_auto/step5_satupr.gif" alt="VideoClipper: Download your clip demonstration" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+                        <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_webp,q_auto,w_336,h_280,c_fit/step5_satupr.gif" loading="lazy" alt="VideoClipper: Download your clip demonstration" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
                     </div>
                 </div>
             </div>
@@ -610,7 +621,7 @@
                 style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 30px;">
                 <!-- Left Side: Logo, Title, and Description in one line -->
                 <div style="display: flex; align-items: center; gap: 15px; flex-wrap: nowrap;">
-                    <img src="/images/icon.png" alt="VideoClipper Logo"
+                    <img src="/images/icon-48.png" alt="VideoClipper Logo"
                         style="width: 30px; height: 30px; object-fit: contain; flex-shrink: 0;">
                     <h3 style="margin: 0; font-size: 1.3rem; font-weight: 600; color: #2c3e50; white-space: nowrap;">
                         VideoClipper
