@@ -502,7 +502,7 @@ const contentSuggestions = {
                 ad_name: 'Pcloud',
                 ad_position: 'bottom'
             });">
-            <img src="https://partner.pcloud.com/media/banners/lifetime/lifetime00772890.jpg" alt="pCloud Premium"/></a>`
+            <img src="https://partner.pcloud.com/media/banners/lifetime/lifetime00772890.jpg" alt="pCloud Premium" loading="lazy"/></a>`
         },
         {
             html: `<a href="https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902"
@@ -513,7 +513,7 @@ const contentSuggestions = {
                 ad_name: 'NordVPN',
                 ad_position: 'bottom'
             });">
-               <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1756161613/nordvpn-728x90-en-us_wc4ng1.png" alt="NordVPN" style="width: 100%; max-height: 90px; object-fit: contain;" /></a>`
+               <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1756161613/nordvpn-728x90-en-us_wc4ng1.png" alt="NordVPN" style="width: 100%; max-height: 90px; object-fit: contain;" loading="lazy" /></a>`
         },
         {
             html: `<a href="https://privadovpn.com/resources/best-vpn-for-gaming#a_aid=1619&a_bid=203d5f79"
@@ -523,7 +523,7 @@ const contentSuggestions = {
                 ad_name: 'PrivadoVPN',
                 ad_position: 'bottom'
             });">
-               <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753306325/728x90_c9y6b3.png" alt="PrivadoVPN" style="width: 100%; max-height: 90px; object-fit: contain;"></a>`
+               <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753306325/728x90_c9y6b3.png" alt="PrivadoVPN" style="width: 100%; max-height: 90px; object-fit: contain;" loading="lazy" /></a>`
         }
 
     ]
