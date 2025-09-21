@@ -80,6 +80,7 @@ func New(bucket *storage.BucketHandle) *Server {
 	mux.HandleFunc("/robots.txt", handlers.RobotsTxtHandler)
 	mux.HandleFunc("/sitemap.xml", handlers.SitemapXMLHandler)
 	mux.Handle("/favicon.ico", http.FileServer(http.Dir("internal/web/images")))
+	mux.Handle("/ads.txt", fs)
 
 	return &Server{mux: mux}
 }
