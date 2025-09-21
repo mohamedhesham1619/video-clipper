@@ -14,15 +14,15 @@ func ProgressHandler(w http.ResponseWriter, r *http.Request) {
 	// Get the process ID from the URL
 	processId := strings.TrimPrefix(r.URL.Path, "/progress/")
 
-	// Notify the watcher that the client is still connected
-	data.notifyWatcher(processId)
-
 	// Get the download process
 	downloadProcess, exists := data.getDownloadProcess(processId)
 	if !exists {
 		http.Error(w, "Process not found", http.StatusNotFound)
 		return
 	}
+
+	// Notify the watcher that the client is still connected
+	data.notifyWatcher(processId)
 
 	// Get the progress channel
 	progressChannel := downloadProcess.ProgressChan
