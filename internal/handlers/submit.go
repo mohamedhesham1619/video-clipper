@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	firestore "cloud.google.com/go/firestore"
@@ -45,6 +46,7 @@ func SubmitHandler(bucket *storage.BucketHandle) http.HandlerFunc {
 		clipDurationInSeconds, _ := utils.ParseClipDuration(videoRequest.ClipStart, videoRequest.ClipEnd)
 		clipDurationFormatted := utils.FormatSecondsToMMSS(clipDurationInSeconds)
 		slog.Info("Received clip request",
+			"user ip", getUserIP(r),
 			"origin", r.Header.Get("Origin"),
 			"refer", r.Header.Get("Referer"),
 			"url", videoRequest.VideoURL,
@@ -331,3 +333,18 @@ func handleProcessError(processName string, err error, progressChan chan models.
 	close(progressChan)
 	data.removeDownloadProcess(processID)
 }
+
+func getUserIP(r *http.Request) string {
+	// 1. Cloudflare header
+	if ip := r.Header.Get("CF-Connecting-IP"); ip != "" {
+		return ip
+	}
+	// 2. Standard header
+	if ip := r.Header.Get("X-Forwarded-For"); ip != "" {
+		parts := strings.Split(ip, ",")
+		return strings.TrimSpace(parts[0])
+	}
+	return ""
+}
+	
+	
