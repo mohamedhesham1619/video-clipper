@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"io"
+	"log/slog"
 	"net/http"
+	"os"
 	"path/filepath"
 )
 
@@ -114,4 +117,39 @@ func GeneralGuideHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.ServeFile(w, r, filepath.Join("internal/web/pages/guides", "trim-videos-online.html"))
+}
+
+func AdstxtHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/ads.txt" {
+		http.NotFound(w, r)
+		return
+	}
+
+	adstxtURL := os.Getenv("ADSTXT_URL")
+	if adstxtURL == "" {
+		slog.Error("ADSTXT_URL environment variable is not set")
+		http.NotFound(w, r)
+		return
+	}
+
+	resp, err := http.Get(adstxtURL)
+	if err != nil {
+		slog.Error("Failed to fetch ads.txt", "error", err)
+		http.Error(w, "Failed to fetch ads.txt", http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		slog.Error("Failed to fetch ads.txt, non-200 status", "status", resp.StatusCode)
+		http.Error(w, "Failed to fetch ads.txt", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	if _, err := io.Copy(w, resp.Body); err != nil {
+		slog.Error("Failed to serve ads.txt content", "error", err)
+		http.Error(w, "Failed to serve ads.txt content", http.StatusInternalServerError)
+		return
+	}
 }
