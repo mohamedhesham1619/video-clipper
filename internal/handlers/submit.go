@@ -42,6 +42,12 @@ func SubmitHandler(bucket *storage.BucketHandle) http.HandlerFunc {
 			return
 		}
 
+		// Validate YouTube URL
+		if !isValidYouTubeURL(videoRequest.VideoURL) {
+			http.Error(w, "Not supported", http.StatusBadRequest)
+			return
+		}
+
 		// Log the request details
 		clipDurationInSeconds, _ := utils.ParseClipDuration(videoRequest.ClipStart, videoRequest.ClipEnd)
 		clipDurationFormatted := utils.FormatSecondsToMMSS(clipDurationInSeconds)
@@ -248,6 +254,11 @@ func uploadFileToGCS(bucket *storage.BucketHandle, objectName, filePath string) 
 		return err
 	}
 	return nil
+}
+
+// isValidYouTubeURL checks if the given URL contains 'youtube' or 'youtu.be'
+func isValidYouTubeURL(urlString string) bool {
+	return strings.Contains(urlString, "youtube") || strings.Contains(urlString, "youtu.be")
 }
 
 // generateSignedURL generates a signed URL for a file in Google Cloud Storage bucket.
