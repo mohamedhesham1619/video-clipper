@@ -44,6 +44,7 @@ func SubmitHandler(bucket *storage.BucketHandle) http.HandlerFunc {
 
 		// Validate YouTube URL
 		if !isValidYouTubeURL(videoRequest.VideoURL) {
+			slog.Error("Non youtube request", "url", videoRequest.VideoURL)
 			http.Error(w, "Not supported", http.StatusBadRequest)
 			return
 		}
