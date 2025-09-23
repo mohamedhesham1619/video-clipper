@@ -11,20 +11,48 @@
         ezstandalone.cmd = ezstandalone.cmd || [];
     </script>
     <script>
-        // Prepare GA queue immediately so events aren't lost
+        // Enhanced gtag function that queues events until GA loads
         window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
+        window.pendingEvents = window.pendingEvents || [];
+        window.analyticsLoaded = false;
+        
+        function gtag() {
+            if (window.analyticsLoaded) {
+                dataLayer.push(arguments);
+            } else {
+                // Queue the event for later
+                window.pendingEvents.push(Array.from(arguments));
+            }
+        }
+        
         gtag('js', new Date());
         gtag('config', 'G-3TYZ3E3FGY');
-
-        // Function to load GA + Clarity
+        
         function loadAnalytics() {
+            if (window.analyticsLoaded) return;
+            
             // ---- Google Analytics ----
             const gtagScript = document.createElement('script');
             gtagScript.async = true;
             gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-3TYZ3E3FGY';
+            
+            gtagScript.onload = function() {
+                window.analyticsLoaded = true;
+                
+                // Process queued events
+                window.pendingEvents.forEach(eventArgs => {
+                    dataLayer.push(eventArgs);
+                });
+                window.pendingEvents = []; // Clear queue
+                
+                // Override gtag to work normally now
+                window.gtag = function() {
+                    dataLayer.push(arguments);
+                };
+            };
+            
             document.head.appendChild(gtagScript);
-
+        
             // ---- Microsoft Clarity ----
             (function (c, l, a, r, i, t, y) {
                 c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
@@ -32,8 +60,8 @@
                 y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
             })(window, document, "clarity", "script", "t30r3h39vs");
         }
-
-        // Load analytics after the *first* user interaction
+        
+        // Trigger loading on any interaction
         ['click', 'scroll', 'keydown', 'mousemove', 'touchstart'].forEach(evt => {
             window.addEventListener(evt, loadAnalytics, { once: true, passive: true });
         });
