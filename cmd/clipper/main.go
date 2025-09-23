@@ -37,8 +37,17 @@ func main() {
 		slog.Warn("Failed to load .env file", "error", err)
 	}
 
+	// This file is needed for youtube downloads
+	// It is mounted from a secret in GCP
+	// It is copied to /tmp because it is the only writable location in Cloud Run and ytdlp needs to write to it
 	if err := utils.CopyCookieToTmp(); err != nil {
 		slog.Error("Failed to copy cookie to tmp", "error", err)
+	}
+
+	// Load blocked domains into memory
+	err := utils.LoadBlockedDomainsFromFile("internal/data/blocked_domains.txt")
+	if err != nil {
+		slog.Error("Failed to load blocked domains", "error", err)
 	}
 
 	// Initialize GCS client and bucket

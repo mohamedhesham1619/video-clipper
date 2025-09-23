@@ -42,13 +42,6 @@ func SubmitHandler(bucket *storage.BucketHandle) http.HandlerFunc {
 			return
 		}
 
-		// Validate YouTube URL
-		if !isValidYouTubeURL(videoRequest.VideoURL) {
-			slog.Error("Non youtube request", "url", videoRequest.VideoURL)
-			http.Error(w, "Not supported", http.StatusBadRequest)
-			return
-		}
-
 		// Log the request details
 		clipDurationInSeconds, _ := utils.ParseClipDuration(videoRequest.ClipStart, videoRequest.ClipEnd)
 		clipDurationFormatted := utils.FormatSecondsToMMSS(clipDurationInSeconds)
@@ -59,6 +52,17 @@ func SubmitHandler(bucket *storage.BucketHandle) http.HandlerFunc {
 			"url", videoRequest.VideoURL,
 			"quality", videoRequest.Quality,
 			"clip duration", clipDurationFormatted)
+
+		// Check if the URL is blocked
+		// Since most of the requests are for YouTube, we skip the blocked check for YouTube URLs
+		if !utils.IsYouTubeURL(videoRequest.VideoURL) {
+			if utils.IsBlocked(videoRequest.VideoURL) {
+				slog.Warn("Blocked download request", "request", videoRequest)
+				http.Error(w, "Failed to process the video", http.StatusBadRequest) // Intentionally vague
+				return
+			}
+			
+		}
 
 		// Check if duration exceeds 30 minutes (1800 seconds)
 		if clipDurationInt, err := strconv.Atoi(clipDurationInSeconds); err == nil && clipDurationInt > 1800 {
@@ -255,11 +259,6 @@ func uploadFileToGCS(bucket *storage.BucketHandle, objectName, filePath string) 
 		return err
 	}
 	return nil
-}
-
-// isValidYouTubeURL checks if the given URL contains 'youtube' or 'youtu.be'
-func isValidYouTubeURL(urlString string) bool {
-	return strings.Contains(urlString, "youtube") || strings.Contains(urlString, "youtu.be")
 }
 
 // generateSignedURL generates a signed URL for a file in Google Cloud Storage bucket.

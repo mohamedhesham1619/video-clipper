@@ -91,7 +91,6 @@ func SanitizeName(name string, opts *SanitizeOptions) string {
 	return sanitized
 }
 
-
 // getVideoTitle retrieves the video title using yt-dlp.
 func GetVideoTitle(videoRequest models.VideoRequest) (string, error) {
 	args := []string{
@@ -105,7 +104,7 @@ func GetVideoTitle(videoRequest models.VideoRequest) (string, error) {
 		"--socket-timeout", "20", // Prevents hanging
 		"--retries", "2",
 	}
-	if isYouTubeURL(videoRequest.VideoURL) {
+	if IsYouTubeURL(videoRequest.VideoURL) {
 		args = append(args, "--cookies", "/tmp/cookie.txt")
 	}
 	args = append(args, videoRequest.VideoURL)

@@ -2,5 +2,4 @@ build/
 .env
 cookie.txt
 ui/
-internal/data/
 clipper.json

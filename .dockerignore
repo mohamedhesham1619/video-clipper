@@ -4,7 +4,6 @@ ui/
 Dockerfile
 .dockerignore
 /build
-internal/data/
 .env
 cookie.txt
 clipper.json

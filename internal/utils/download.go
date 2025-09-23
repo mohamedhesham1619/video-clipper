@@ -58,8 +58,8 @@ func StartVideoDownloadProcesses(videoRequest models.VideoRequest, videoTitle st
 	return ytdlpCmd, ffmpegCmd, nil
 }
 
-// isYouTubeURL returns true if the URL is a YouTube link.
-func isYouTubeURL(url string) bool {
+// IsYouTubeURL returns true if the URL is a YouTube link.
+func IsYouTubeURL(url string) bool {
 	return strings.Contains(url, "youtube.com") || strings.Contains(url, "youtu.be")
 }
 
@@ -67,7 +67,7 @@ func prepareYtDlpCommand(videoRequest models.VideoRequest) *exec.Cmd {
 
 	var formatString string
 
-	if isYouTubeURL(videoRequest.VideoURL) {
+	if IsYouTubeURL(videoRequest.VideoURL) {
 		// Youtube often seperate the audio and video streams, so we need to prefer seperate streams to get the required video quality.
 		formatString = fmt.Sprintf("bestvideo[height<=%[1]v]+bestaudio/best[height<=%[1]v]/best", videoRequest.Quality)
 	} else {
@@ -85,7 +85,7 @@ func prepareYtDlpCommand(videoRequest models.VideoRequest) *exec.Cmd {
 		"--retries", "2",
 		"-o", "-", // Output to stdout
 	}
-	if isYouTubeURL(videoRequest.VideoURL) {
+	if IsYouTubeURL(videoRequest.VideoURL) {
 		args = append(args, "--cookies", "/tmp/cookie.txt")
 	}
 	args = append(args, videoRequest.VideoURL)
@@ -93,7 +93,7 @@ func prepareYtDlpCommand(videoRequest models.VideoRequest) *exec.Cmd {
 }
 
 func prepareFfmpegCommand(downloadPath string) *exec.Cmd {
-	
+
 	return exec.Command("ffmpeg",
 		"-hide_banner", // Quieter logs
 		"-i", "pipe:0", // Read from stdin
