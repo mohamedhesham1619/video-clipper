@@ -22,7 +22,14 @@ func ProgressHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Notify the watcher that the client is still connected
-	data.notifyWatcher(processId)
+	alreadyNotified := data.notifyWatcher(processId)
+
+	// In rare cases, the client may connect multiple times
+	// If a duplicate connection is detected, return early
+	if alreadyNotified {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
 
 	// Get the progress channel
 	progressChannel := downloadProcess.ProgressChan

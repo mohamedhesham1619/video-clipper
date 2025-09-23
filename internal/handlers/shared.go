@@ -35,14 +35,26 @@ func (s *sharedData) removeDownloadProcess(processID string) {
 	s.mu.Unlock()
 }
 
-func (s *sharedData) notifyWatcher(processID string) {
+// NotifyWatcher notifies the watcher that is listening for the channel
+// Returns true if the watcher was already notified
+func (s *sharedData) notifyWatcher(processID string) (alreadyNotified bool) {
 	s.mu.RLock()
 	downloadProcess, exists := s.downloadProcesses[processID]
 	s.mu.RUnlock()
-	if exists {
+
+	// Only close the channel if it exists and is not already closed
+	if exists && downloadProcess.Watcher != nil {
 		// Closing the channel will notify the watcher that is listening for the channel
 		close(downloadProcess.Watcher)
+
+		// Set the watcher to nil so if the function is called again we know the watcher has already been notified
+		// This prevents panic if the function is called more than once
+		downloadProcess.Watcher = nil
+
+		return false
 	}
+	
+	return true
 }
 
 // StopDownloadProcessAndCleanUp stops the download process if it is still running and cleans up all associated resources.
