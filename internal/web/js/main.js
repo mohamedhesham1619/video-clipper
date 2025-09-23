@@ -487,9 +487,19 @@ const contentSuggestions = {
             </a>
             <img height="0" width="0"
                 src="https://1.envato.market/i/6416428/3249424/4662"
-                style="position:absolute;visibility:hidden;" border="0" />
-
-`
+                style="position:absolute;visibility:hidden;" border="0" />`
+        },
+        {
+            html: `
+            <a rel="noopener sponsored"
+            href="https://capcutaffiliateprogram.pxf.io/c/6416428/3069242/22474" 
+            target="_blank" id="3069242"
+            onclick="gtag('event', 'ad_click', {
+                ad_name: 'CapCut',
+                ad_position: 'side'
+            });">
+            <img src="//a.impactradius-go.com/display-ad/22474-3069242" border="0" alt="" width="160" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/3069242/22474" style="position:absolute;visibility:hidden;" border="0" />
+            `
         }
     ],
     bottom: [
@@ -683,11 +693,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
 const recommended_tools = [
     {
-        "name": "Movavi",
-        "header": "Your do-it-all video-making bundle",
-        "link": "https://www.mvvitrk.com/bDig55",
-        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1756326278/336x280-v3_ciesw3.png",
-        "description": "Auto subtitles with one click, ready-made templates\nHandy video editing, file conversion, and screen recording\nHundreds of drag-and-drop filters, transitions, titles, and overlays\nUse code (PTNAFFDIS010925ALLAFS15) for 15% discount on yearly subscription (valid till 15th October 2025)"
+        "name": "CapCut",
+        "header": "Create Stunning Videos—Fast, Fun & Free",
+        "link": "https://capcutaffiliateprogram.pxf.io/c/6416428/3069270/22474",
+        "image": "https://app.impact.com/display-ad/22474-3069270?v=0",
+        "description": "CapCut brings pro-level video editing to everyone—no steep learning curve.\nEnjoy built-in AI features, free effects, and customizable templates.\nEdit, collaborate, and share—all from one simple app."
+    },
+    {
+        "name": "Renderforest",
+        "header": "Bring Your Ideas to Life—Animated, Branded & Ready",
+        "link": "https://renderforest.pxf.io/qzvzVj",
+        "image": "https://app.impact.com/display-ad/14885-1957252?v=1",
+        "description": "Pick a template, type your script, and let AI do the rest.\nCustomize colors, fonts & music with drag‑and‑drop ease.\nExport in HD or 4K with advanced features available on premium plans."
+    },
+
+    {
+        "name": "Pcloud",
+        "header": "Smart Virtual Drive—Cloud Storage That Works Like Local",
+        "link": "https://partner.pcloud.com/r/146969",
+        "image": "https://partner.pcloud.com/media/banners/personal/personal008300250.jpg",
+        "description": "Start with free 10GB, expand easily, or lock in lifetime access for one fee.\nEnjoy built-in media streaming, automatic cross‑platform backups, and file previews.\nOptional Crypto encryption gives you exclusive control over sensitive files."
+    },
+    {
+        "name": "Flixier",
+        "header": "Your Cloud-Powered Video Studio",
+        "link": "https://flixier.com?fpr=mh1619",
+        "image": "https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24602/720x300px.png",
+        "description": "AI subtitle, voiceover & translation tools—all built right into your browser.\nCloud rendering delivers full‑HD or 4K videos in minutes, no high-end PC needed.\nCollaborative editing, stock media & templates—team up and produce faster."
     },
     {
         "name": "Envato",
@@ -698,25 +730,11 @@ const recommended_tools = [
 
     },
     {
-        "name": "Flixier",
-        "header": "Your Cloud-Powered Video Studio",
-        "link": "https://flixier.com?fpr=mh1619",
-        "image": "https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24602/720x300px.png",
-        "description": "AI subtitle, voiceover & translation tools—all built right into your browser.\nCloud rendering delivers full‑HD or 4K videos in minutes, no high-end PC needed.\nCollaborative editing, stock media & templates—team up and produce faster."
-    },
-    {
-        "name": "Renderforest",
-        "header": "Bring Your Ideas to Life—Animated, Branded & Ready",
-        "link": "https://renderforest.pxf.io/qzvzVj",
-        "image": "https://app.impact.com/display-ad/14885-1957252?v=1",
-        "description": "Pick a template, type your script, and let AI do the rest.\nCustomize colors, fonts & music with drag‑and‑drop ease.\nExport in HD or 4K with advanced features available on premium plans."
-    },
-    {
-        "name": "Pcloud",
-        "header": "Smart Virtual Drive—Cloud Storage That Works Like Local",
-        "link": "https://partner.pcloud.com/r/146969",
-        "image": "https://partner.pcloud.com/media/banners/personal/personal008300250.jpg",
-        "description": "Start with free 10GB, expand easily, or lock in lifetime access for one fee.\nEnjoy built-in media streaming, automatic cross‑platform backups, and file previews.\nOptional Crypto encryption gives you exclusive control over sensitive files."
+        "name": "Movavi",
+        "header": "Your do-it-all video-making bundle",
+        "link": "https://www.mvvitrk.com/bDig55",
+        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1756326278/336x280-v3_ciesw3.png",
+        "description": "Auto subtitles with one click, ready-made templates\nHandy video editing, file conversion, and screen recording\nHundreds of drag-and-drop filters, transitions, titles, and overlays\nUse code (PTNAFFDIS010925ALLAFS15) for 15% discount on yearly subscription (valid till 15th October 2025)"
     },
     {
         "name": "NordVPN",
