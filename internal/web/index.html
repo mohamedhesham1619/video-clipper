@@ -10,60 +10,28 @@
         window.ezstandalone = window.ezstandalone || {};
         ezstandalone.cmd = ezstandalone.cmd || [];
     </script>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3TYZ3E3FGY"></script>
     <script>
-        // Enhanced gtag function that queues events until GA loads
         window.dataLayer = window.dataLayer || [];
-        window.pendingEvents = window.pendingEvents || [];
-        window.analyticsLoaded = false;
-        
-        function gtag() {
-            if (window.analyticsLoaded) {
-                dataLayer.push(arguments);
-            } else {
-                // Queue the event for later
-                window.pendingEvents.push(Array.from(arguments));
-            }
-        }
-        
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
+
         gtag('config', 'G-3TYZ3E3FGY');
-        
-        function loadAnalytics() {
-            if (window.analyticsLoaded) return;
-            
-            // ---- Google Analytics ----
-            const gtagScript = document.createElement('script');
-            gtagScript.async = true;
-            gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-3TYZ3E3FGY';
-            
-            gtagScript.onload = function() {
-                window.analyticsLoaded = true;
-                
-                // Process queued events
-                window.pendingEvents.forEach(eventArgs => {
-                    dataLayer.push(eventArgs);
-                });
-                window.pendingEvents = []; // Clear queue
-                
-                // Override gtag to work normally now
-                window.gtag = function() {
-                    dataLayer.push(arguments);
-                };
-            };
-            
-            document.head.appendChild(gtagScript);
-        
-            // ---- Microsoft Clarity ----
+    </script>
+
+    <script>
+        function loadClarity() {
             (function (c, l, a, r, i, t, y) {
                 c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
                 t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
                 y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
             })(window, document, "clarity", "script", "t30r3h39vs");
         }
-        
-        // Trigger loading on any interaction
+
+        // Load Clarity on first interaction
         ['click', 'scroll', 'keydown', 'mousemove', 'touchstart'].forEach(evt => {
-            window.addEventListener(evt, loadAnalytics, { once: true, passive: true });
+            window.addEventListener(evt, loadClarity, { once: true, passive: true });
         });
     </script>
 
