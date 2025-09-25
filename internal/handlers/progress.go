@@ -36,35 +36,11 @@ func ProgressHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Set headers for SSE
 	w.Header().Set("Content-Type", "text/event-stream")
-	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
-	w.Header().Set("X-Accel-Buffering", "no")
-	w.Header().Set("Access-Control-Allow-Origin", "*") 
-	w.Header().Set("Access-Control-Allow-Headers", "Cache-Control")
-
-	// Additional anti-buffering headers
-	w.Header().Set("Pragma", "no-cache")
-	w.Header().Set("Expires", "0")
-	w.Header().Set("X-Buffer", "no")
-	w.Header().Set("Proxy-Buffering", "off")
-
-	w.Header().Del("Content-Length")
-	w.Header().Set("Transfer-Encoding", "chunked")
-
-	// Write status immediately before any content
-	w.WriteHeader(http.StatusOK)
 	
 	flusher := w.(http.Flusher)
-
-	// Send immediate padding to break proxy buffering
-	padding := strings.Repeat(" ", 2048) // 2KB padding
-	fmt.Fprintf(w, ": padding%s\n", padding)
-	fmt.Fprintf(w, "retry: 1000\n")
-	fmt.Fprintf(w, "data: {\"status\":\"connected\"}\n\n")
 	flusher.Flush()
-
-	// Small delay to ensure first chunk gets through
-	time.Sleep(200 * time.Millisecond)
 
 	// Set up a heartbeat to check if the client is still connected every 5 seconds.
 	heartbeat := time.NewTicker(5 * time.Second)

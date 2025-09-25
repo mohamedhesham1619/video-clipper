@@ -547,7 +547,7 @@ document.addEventListener('DOMContentLoaded', function () {
     rotateContent();
 
     // Set up intervals for rotations
-    setInterval(rotateContent, 15000); // Side ads rotation (15 seconds)
+    setInterval(rotateContent, 20000); // Side ads rotation (20 seconds)
 
     // Set up separate interval for bottom ads (every 10 seconds)
     const rotateBottomContent = () => {
@@ -596,8 +596,8 @@ document.addEventListener('DOMContentLoaded', function () {
         rotateBottomContent();
     }
 
-    // Set interval for bottom rotation (15 seconds)
-    setInterval(rotateBottomContent, 15000);
+    // Set interval for bottom rotation (20 seconds)
+    setInterval(rotateBottomContent, 20000);
 });
 
 // Recommended tools data
