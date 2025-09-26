@@ -272,7 +272,7 @@ const VideoClipper = (function () {
             state.form.reset();
             
             // Clear any custom state or UI elements if needed
-            const urlInput = getFormElement('url');
+            const urlInput = getFormElement('video-url');
             if (urlInput) {
                 urlInput.value = '';
             }
