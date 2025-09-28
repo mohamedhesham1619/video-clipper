@@ -243,12 +243,11 @@ const VideoClipper = (function () {
         const currentProcessId = state.currentProcessId;
         state.currentProcessId = null;
         
-        if (isPageUnloading && !force) {
-            return;
-        }
-        
         try {
-            sessionStorage.removeItem('ProcessId');
+            // Always clear from session storage when force is true, regardless of page unloading
+            if (force || !isPageUnloading) {
+                sessionStorage.removeItem('ProcessId');
+            }
             
             // Reset status text if it exists
             if (state.statusText) {
@@ -267,14 +266,14 @@ const VideoClipper = (function () {
     }
     
     function clearFormValues() {
-        if (state.form) {
+            if (state.form) {
             // Reset the form
-            state.form.reset();
-            
-            // Clear any custom state or UI elements if needed
-            const urlInput = getFormElement('video-url');
-            if (urlInput) {
-                urlInput.value = '';
+                state.form.reset();
+                
+                // Clear any custom state or UI elements if needed
+                const urlInput = getFormElement('video-url');
+                if (urlInput) {
+                    urlInput.value = '';
             }
             
             // Clear time input fields
