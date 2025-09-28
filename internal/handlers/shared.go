@@ -68,6 +68,8 @@ func (s *sharedData) stopDownloadProcessAndCleanUp(processID string) {
 		slog.Warn("Couldn't stop download process because it doesn't exist", "processID", processID)
 		return
 	}
+
+	downloadProcess.IsCancelled = true
 	ffmpegProcess := downloadProcess.FFmpegProcess
 	ytdlpProcess := downloadProcess.YtDlpProcess
 

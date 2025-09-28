@@ -8,6 +8,7 @@ type DownloadProcess struct {
 	Watcher       chan struct{}
 	YtDlpProcess  *exec.Cmd
 	FFmpegProcess *exec.Cmd
+	IsCancelled   bool
 }
 
 type EventName string
