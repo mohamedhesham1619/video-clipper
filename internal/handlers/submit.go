@@ -233,6 +233,7 @@ func SubmitHandler(bucket *storage.BucketHandle) http.HandlerFunc {
 			default:
 				slog.Warn("Client disconnected before progress handler was requested", "processId", processID)
 				close(watcher)
+				downloadProcess.Watcher = nil // This will prevent server panic if the progress handler is requested after 10 seconds 
 				data.stopDownloadProcessAndCleanUp(processID) // Stop the download process and clean up resources
 			}
 		})

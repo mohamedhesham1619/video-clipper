@@ -463,35 +463,24 @@ const contentSuggestions = {
         },
         {
             html: `<a rel="noopener sponsored"
-            href="https://renderforest.pxf.io/c/6416428/1957251/14885"
-            target="_blank" 
-            id="1957251"
+            href="https://renderforest.pxf.io/c/6416428/1275473/14885" target="_blank" id="1275473"
             onclick="gtag('event', 'ad_click', {
                 ad_name: 'Renderforest',
                 ad_position: 'side',
                 transport: 'beacon'
             });">
-            <img src="//a.impactradius-go.com/display-ad/14885-1957251" border="0" alt="" width="300" height="600"/>
-            </a>
-            <img height="0" width="0" src="https://imp.pxf.io/i/6416428/1957251/14885" style="position:absolute;visibility:hidden;" border="0" />
+            <img src="//a.impactradius-go.com/display-ad/14885-1275473" border="0" alt="" width="300" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/1275473/14885" style="position:absolute;visibility:hidden;" border="0" />
             `
         },
         {
             html: `<a rel="noopener sponsored"
-            href="https://1.envato.market/c/6416428/3249424/4662?subId1=ULVG"
-            target="_blank"
-            id="3249424"
+            href="https://1.envato.market/c/6416428/3279856/4662?subId1=ulvg&subId2=october" target="_blank" id="3279856"
             onclick="gtag('event', 'ad_click', {
                 ad_name: 'Envato',
                 ad_position: 'side',
                 transport: 'beacon'
             });">
-            <img src="//a.impactradius-go.com/display-ad/4662-3249424"
-                    border="0" alt="" width="300" height="600"/>
-            </a>
-            <img height="0" width="0"
-                src="https://1.envato.market/i/6416428/3249424/4662"
-                style="position:absolute;visibility:hidden;" border="0" />`
+            <img src="//a.impactradius-go.com/display-ad/4662-3279856" border="0" alt="" width="300" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/3279856/4662" style="position:absolute;visibility:hidden;" border="0" />`
         },
         {
             html: `
