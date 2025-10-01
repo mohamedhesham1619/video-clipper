@@ -936,7 +936,7 @@ const VideoClipper = (function () {
     
     // Cache warning element and state
     let warningElement = null;
-    const maxDuration = 5 * 60; // 5 minutes in seconds
+    const maxDuration = 20 * 60; // 20 minutes in seconds
     let lastWarningState = null;
     
     function createDurationWarning() {
@@ -977,7 +977,7 @@ const VideoClipper = (function () {
             
             if (warningState === 'long') {
                 warningElement.style.display = 'block';
-                warningElement.textContent = '⚠️ Temporarily, the max clip duration has been reduced to 5 minutes until October 1st.';
+                warningElement.textContent = 'Maximum clip duration is 20 minutes. Please choose a shorter clip.';
                 return false;
             } else if (warningState === 'invalid') {
                 warningElement.style.display = 'block';

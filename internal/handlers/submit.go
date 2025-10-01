@@ -64,9 +64,9 @@ func SubmitHandler(bucket *storage.BucketHandle) http.HandlerFunc {
 			
 		}
 
-		// Check if duration exceeds 5 minutes (300 seconds)
-		if clipDurationInt, err := strconv.Atoi(clipDurationInSeconds); err == nil && clipDurationInt > 300 {
-			http.Error(w, "Clip duration cannot exceed 5 minutes", http.StatusBadRequest)
+		// Check if duration exceeds 20 minutes (1200 seconds)
+		if clipDurationInt, err := strconv.Atoi(clipDurationInSeconds); err == nil && clipDurationInt > 1200 {
+			http.Error(w, "Clip duration cannot exceed 20 minutes", http.StatusBadRequest)
 			return
 		}
 

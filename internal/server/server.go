@@ -22,11 +22,11 @@ type Server struct {
 func New(bucket *storage.BucketHandle) *Server {
 	mux := http.NewServeMux()
 
-	// Rate limiter: 2 requests per hour per IP
+	// Rate limiter: 4 requests per 2 hours per IP
 	limiterStore := memoryStore.NewStore()
 	rate := limiter.Rate{
-		Limit:  2,
-		Period: 1 * time.Hour,
+		Limit:  4,
+		Period: 2 * time.Hour,
 	}
 	limiterInstance := limiter.New(limiterStore, rate)
 
