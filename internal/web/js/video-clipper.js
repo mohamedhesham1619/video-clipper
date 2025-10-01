@@ -936,7 +936,7 @@ const VideoClipper = (function () {
     
     // Cache warning element and state
     let warningElement = null;
-    const maxDuration = 20 * 60; // 20 minutes in seconds
+    const maxDuration = 10 * 60; // 10 minutes in seconds
     let lastWarningState = null;
     
     function createDurationWarning() {
@@ -948,7 +948,7 @@ const VideoClipper = (function () {
             warningElement = document.createElement('div');
             warningElement.id = 'duration-warning';
             warningElement.className = 'duration-warning-text';
-            warningElement.innerHTML = 'Max duration is 30 min. Need more? <a href="/contact" class="contact-link">Let us know</a>';
+            warningElement.innerHTML = '';
             durationSpan.parentNode.appendChild(warningElement);
         }
         return warningElement;
@@ -977,7 +977,7 @@ const VideoClipper = (function () {
             
             if (warningState === 'long') {
                 warningElement.style.display = 'block';
-                warningElement.textContent = 'Maximum clip duration is 20 minutes. Please choose a shorter clip.';
+                warningElement.textContent = 'Maximum clip duration is 10 minutes. Please choose a shorter clip.';
                 return false;
             } else if (warningState === 'invalid') {
                 warningElement.style.display = 'block';
