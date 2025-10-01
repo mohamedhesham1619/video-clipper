@@ -482,16 +482,16 @@
                 <div class="box-right"></div>
             </div>
 
-             <!-- Bottom Ad Container -->
-             <div class="container" style="margin: -0.5rem auto 0; padding: 0 !important;">
+            <!-- Bottom Ad Container -->
+            <div class="container" style="margin: -0.5rem auto 0; padding: 0 !important;">
                 <div class="tool-suggestion">
                     <div class="suggestion-content"></div>
                 </div>
             </div>
         </section>
 
-          <!-- Recommended For You Section -->
-          <style>
+        <!-- Recommended For You Section -->
+        <style>
             /* Recommended card image styles */
             .recommended-card .image-wrapper {
                 position: relative;
@@ -948,7 +948,16 @@
     <script src="/js/video-clipper.js"></script>
     <script src="/js/faq.js"></script>
     <script src="/js/floating-button.js"></script>
-    <!-- Overlay will be created dynamically by JavaScript -->
+
+    <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+    <script>
+        kofiWidgetOverlay.draw('videoclipper', {
+            'type': 'floating-chat',
+            'floating-chat.donateButton.text': 'Support Us',
+            'floating-chat.donateButton.background-color': '#f45d22',
+            'floating-chat.donateButton.text-color': '#fff'
+        });
+    </script>
 </body>
 
 </html>

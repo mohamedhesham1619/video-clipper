@@ -275,15 +275,6 @@ const VideoClipper = (function () {
                 if (urlInput) {
                     urlInput.value = '';
             }
-            
-            // Clear time input fields
-            const startTimeInput = getFormElement('start-time');
-            const endTimeInput = getFormElement('end-time');
-            if (startTimeInput) startTimeInput.value = '';
-            if (endTimeInput) endTimeInput.value = '';
-            
-            // Clear any duration display
-            updateDurationDisplay();
         }
     }
 
@@ -698,6 +689,9 @@ const VideoClipper = (function () {
                         resetProgressBar();
                         // Clear form values including URL input
                         clearFormValues();
+                        
+                        // Track the clip and show support popup if needed
+                        trackClipAndShowSupport();
                     }, 3000);
                 } else {
                 throw new Error('Invalid download URL received');
@@ -1796,6 +1790,134 @@ const VideoClipper = (function () {
             `;
             console.log('Test: Progress fill should now be red');
         }
+    }
+
+    // Track clips and show support popup if needed
+    function trackClipAndShowSupport() {
+        try {
+            // Initialize or get the clip count from localStorage
+            let clipsCount = parseInt(localStorage.getItem('clipsCount')) || 0;
+            clipsCount++;
+            localStorage.setItem('clipsCount', clipsCount);
+            
+            // Check if we should show the support popup
+            const isAsked = localStorage.getItem('isAsked') === 'true';
+            
+            if (clipsCount >= 3 && !isAsked) {
+                // Set flag to prevent showing the popup again
+                localStorage.setItem('isAsked', 'true');
+                
+                // Show the support popup
+                showSupportPopup();
+            }
+        } catch (error) {
+            console.error('Error tracking clip count:', error);
+        }
+    }
+    
+    // Show support popup
+    function showSupportPopup() {
+        // Create popup container
+        const popup = document.createElement('div');
+        popup.id = 'support-popup';
+        popup.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2.5rem 3rem;
+            border-radius: 12px;
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
+            z-index: 10000;
+            max-width: 90%;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        `;
+        
+        // Add popup content
+        popup.innerHTML = `
+            <h3 style="margin: 0 0 1.25rem 0; color: #1a1a1a; font-size: 1.75rem; font-weight: 700; line-height: 1.3;">3 videos down already!</h3>
+            <p style="color: #4a5568; line-height: 1.6; margin: 0 0 2rem 0; font-size: 1.1rem;">
+                Looks like you're enjoying VideoClipper! 💙<br>Help us keep it free and running by supporting the project.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 1rem;">
+                <a id="support-yes" href="https://ko-fi.com/videoclipper" target="_blank" style="
+                    background: #f45d22;
+                    color: white;
+                    text-decoration: none;
+                    border: none;
+                    padding: 0.9rem 2.25rem;
+                    border-radius: 6px;
+                    font-weight: 600;
+                    font-size: 1.05rem;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    display: inline-block;
+                ">
+                    Support us
+                </a>
+                <button id="support-no" style="
+                    background: transparent;
+                    color: #4b5563;
+                    border: 1px solid #e5e7eb;
+                    padding: 0.9rem 2.25rem;
+                    border-radius: 6px;
+                    font-weight: 500;
+                    font-size: 1.05rem;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                ">
+                    Not now
+                </button>
+            </div>
+        `;
+        
+        // Add overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'support-popup-overlay';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 9999;
+            backdrop-filter: blur(2px);
+        `;
+        
+        // Add to body
+        document.body.appendChild(overlay);
+        document.body.appendChild(popup);
+        
+        // Add event listeners
+        document.getElementById('support-yes').addEventListener('click', (e) => {
+            // Let the default anchor click behavior handle the navigation
+            closePopup();
+        });
+        
+        document.getElementById('support-no').addEventListener('click', closePopup);
+        // Removed overlay click to close
+        
+        // Close popup function
+        function closePopup() {
+            if (document.body.contains(popup)) {
+                document.body.removeChild(popup);
+            }
+            if (document.body.contains(overlay)) {
+                document.body.removeChild(overlay);
+            }
+        }
+        
+        // Close with Escape key
+        document.addEventListener('keydown', function handleEscape(e) {
+            if (e.key === 'Escape') {
+                closePopup();
+                document.removeEventListener('keydown', handleEscape);
+            }
+        });
     }
 
     // Public API
