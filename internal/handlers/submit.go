@@ -113,6 +113,8 @@ func SubmitHandler(bucket *storage.BucketHandle) http.HandlerFunc {
 			// If the download process was cancelled (the client disconnected or cancelled the download), don't start the download process.
 			if downloadProcess.IsCancelled {
 				slog.Warn("Skipping download start as process was cancelled", "processID", processID)
+				close(progressChan)
+				data.removeDownloadProcess(processID)
 				return
 			}
 			// StartVideoDownloadProcesses function start the download processes and doesn't wait for them to finish instead it returns the running commands
