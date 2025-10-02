@@ -1832,15 +1832,15 @@ const VideoClipper = (function () {
             z-index: 10000;
             max-width: 90%;
             width: 100%;
-            max-width: 600px;
+            max-width: 650px;
             text-align: center;
         `;
         
         // Add popup content
         popup.innerHTML = `
-            <h3 style="margin: 0 0 1.25rem 0; color: #1a1a1a; font-size: 1.75rem; font-weight: 700; line-height: 1.3;">3 videos down already!</h3>
+            <h3 style="margin: 0 0 1.25rem 0; color: #1a1a1a; font-size: 1.75rem; font-weight: 700; line-height: 1.3;">Love using VideoClipper?</h3>
             <p style="color: #4a5568; line-height: 1.6; margin: 0 0 2rem 0; font-size: 1.1rem;">
-                Looks like you're enjoying VideoClipper! 💙<br>Help us keep it free and running by supporting the project.
+                We love seeing you get value from VideoClipper! 💙<br>If it’s been helpful, please consider supporting the project so we can keep it alive, free, and growing with new features for everyone.
             </p>
             <div style="display: flex; justify-content: center; gap: 1rem;">
                 <a id="support-yes" href="https://ko-fi.com/videoclipper" target="_blank" style="
