@@ -440,7 +440,7 @@ function rotateContent() {
 const contentSuggestions = {
     sides: [
         {
-            html: `<a href="https://www.mvvitrk.com/bDig55" 
+            html: `<a href="https://www.mvvitrk.com/click?pid=5677&offer_id=1&l=1759319109" 
             rel="noopener sponsored" 
             target="_blank"
             onclick="gtag('event', 'ad_click', {
@@ -448,7 +448,7 @@ const contentSuggestions = {
                 ad_position: 'side',
                 transport: 'beacon'
             });">
-            <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753699762/300x600_tazs11.png" alt="Movavi Video Editor" style="width: 100%; height: 100%; object-fit: contain;"></a>`
+            <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1759417807/300x600-v3_m07yv2.png" alt="Movavi Video Editor" style="width: 100%; height: 100%; object-fit: contain;"></a>`
         },
         {
             html: `<a href="https://flixier.com?fpr=mh1619"
@@ -544,7 +544,7 @@ document.addEventListener('DOMContentLoaded', function () {
     rotateContent();
 
     // Set up intervals for rotations
-    setInterval(rotateContent, 20000); // Side ads rotation (20 seconds)
+    setInterval(rotateContent, 30000); // Side ads rotation (30 seconds)
 
     // Set up separate interval for bottom ads (every 10 seconds)
     const rotateBottomContent = () => {
@@ -593,8 +593,8 @@ document.addEventListener('DOMContentLoaded', function () {
         rotateBottomContent();
     }
 
-    // Set interval for bottom rotation (20 seconds)
-    setInterval(rotateBottomContent, 20000);
+    // Set interval for bottom rotation (30 seconds)
+    setInterval(rotateBottomContent, 30000);
 });
 
 // Recommended tools data
@@ -730,8 +730,8 @@ const recommended_tools = [
     {
         "name": "Movavi",
         "header": "Your do-it-all video-making bundle",
-        "link": "https://www.mvvitrk.com/bDig55",
-        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1756326278/336x280-v3_ciesw3.png",
+        "link": "https://www.mvvitrk.com/click?pid=5677&offer_id=1&l=1759319109",
+        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1759417834/336x280-v3_bpsexv.png",
         "description": "Auto subtitles with one click, ready-made templates\nHandy video editing, file conversion, and screen recording\nHundreds of drag-and-drop filters, transitions, titles, and overlays\nUse code (PTNAFFDIS010925ALLAFS15) for 15% discount on yearly subscription (valid till 15th October 2025)"
     },
     {
