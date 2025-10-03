@@ -212,18 +212,16 @@ function initRotationElements() {
     if (!domCache.sidePanels.left) {
         domCache.sidePanels.left = document.querySelector('.box-left');
         domCache.sidePanels.right = document.querySelector('.box-right');
-        domCache.bottomContainer = document.querySelector('.tool-suggestion .suggestion-content');
     }
     return {
         leftPanel: domCache.sidePanels.left,
-        rightPanel: domCache.sidePanels.right,
-        bottomContainer: domCache.bottomContainer
+        rightPanel: domCache.sidePanels.right
     };
 }
 
 // Function to rotate content
 function rotateContent() {
-    const { leftPanel, rightPanel, bottomContainer } = initRotationElements();
+    const { leftPanel, rightPanel } = initRotationElements();
 
     // Initialize content arrays if they don't exist
     if (!window.contentRotation) {
@@ -260,7 +258,6 @@ function rotateContent() {
 
         // Shuffle side and bottom ads once
         const shuffledSideItems = shuffleArray([...sideItems]);
-        const shuffledBottomContent = shuffleArray([...contentSuggestions.bottom]);
 
         // Initialize content rotation with pre-shuffled ad pairs
         window.contentRotation = {
@@ -270,12 +267,7 @@ function rotateContent() {
             // Create pairs from the pre-shuffled items
             adPairs: createAdPairs([...shuffledSideItems]),
             // Track current pair index
-            currentPairIndex: 0,
-            // Bottom content - use pre-shuffled array
-            bottomContent: [...shuffledBottomContent],
-            currentBottomIndex: 0,
-            // Remove reshuffling flag since we're not doing it anymore
-            isRotatingBottom: false
+            currentPairIndex: 0
         };
     }
 
@@ -367,8 +359,8 @@ function rotateContent() {
             // No need to reshuffle, just loop back to the start
             // We're using the same shuffled list for all rotations
 
-            // Rotate bottom content
-            rotateBottomContent();
+            // Reset rotation flag
+            window.contentRotation.isRotating = false;
 
         }).catch(error => {
             console.error('Rotation error:', error);
@@ -376,61 +368,6 @@ function rotateContent() {
         });
     };
 
-    // Rotate bottom content
-    const rotateBottomContent = () => {
-        if (bottomContainer && window.contentRotation.bottomContent.length > 0) {
-            // First fade out (slower fade out) and update content immediately
-            bottomContainer.style.transition = 'opacity 1.5s ease-out';
-            bottomContainer.style.opacity = '0';
-
-            // Update content immediately after starting fade out
-            const currentContent = window.contentRotation.bottomContent[window.contentRotation.currentBottomIndex];
-            if (currentContent?.html) {
-                bottomContainer.style.display = 'flex';
-                bottomContainer.innerHTML = `<div class="content-item">${currentContent.html}</div>`;
-                bottomContainer.style.transition = 'opacity 0s, transform 0s';
-                bottomContainer.style.opacity = '0';
-                bottomContainer.style.transform = 'translateY(10px)';
-            }
-
-            // After fade out completes, start fade in
-            setTimeout(() => {
-                if (!bottomContainer) {
-                    window.contentRotation.isRotating = false;
-                    return;
-                }
-
-                if (!currentContent?.html) {
-                    bottomContainer.style.display = 'none';
-                    window.contentRotation.isRotating = false;
-                    return;
-                }
-
-                // Force reflow
-                void bottomContainer.offsetHeight;
-
-                // Fade in with slide up
-                bottomContainer.style.opacity = '1';
-                bottomContainer.style.transform = 'translateY(0)';
-
-                // Update index for next rotation
-                window.contentRotation.currentBottomIndex = (window.contentRotation.currentBottomIndex + 1) % window.contentRotation.bottomContent.length;
-
-                // No need to reshuffle, just loop back to the start
-                // We're using the same shuffled list for all rotations
-
-                // Reset rotation flag after all animations complete
-                setTimeout(() => {
-                    window.contentRotation.isRotating = false;
-                }, 500);
-            }, 1500); // Wait for fade out to complete (1.5s)
-        } else {
-            if (bottomContainer) {
-                bottomContainer.style.display = 'none';
-            }
-            window.contentRotation.isRotating = false;
-        }
-    };
 
     // Start the rotation sequence
     rotateSideContent();
@@ -494,45 +431,14 @@ const contentSuggestions = {
             });">
             <img src="//a.impactradius-go.com/display-ad/22474-3069242" border="0" alt="" width="160" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/3069242/22474" style="position:absolute;visibility:hidden;" border="0" />
             `
-        }
-    ],
-    bottom: [
-        {
-            html: `<a href="https://partner.pcloud.com/r/146969" 
-            title="pCloud Premium" 
-            rel="sponsored"
-            target="_blank"
-            onclick="gtag('event', 'ad_click', {
-                ad_name: 'Pcloud',
-                ad_position: 'bottom',
-                transport: 'beacon'
-            });">
-            <img src="https://partner.pcloud.com/media/banners/lifetime/lifetime00772890.jpg" alt="pCloud Premium" loading="lazy"/></a>`
         },
         {
-            html: `<a href="https://go.nordvpn.net/aff_c?offer_id=15&amp;aff_id=127970&amp;url_id=902"
-    
-            rel="noopener sponsored"
-            target="_blank"
-            onclick="gtag('event', 'ad_click', {
-                ad_name: 'NordVPN',
-                ad_position: 'bottom',
+            html: `<a href="https://partner.pcloud.com/r/146969" title="pCloud Premium" target="_blank" onclick="gtag('event', 'ad_click', {
+                ad_name: 'pCloud Premium',
+                ad_position: 'side',
                 transport: 'beacon'
-            });">
-               <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1756161613/nordvpn-728x90-en-us_wc4ng1.png" alt="NordVPN" style="width: 100%; max-height: 90px; object-fit: contain;" loading="lazy" /></a>`
-        },
-        {
-            html: `<a href="https://privadovpn.com/resources/best-vpn-for-gaming#a_aid=1619&a_bid=203d5f79"
-            rel="noopener sponsored"
-            target="_blank"
-            onclick="gtag('event', 'ad_click', {
-                ad_name: 'PrivadoVPN',
-                ad_position: 'bottom',
-                transport: 'beacon'
-            });">
-               <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1753306325/728x90_c9y6b3.png" alt="PrivadoVPN" style="width: 100%; max-height: 90px; object-fit: contain;" loading="lazy" /></a>`
+            });"><img src="https://partner.pcloud.com/media/banners/lifetime/lifetime008160600.jpg" alt="pCloud Premium"/></a>`
         }
-
     ]
 };
 
@@ -540,61 +446,11 @@ const contentSuggestions = {
 
 // Initialize content rotation when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function () {
-    // Initial rotation
+    // Initial rotation for side panels
     rotateContent();
 
-    // Set up intervals for rotations
-    setInterval(rotateContent, 30000); // Side ads rotation (30 seconds)
-
-    // Set up separate interval for bottom ads (every 10 seconds)
-    const rotateBottomContent = () => {
-        const bottomContainer = document.querySelector('.tool-suggestion .suggestion-content');
-        if (!bottomContainer || !window.contentRotation?.bottomContent?.length) return;
-
-        if (window.contentRotation.isRotatingBottom) return;
-        window.contentRotation.isRotatingBottom = true;
-
-        // Fade out
-        bottomContainer.style.transition = 'opacity 0.5s ease-out';
-        bottomContainer.style.opacity = '0';
-
-        // Update content after fade out
-        setTimeout(() => {
-            const currentContent = window.contentRotation.bottomContent[window.contentRotation.currentBottomIndex];
-            if (currentContent?.html) {
-                bottomContainer.style.display = 'flex';
-                bottomContainer.innerHTML = `<div class="content-item">${currentContent.html}</div>`;
-                bottomContainer.style.transition = 'opacity 0s, transform 0s';
-                bottomContainer.style.opacity = '0';
-                bottomContainer.style.transform = 'translateY(10px)';
-
-                // Force reflow
-                void bottomContainer.offsetHeight;
-
-                // Fade in
-                bottomContainer.style.transition = 'opacity 0.5s ease-in, transform 0.5s ease-in';
-                bottomContainer.style.opacity = '1';
-                bottomContainer.style.transform = 'translateY(0)';
-
-                // Update index for next rotation (loop back to start if we reach the end)
-                // We update it here but after a delay to ensure the current ad is shown
-                setTimeout(() => {
-                    window.contentRotation.currentBottomIndex =
-                        (window.contentRotation.currentBottomIndex + 1) % window.contentRotation.bottomContent.length;
-                }, 100);
-            }
-
-            window.contentRotation.isRotatingBottom = false;
-        }, 500); // Wait for fade out to complete
-    };
-
-    // Initial bottom rotation
-    if (window.contentRotation) {
-        rotateBottomContent();
-    }
-
-    // Set interval for bottom rotation (30 seconds)
-    setInterval(rotateBottomContent, 30000);
+    // Set up interval for side ads rotation (30 seconds)
+    setInterval(rotateContent, 30000);
 });
 
 // Recommended tools data
@@ -709,7 +565,7 @@ const recommended_tools = [
         "name": "Pcloud",
         "header": "Smart Virtual Drive—Cloud Storage That Works Like Local",
         "link": "https://partner.pcloud.com/r/146969",
-        "image": "https://partner.pcloud.com/media/banners/personal/personal008300250.jpg",
+        "image": "https://partner.pcloud.com/media/banners/personal/personal005300250.jpg",
         "description": "Start with free 10GB, expand easily, or lock in lifetime access for one fee.\nEnjoy built-in media streaming, automatic cross‑platform backups, and file previews.\nOptional Crypto encryption gives you exclusive control over sensitive files."
     },
     {
@@ -733,20 +589,6 @@ const recommended_tools = [
         "link": "https://www.mvvitrk.com/click?pid=5677&offer_id=1&l=1759319109",
         "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1759417834/336x280-v3_bpsexv.png",
         "description": "Auto subtitles with one click, ready-made templates\nHandy video editing, file conversion, and screen recording\nHundreds of drag-and-drop filters, transitions, titles, and overlays\nUse code (PTNAFFDIS010925ALLAFS15) for 15% discount on yearly subscription (valid till 15th October 2025)"
-    },
-    {
-        "name": "NordVPN",
-        "header": "Trusted by Millions, Audited for Privacy – Take your online security to the next level with NordVPN",
-        "link": "https://go.nordvpn.net/aff_c?offer_id=15&aff_id=127970&url_id=902",
-        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1756161613/nordvpn-480x320-en-us_cgexjk.jpg",
-        "description": "Threat Protection Pro blocks malware, trackers, and phishing sites in real-time.\nDark Web Monitor alerts you if your credentials appear in data breaches.\nSplit tunneling, dedicated IP, and Meshnet secure all your devices—even across continents."
-    },
-    {
-        "name": "PrivadoVPN",
-        "header": "Budget VPN Built for Privacy & Streaming",
-        "link": "https://privadovpn.com/getprivadovpn/#a_aid=1619",
-        "image": "https://affiliates.privadovpn.com/accounts/default1/3abd4o9y/fb34eb50.png?t=1632790058",
-        "description": "Deep discounts with long-term plans: ultra-low pricing from $1.11/month*.\nReliable speeds for HD streaming and browsing on global servers.\nPremium features like unlimited devices, streaming unblock & ad blocking."
     }
 ];
 

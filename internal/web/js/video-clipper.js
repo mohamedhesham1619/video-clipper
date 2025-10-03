@@ -1359,53 +1359,106 @@ const VideoClipper = (function () {
             }
 
             try {
-                // Focus the input first
+                // Focus the input first and show loading state
                 videoUrlInput.focus();
+                showLoading();
 
-                // On mobile, show instructions
+                // On mobile, use a different approach
                 if (isMobile) {
-                    urlErrorElement.textContent = 'Tap and hold in the input field, then select "Paste"';
-                    urlErrorElement.style.display = 'block';
+                    // For mobile, we'll use a temporary input to capture the paste
+                    const tempInput = document.createElement('input');
+                    tempInput.style.position = 'fixed';
+                    tempInput.style.opacity = 0;
+                    tempInput.style.pointerEvents = 'none';
+                    document.body.appendChild(tempInput);
+                    
+                    // Focus and select the temp input
+                    tempInput.focus();
+                    
+                    // Use a timeout to handle async nature of mobile paste
+                    setTimeout(async () => {
+                        try {
+                            // Try modern clipboard API first
+                            if (navigator.clipboard && navigator.clipboard.readText) {
+                                const text = await navigator.clipboard.readText();
+                                if (text && text.trim()) {
+                                    handlePasteSuccess(text);
+                                    document.body.removeChild(tempInput);
+                                    return;
+                                }
+                            }
+                            
+                            // If we get here, modern API failed - show instructions
+                            urlErrorElement.textContent = 'Tap and hold in the input field, then select "Paste"';
+                            urlErrorElement.style.display = 'block';
+                            videoUrlInput.focus();
+                            
+                        } catch (err) {
+                            console.error('Clipboard access error:', err);
+                            urlErrorElement.textContent = 'Please tap and hold in the input field to paste';
+                            urlErrorElement.style.display = 'block';
+                            videoUrlInput.focus();
+                        } finally {
+                            document.body.removeChild(tempInput);
+                            setTimeout(resetButton, 2000);
+                        }
+                    }, 0);
                     return;
                 }
 
-                // Show loading state
-                showLoading();
-
-                // Try to read from clipboard
-                if (navigator.clipboard && navigator.clipboard.readText) {
-                    try {
-                        const permission = await navigator.permissions.query({ name: 'clipboard-read' });
-                        if (permission.state === 'denied') {
-                            throw new Error('Clipboard permission denied');
-                        }
-                        
-                        const text = await navigator.clipboard.readText();
-                        if (text && text.trim()) {
-                            handlePasteSuccess(text);
-                        } else {
+                // For desktop browsers
+                try {
+                    // Try modern clipboard API with permission check
+                    if (navigator.clipboard && navigator.clipboard.readText) {
+                        try {
+                            const permission = await navigator.permissions.query({ name: 'clipboard-read' });
+                            if (permission.state === 'denied') {
+                                throw new Error('Clipboard permission denied');
+                            }
+                            
+                            const text = await navigator.clipboard.readText();
+                            if (text && text.trim()) {
+                                handlePasteSuccess(text);
+                                return;
+                            }
                             throw new Error('Clipboard is empty');
+                        } catch (err) {
+                            console.warn('Modern clipboard API failed, falling back to execCommand');
+                            throw err; // Will be caught by the outer catch
                         }
-                    } catch (err) {
-                        console.error('Clipboard access error:', err);
-                        // Fallback to document.execCommand for older browsers
+                    }
+                    
+                    // Fallback for browsers that don't support the modern Clipboard API
+                    try {
+                        // Show instructions for manual paste
+                        urlErrorElement.textContent = 'Please use Ctrl+V to paste or type the URL';
+                        urlErrorElement.style.display = 'block';
+                        videoUrlInput.focus();
+                        
+                        // Focus the input and select all text to make manual paste easier
                         videoUrlInput.select();
-                        const success = document.execCommand('paste');
-                        if (!success) {
-                            throw new Error('Could not access clipboard');
-                        }
+                        
+                        // Reset the button after a short delay
+                        setTimeout(resetButton, 2000);
+                        return;
+                    } catch (execCommandErr) {
+                        console.warn('execCommand failed:', execCommandErr);
+                        // Continue to show instructions
                     }
-                } else {
-                    // Fallback for older browsers
-                    videoUrlInput.select();
-                    const success = document.execCommand('paste');
-                    if (!success) {
-                        throw new Error('Clipboard API not supported');
-                    }
+                    
+                    // If we get here, all methods failed
+                    throw new Error('Could not access clipboard');
+                    
+                } catch (err) {
+                    console.error('Paste error:', err);
+                    urlErrorElement.textContent = 'Please use Ctrl+V to paste the URL';
+                    urlErrorElement.style.display = 'block';
+                    videoUrlInput.focus();
                 }
+                
             } catch (err) {
-                console.error('Paste error:', err);
-                urlErrorElement.textContent = 'Please paste manually (Ctrl+V) or type the URL';
+                console.error('Unexpected error in paste handler:', err);
+                urlErrorElement.textContent = 'Please paste manually (Ctrl+V)';
                 urlErrorElement.style.display = 'block';
             } finally {
                 // Reset the button after a short delay
@@ -1415,27 +1468,176 @@ const VideoClipper = (function () {
 
         // Initialize input field for mobile
         const initMobileInput = () => {
-            // Ensure input field is editable
+            // Ensure input field is editable and visible
             videoUrlInput.removeAttribute('readonly');
             videoUrlInput.removeAttribute('disabled');
+            videoUrlInput.setAttribute('inputmode', 'url');
+            videoUrlInput.setAttribute('autocapitalize', 'off');
+            videoUrlInput.setAttribute('autocomplete', 'on');
+            videoUrlInput.setAttribute('autocorrect', 'off');
+            videoUrlInput.setAttribute('spellcheck', 'false');
 
             // Reset any problematic styles
-            videoUrlInput.style.cssText = '';
+            videoUrlInput.style.cssText = `
+                -webkit-appearance: none;
+                -moz-appearance: textfield;
+                appearance: none;
+                width: 100%;
+                min-height: 44px;  /* Minimum touch target size */
+                padding: 8px 12px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                font-size: 16px;  /* Prevent iOS zoom on focus */
+                line-height: 1.5;
+            `;
 
-            // Ensure standard input behavior
-            videoUrlInput.style.webkitAppearance = 'none';
-            videoUrlInput.style.MozAppearance = 'textfield';
-            videoUrlInput.style.appearance = 'none';
+            // Add a tap handler to help with mobile focus issues
+            const handleTap = (e) => {
+                e.preventDefault();
+                videoUrlInput.focus();
+                
+                // Show keyboard on mobile
+                if (document.activeElement !== videoUrlInput) {
+                    videoUrlInput.focus();
+                    // Small delay to ensure focus is set before showing keyboard
+                    setTimeout(() => {
+                        videoUrlInput.selectionStart = videoUrlInput.selectionEnd = 10000;
+                    }, 100);
+                }
+            };
+
+            // Add touch events for better mobile support
+            videoUrlInput.addEventListener('touchstart', handleTap, { passive: true });
+            videoUrlInput.addEventListener('click', handleTap);
+            
+            // Enhanced paste handling for mobile
+            const handlePasteEvent = (e) => {
+                try {
+                    const clipboardData = e.clipboardData || (window.clipboardData && window.clipboardData.getData) ? window.clipboardData : null;
+                    if (!clipboardData) return;
+
+                    // Get pasted text
+                    const pastedText = clipboardData.getData('text/plain');
+                    if (!pastedText) return;
+                    
+                    e.preventDefault();
+                    
+                    // Get current cursor position
+                    const start = videoUrlInput.selectionStart;
+                    const end = videoUrlInput.selectionEnd;
+                    
+                    // Insert text at cursor position
+                    const currentValue = videoUrlInput.value;
+                    const newValue = currentValue.substring(0, start) + pastedText + currentValue.substring(end);
+                    
+                    // Update input value
+                    videoUrlInput.value = newValue;
+                    
+                    // Update cursor position
+                    const newPos = start + pastedText.length;
+                    requestAnimationFrame(() => {
+                        videoUrlInput.setSelectionRange(newPos, newPos);
+                        // Trigger input event for any listeners
+                        videoUrlInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        videoUrlInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    });
+                    
+                    // Show success feedback
+                    if (isMobile) {
+                        urlErrorElement.textContent = 'Pasted successfully!';
+                        urlErrorElement.style.color = '#10b981';
+                        urlErrorElement.style.display = 'block';
+                        setTimeout(() => {
+                            urlErrorElement.style.display = 'none';
+                        }, 2000);
+                    }
+                } catch (err) {
+                    console.error('Paste handler error:', err);
+                }
+            };
+            
+            // Add paste event listeners
+            videoUrlInput.addEventListener('paste', handlePasteEvent, { passive: false });
+            
+            // For iOS Safari which sometimes needs this
+            videoUrlInput.addEventListener('input', (e) => {
+                // This helps with some iOS paste issues
+                if (e.inputType === 'insertFromPaste' || e.inputType === 'insertText') {
+                    videoUrlInput.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            });
         };
 
         // Initialize mobile input if needed
         if (isMobile) {
             initMobileInput();
-            pasteButton.title = 'Tap to paste (long-press in the input field)';
+            
+            // For mobile, we'll use a different approach
+            const handleMobilePaste = async () => {
+                try {
+                    // Show loading state
+                    showLoading();
+                    
+                    // Try to read from clipboard
+                    if (navigator.clipboard && navigator.clipboard.readText) {
+                        try {
+                            const text = await navigator.clipboard.readText();
+                            if (text && text.trim()) {
+                                // Insert the text and show success
+                                videoUrlInput.value = text;
+                                videoUrlInput.dispatchEvent(new Event('input', { bubbles: true }));
+                                
+                                // Show success feedback
+                                urlErrorElement.textContent = 'Pasted successfully!';
+                                urlErrorElement.style.color = '#10b981';
+                                urlErrorElement.style.display = 'block';
+                                setTimeout(() => {
+                                    urlErrorElement.style.display = 'none';
+                                }, 2000);
+                                return;
+                            }
+                        } catch (err) {
+                            console.log('Clipboard API not available or permission denied');
+                        }
+                    }
+                    
+                    // If we get here, show instructions for manual paste
+                    urlErrorElement.textContent = 'Please tap and hold in the input field to paste';
+                    urlErrorElement.style.display = 'block';
+                    videoUrlInput.focus();
+                    
+                    // Set a temporary input for better mobile paste experience
+                    const tempInput = document.createElement('input');
+                    tempInput.type = 'text';
+                    tempInput.style.position = 'fixed';
+                    tempInput.style.opacity = 0;
+                    tempInput.style.pointerEvents = 'none';
+                    document.body.appendChild(tempInput);
+                    tempInput.focus();
+                    
+                    // Clean up after a short delay
+                    setTimeout(() => {
+                        document.body.removeChild(tempInput);
+                        videoUrlInput.focus();
+                        setTimeout(resetButton, 1000);
+                    }, 500);
+                    
+                } catch (err) {
+                    console.error('Mobile paste error:', err);
+                    urlErrorElement.textContent = 'Please tap and hold in the input field to paste';
+                    urlErrorElement.style.display = 'block';
+                    videoUrlInput.focus();
+                    setTimeout(resetButton, 1000);
+                }
+            };
+            
+            // Use the mobile-specific handler
+            pasteButton.addEventListener('click', handleMobilePaste);
+            pasteButton.title = 'Tap to paste from clipboard';
+        } else {
+            // Use the regular handler for desktop
+            pasteButton.addEventListener('click', handlePaste);
         }
-
-        // Add event listeners
-        pasteButton.addEventListener('click', handlePaste);
         
         // Add input event listener for live URL validation
         videoUrlInput.addEventListener('input', function() {
