@@ -57,7 +57,6 @@ func New(cfg *config.Config) *Server {
 	mux.HandleFunc("/progress/", handlers.ProgressHandler)
 	mux.HandleFunc("/cancel/", handlers.CancelHandler)
 	mux.HandleFunc("/feedback", handlers.FeedbackHandler(cfg))
-	mux.HandleFunc("/check-ytdlp-update", handlers.CheckForYtDlpUpdateHandler)
 	mux.HandleFunc("/stats/clips", handlers.StatsHandler(cfg))
 
 	// Static page routes

@@ -90,7 +90,7 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 				data.cleanupDownloadProcess(processID)
 
 				// The download could fail if yt-dlp is outdated, so we check for updates and rebuild the container if necessary.
-				go utils.CheckForYtDlpUpdate()
+				go utils.CheckAndUpdateYtDlp()
 				return
 			}
 

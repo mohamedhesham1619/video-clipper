@@ -47,6 +47,9 @@ func main() {
 		slog.Error("Failed to load blocked domains", "error", err)
 	}
 
+	// Start yt-dlp daily updater
+	utils.StartYtDlpDailyUpdater()
+
 	// --- Server Initialization ---
 	srv := server.New(cfg)
 
