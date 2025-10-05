@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"clipper/internal/config"
 	"clipper/internal/models"
 	"fmt"
 	"io"
@@ -13,14 +14,14 @@ import (
 )
 
 // StartVideoDownloadProcesses starts the video download processes and returns the running commands.
-func StartVideoDownloadProcesses(videoRequest models.VideoRequest, videoTitle string, downloadProcess *models.DownloadProcess) (ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd, err error) {
+func StartVideoDownloadProcesses(cfg *config.Config, videoRequest models.VideoRequest, videoTitle string, downloadProcess *models.DownloadProcess) (ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd, err error) {
 
-	// Set the download path.
-	downloadPath := filepath.Join("/tmp", videoTitle)
+	// Build the download path and save it to the download process struct.
+	downloadPath := filepath.Join(cfg.App.DownloadPath, videoTitle)
 	downloadProcess.DownloadPath = downloadPath
 
 	// Create the yt-dlp and ffmpeg commands.
-	ytdlpCmd = prepareYtDlpCommand(videoRequest)
+	ytdlpCmd = prepareYtDlpCommand(cfg, videoRequest)
 	ffmpegCmd = prepareFfmpegCommand(downloadPath)
 
 	// Prepare the pipes for yt-dlp, ffmpeg.
@@ -63,7 +64,7 @@ func IsYouTubeURL(url string) bool {
 	return strings.Contains(url, "youtube.com") || strings.Contains(url, "youtu.be")
 }
 
-func prepareYtDlpCommand(videoRequest models.VideoRequest) *exec.Cmd {
+func prepareYtDlpCommand(cfg *config.Config, videoRequest models.VideoRequest) *exec.Cmd {
 
 	var formatString string
 
@@ -86,7 +87,7 @@ func prepareYtDlpCommand(videoRequest models.VideoRequest) *exec.Cmd {
 		"-o", "-", // Output to stdout
 	}
 	if IsYouTubeURL(videoRequest.VideoURL) {
-		args = append(args, "--cookies", "/tmp/cookie.txt")
+		args = append(args, "--cookies", cfg.YouTube.CookiePath)
 	}
 	args = append(args, videoRequest.VideoURL)
 	return exec.Command("yt-dlp", args...)

@@ -26,6 +26,8 @@ COPY --from=builder /app/internal/data/blocked_domains.txt ./internal/data/
 COPY --from=builder /app/internal/web ./internal/web
 COPY --from=builder /app/build/clipper .
 
+RUN mkdir -p /app/clips
+
 EXPOSE 8080
 
 CMD ["./clipper"]

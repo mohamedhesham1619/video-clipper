@@ -3,6 +3,7 @@ package handlers
 import (
 	"clipper/internal/models"
 	"log/slog"
+	"os"
 	"os/exec"
 	"sync"
 )
@@ -29,7 +30,19 @@ func (s *sharedData) getDownloadProcess(processID string) (*models.DownloadProce
 	return downloadProcess, exists
 }
 
-func (s *sharedData) removeDownloadProcess(processID string) {
+func (s *sharedData) cleanupDownloadProcess(processID string) {
+	
+	downloadProcess, exists := s.getDownloadProcess(processID)
+	if !exists {
+		slog.Warn("Couldn't cleanup download process because it doesn't exist", "processID", processID)
+		return
+	}
+
+	// Remove the downloaded file
+	if err := os.Remove(downloadProcess.DownloadPath); err != nil {
+		slog.Error("Error removing download file", "error", err, "filePath", downloadProcess.DownloadPath)
+	}
+	
 	s.mu.Lock()
 	delete(s.downloadProcesses, processID)
 	s.mu.Unlock()
@@ -86,7 +99,7 @@ func (s *sharedData) stopDownloadProcessAndCleanUp(processID string) {
 	// If either process was running and was stopped, it's a true cancellation, so clean up.
 	// If neither was running, the download process was already complete, so we let the submit handler clean up.
 	if ffmpegStopped || ytdlpStopped {
-		s.removeDownloadProcess(processID)
+		s.cleanupDownloadProcess(processID)
 		slog.Warn("Download process stopped and resources cleaned up", "processID", processID)
 	} else {
 		slog.Info("Download process already finished; no need to stop or clean up", "processID", processID)

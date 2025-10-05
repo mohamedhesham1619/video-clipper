@@ -1,6 +1,7 @@
 package server
 
 import (
+	"clipper/internal/config"
 	"clipper/internal/handlers"
 	"log/slog"
 	"net"
@@ -9,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	storage "cloud.google.com/go/storage"
 	"github.com/ulule/limiter/v3"
 	limiterMiddleware "github.com/ulule/limiter/v3/drivers/middleware/stdlib"
 	memoryStore "github.com/ulule/limiter/v3/drivers/store/memory"
@@ -19,7 +19,7 @@ type Server struct {
 	mux *http.ServeMux
 }
 
-func New(bucket *storage.BucketHandle) *Server {
+func New(cfg *config.Config) *Server {
 	mux := http.NewServeMux()
 
 	// Rate limiter: 4 requests per 2 hours per IP
@@ -53,12 +53,12 @@ func New(bucket *storage.BucketHandle) *Server {
 
 	// Main app routes
 	mux.HandleFunc("/", handlers.HomeHandler)
-	mux.Handle("/submit", limiterMw.Handler(handlers.SubmitHandler(bucket)))
+	mux.Handle("/submit", limiterMw.Handler(handlers.SubmitHandler(cfg)))
 	mux.HandleFunc("/progress/", handlers.ProgressHandler)
 	mux.HandleFunc("/cancel/", handlers.CancelHandler)
-	mux.HandleFunc("/feedback", handlers.FeedbackHandler)
+	mux.HandleFunc("/feedback", handlers.FeedbackHandler(cfg))
 	mux.HandleFunc("/check-ytdlp-update", handlers.CheckForYtDlpUpdateHandler)
-	mux.HandleFunc("/stats/clips", handlers.StatsHandler)
+	mux.HandleFunc("/stats/clips", handlers.StatsHandler(cfg))
 
 	// Static page routes
 	mux.HandleFunc("/contact", handlers.ContactPageHandler)

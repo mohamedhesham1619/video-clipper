@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"clipper/internal/config"
 	"clipper/internal/models"
 	"clipper/internal/utils"
 	"encoding/json"
@@ -8,65 +9,60 @@ import (
 	"log/slog"
 	"net/http"
 	"net/smtp"
-	"os"
 )
 
-func FeedbackHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
+func FeedbackHandler(cfg *config.Config) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
 
-	var feedback models.FeedbackRequest
-	if err := json.NewDecoder(r.Body).Decode(&feedback); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
+		var feedback models.FeedbackRequest
+		if err := json.NewDecoder(r.Body).Decode(&feedback); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
 
-	// Validate required message field
-	if feedback.Message == "" {
-		http.Error(w, "Message is required", http.StatusBadRequest)
-		return
-	}
+		// Validate required message field
+		if feedback.Message == "" {
+			http.Error(w, "Message is required", http.StatusBadRequest)
+			return
+		}
 
-	slog.Info("Feedback received",
-		"message", feedback.Message,
-		"email", feedback.Email,
-		"timestamp", utils.GetEgyptTime(),
-		"userAgent", r.UserAgent(),
-		"ip", r.RemoteAddr)
+		userIP := getUserIP(r)
 
-	// Send email if SMTP is configured
-	if os.Getenv("SMTP_HOST") != "" {
-		if err := sendFeedbackEmail(feedback, r.UserAgent(), r.RemoteAddr); err != nil {
+		slog.Info("Feedback received",
+			"message", feedback.Message,
+			"email", feedback.Email,
+			"timestamp", utils.GetEgyptTime(),
+			"userAgent", r.UserAgent(),
+			"ip", userIP)
+
+		// Send email if SMTP is configured
+		if err := sendFeedbackEmail(cfg, feedback, r.UserAgent(), userIP); err != nil {
 			slog.Error("Failed to send feedback email", "error", err)
 			// Don't fail the request if email fails, just log it
 		} else {
 			slog.Info("Feedback email sent successfully")
 		}
-	} else {
-		slog.Info("SMTP not configured, feedback logged only")
-	}
 
-	response := models.FeedbackResponse{
-		Status:  "success",
-		Message: "Thank you for your feedback!",
-	}
+		response := models.FeedbackResponse{
+			Status:  "success",
+			Message: "Thank you for your feedback!",
+		}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}
 }
 
-func sendFeedbackEmail(feedback models.FeedbackRequest, userAgent, ip string) error {
-	smtpHost := os.Getenv("SMTP_HOST")
-	smtpPort := os.Getenv("SMTP_PORT")
-	smtpUser := os.Getenv("SMTP_USER")
-	smtpPass := os.Getenv("SMTP_PASS")
-	toEmail := os.Getenv("FEEDBACK_EMAIL")
-
-	if smtpHost == "" || smtpUser == "" || smtpPass == "" || toEmail == "" {
-		return fmt.Errorf("missing SMTP configuration")
-	}
+func sendFeedbackEmail(cfg *config.Config, feedback models.FeedbackRequest, userAgent, ip string) error {
+	smtpHost := cfg.SMTP.Host
+	smtpPort := cfg.SMTP.Port
+	smtpUser := cfg.SMTP.Username
+	smtpPass := cfg.SMTP.Password
+	toEmail := cfg.SMTP.FeedbackMail
 
 	subject := "[VideoClipper Feedback] New Feedback Received"
 

@@ -2005,7 +2005,7 @@ const VideoClipper = (function () {
             // Check if we should show the support popup
             const isAsked = localStorage.getItem('isAsked') === 'true';
             
-            if (clipsCount >= 3 && !isAsked) {
+            if (clipsCount >= 6 && !isAsked) {
                 // Set flag to prevent showing the popup again
                 localStorage.setItem('isAsked', 'true');
                 

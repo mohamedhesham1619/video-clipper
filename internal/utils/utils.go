@@ -1,13 +1,12 @@
 package utils
 
 import (
+	"clipper/internal/config"
 	"clipper/internal/models"
 	"context"
 	"fmt"
-	"io"
 	"log/slog"
 	"math/rand/v2"
-	"os"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -92,7 +91,7 @@ func SanitizeName(name string, opts *SanitizeOptions) string {
 }
 
 // getVideoTitle retrieves the video title using yt-dlp.
-func GetVideoTitle(videoRequest models.VideoRequest) (string, error) {
+func GetVideoTitle(cfg *config.Config, videoRequest models.VideoRequest) (string, error) {
 	args := []string{
 		"-f", fmt.Sprintf("bv*[height<=%[1]v]+ba/b[height<=%[1]v]/best", videoRequest.Quality),
 		"--print", "%(title).220s-%(height)sp.mp4",
@@ -105,7 +104,7 @@ func GetVideoTitle(videoRequest models.VideoRequest) (string, error) {
 		"--retries", "2",
 	}
 	if IsYouTubeURL(videoRequest.VideoURL) {
-		args = append(args, "--cookies", "/tmp/cookie.txt")
+		args = append(args, "--cookies", cfg.YouTube.CookiePath)
 	}
 	args = append(args, videoRequest.VideoURL)
 	infoCmd := exec.Command("yt-dlp", args...)
@@ -191,32 +190,8 @@ func GetEgyptTime() string {
 	return time.Now().In(location).Format("2006-01-02 3:04:05 PM")
 }
 
-// CopyCookieToTmp copies the cookie file to /tmp so yt-dlp can write to it.
-func CopyCookieToTmp() error {
-	srcPath := "/secrets/cookie.txt"
-	dstPath := "/tmp/cookie.txt"
-
-	src, err := os.Open(srcPath)
-	if err != nil {
-		return err
-	}
-	defer src.Close()
-
-	dst, err := os.Create(dstPath)
-	if err != nil {
-		return err
-	}
-	defer dst.Close()
-
-	_, err = io.Copy(dst, src)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func IncrementClipCount(ctx context.Context, client *firestore.Client) error {
-	_, err := client.Collection("stats").Doc("clips").Update(ctx, []firestore.Update{
+func IncrementClipCount(client *firestore.Client) error {
+	_, err := client.Collection("stats").Doc("clips").Update(context.Background(), []firestore.Update{
 		{
 			Path:  "count",
 			Value: firestore.Increment(1),
