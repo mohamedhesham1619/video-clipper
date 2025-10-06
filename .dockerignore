@@ -7,3 +7,4 @@ Dockerfile
 .env
 cookie.txt
 clipper.json
+clips/
