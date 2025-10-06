@@ -58,6 +58,7 @@ func New(cfg *config.Config) *Server {
 	mux.HandleFunc("/cancel/", handlers.CancelHandler)
 	mux.HandleFunc("/feedback", handlers.FeedbackHandler(cfg))
 	mux.HandleFunc("/stats/clips", handlers.StatsHandler(cfg))
+	mux.HandleFunc("/download/", handlers.DownloadHandler)
 
 	// Static page routes
 	mux.HandleFunc("/contact", handlers.ContactPageHandler)
