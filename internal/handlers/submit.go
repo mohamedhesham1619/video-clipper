@@ -156,6 +156,7 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 
 			// Schedule cleanup of the download process
 			time.AfterFunc(20*time.Minute, func() {
+				slog.Info("Cleaning up download process", "processId", processID)
 				data.cleanupDownloadProcess(processID)
 			})
 
