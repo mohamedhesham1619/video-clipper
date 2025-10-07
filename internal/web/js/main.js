@@ -459,13 +459,6 @@ function createToolCard(tool) {
     const card = document.createElement('div');
     card.className = 'recommended-card';
 
-    // Process description
-    const description = tool.description.trim();
-    const hasNewlines = description.includes('\n');
-    const descriptionHtml = hasNewlines
-        ? description.split('\n').filter(line => line.trim() !== '').join('<br>')
-        : description;
-
     const trackingOnClick = `onclick="gtag('event', 'ad_click', {
         ad_name: '${tool.name}',
         ad_position: 'recommended_tool',
@@ -484,25 +477,11 @@ function createToolCard(tool) {
                     font-size: 1.1rem !important;
                     font-weight: 600 !important;
                     color: #1f2937 !important;
-                    margin: 0 0 0.75rem 0 !important;
+                    margin: 0 0 1.5rem 0 !important;
                     line-height: 1.3 !important;
                 ">
                     ${tool.header}
                 </h3>
-                <div class="recommended-desc">
-                    <p class="recommended-description" style="
-                        font-size: 1.05rem !important;
-                        color: #1f2937 !important;
-                        margin: 0.5rem 0 1.5rem 0 !important;
-                        line-height: 1.7 !important;
-                        font-weight: 420 !important;
-                        letter-spacing: 0.02em !important;
-                        text-rendering: optimizeLegibility !important;
-                        -webkit-font-smoothing: antialiased !important;
-                    ">
-                        ${descriptionHtml}
-                    </p>
-                </div>
                 <a href="${tool.link}" rel="noopener sponsored" target="_blank" class="learn-more-btn" ${trackingOnClick} style="
                     display: inline-flex !important;
                     align-items: center !important;
@@ -550,45 +529,38 @@ const recommended_tools = [
         "name": "CapCut",
         "header": "Create Stunning Videos—Fast, Fun & Free",
         "link": "https://capcutaffiliateprogram.pxf.io/c/6416428/3069270/22474",
-        "image": "https://app.impact.com/display-ad/22474-3069270?v=0",
-        "description": "CapCut brings pro-level video editing to everyone—no steep learning curve.\nEnjoy built-in AI features, free effects, and customizable templates.\nEdit, collaborate, and share—all from one simple app."
+        "image": "https://app.impact.com/display-ad/22474-3069270?v=0"
     },
     {
         "name": "Renderforest",
         "header": "Bring Your Ideas to Life—Animated, Branded & Ready",
         "link": "https://renderforest.pxf.io/qzvzVj",
-        "image": "https://app.impact.com/display-ad/14885-1957252?v=1",
-        "description": "Pick a template, type your script, and let AI do the rest.\nCustomize colors, fonts & music with drag‑and‑drop ease.\nExport in HD or 4K with advanced features available on premium plans."
+        "image": "https://app.impact.com/display-ad/14885-1957252?v=1"
     },
 
     {
         "name": "Pcloud",
         "header": "Smart Virtual Drive—Cloud Storage That Works Like Local",
         "link": "https://partner.pcloud.com/r/146969",
-        "image": "https://partner.pcloud.com/media/banners/personal/personal005300250.jpg",
-        "description": "Start with free 10GB, expand easily, or lock in lifetime access for one fee.\nEnjoy built-in media streaming, automatic cross‑platform backups, and file previews.\nOptional Crypto encryption gives you exclusive control over sensitive files."
+        "image": "https://partner.pcloud.com/media/banners/personal/personal005300250.jpg"
     },
     {
         "name": "Flixier",
         "header": "Your Cloud-Powered Video Studio",
         "link": "https://flixier.com?fpr=mh1619",
-        "image": "https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24602/720x300px.png",
-        "description": "AI subtitle, voiceover & translation tools—all built right into your browser.\nCloud rendering delivers full‑HD or 4K videos in minutes, no high-end PC needed.\nCollaborative editing, stock media & templates—team up and produce faster."
+        "image": "https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24602/720x300px.png"
     },
     {
         "name": "Envato",
         "header": "Top-Quality Assets for Designers & Video Editors",
         "link": "https://1.envato.market/WyQOdP",
-        "image": "https://app.impact.com/display-ad/4662-377341?v=3",
-        "description": "Access motion graphics, Premiere Pro templates, royalty-free music, and more.\nCut production time with ready-to-use tools for every project.\nIdeal for freelancers, agencies, and creatives on a deadline."
-
+        "image": "https://app.impact.com/display-ad/4662-377341?v=3"
     },
     {
         "name": "Movavi",
         "header": "Your do-it-all video-making bundle",
         "link": "https://www.mvvitrk.com/click?pid=5677&offer_id=1&l=1759319109",
-        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1759417834/336x280-v3_bpsexv.png",
-        "description": "Auto subtitles with one click, ready-made templates\nHandy video editing, file conversion, and screen recording\nHundreds of drag-and-drop filters, transitions, titles, and overlays\nUse code (PTNAFFDIS010925ALLAFS15) for 15% discount on yearly subscription (valid till 15th October 2025)"
+        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1759417834/336x280-v3_bpsexv.png"
     }
 ];
 

@@ -1227,9 +1227,20 @@ const VideoClipper = (function () {
                 clearTimeout(timeoutId);
 
                 if (!response.ok) {
-                    // For 429 errors, we know it's a rate limit without needing to parse the body
+                    // For 429 errors, include the reset time in the error message
                     if (response.status === 429) {
-                        throw new Error('You have reached the maximum number of requests. Please try again later.');
+                        const resetTime = response.headers.get('x-ratelimit-reset');
+                        let errorMessage = 'You have reached the maximum number of requests. ';
+                        
+                        if (resetTime) {
+                            const resetDate = new Date(parseInt(resetTime) * 1000);
+                            const formattedTime = resetDate.toLocaleTimeString();
+                            errorMessage += `Please try again at ${formattedTime}.`;
+                        } else {
+                            errorMessage += 'Please try again later.';
+                        }
+                        
+                        throw new Error(errorMessage);
                     }
                     // For other errors, try to get the error message from the response
                     try {
@@ -2005,7 +2016,7 @@ const VideoClipper = (function () {
             // Check if we should show the support popup
             const isAsked = localStorage.getItem('isAsked') === 'true';
             
-            if (clipsCount >= 3 && !isAsked) {
+            if (clipsCount >= 7 && !isAsked) {
                 // Set flag to prevent showing the popup again
                 localStorage.setItem('isAsked', 'true');
                 
