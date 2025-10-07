@@ -100,7 +100,7 @@ sequenceDiagram
 
 ### Why `FFmpeg` is Used?
 
-While **`yt-dlp`** can handle the entire download-and-clip process by itself, the **progress information it exposes is limited**. Its `-progress` flag provides meaningful updates for full downloads, but when clipping, the output is too sparse to support real-time progress reporting to the client.  
+While **`yt-dlp`** can handle the entire download-and-clip process by itself, the **progress information it exposes is limited**. Its `-progress` flag provides meaningful updates for full downloads, but when clipping, the output is insufficient to support real-time progress reporting to the client.  
 
 > 💡 **Decision**: Use `yt-dlp` only for extracting and downloading the requested clip, and pipe its output into `ffmpeg`.
 
@@ -143,7 +143,11 @@ Because both Google Cloud Run and Google Cloud Storage are in the same region, t
 
 ### How `yt-dlp` Frequent Updates Are Handled?
 
-`yt-dlp` updates often to adapt to changes on video platforms, and an outdated version can cause downloads to fail. To handle this:
+`yt-dlp` updates often to adapt to changes on video platforms, and an outdated version can cause downloads to fail. 
+
+Since Cloud Run containers are immutable (cannot be modified after creation), the only way to update `yt-dlp` is by rebuilding the container.
+
+Here’s how the system handles this:
 
 - The **Dockerfile always downloads the latest** `yt-dlp` when building the container.
 
@@ -155,6 +159,8 @@ Because both Google Cloud Run and Google Cloud Storage are in the same region, t
 
 - Also, there is a **public endpoint** `/check-ytdlp-update` that runs this function, which is called daily via [cron-job](https://cron-job.org/en/)
 
-  > **Safety note**: Exposing this endpoint publicly is safe because **it only triggers a rebuild if a `yt-dlp` update is detected**, with no other side effects.
+  > **Note**: You might wonder why there isn’t an internal ticker to check for updates. The reason is the system runs on **Cloud Run with autoscaling**, it can scale down to zero instances when idle, so there’s no continuously running process to handle a 24/7 ticker.
+  
+  > Exposing this endpoint publicly is safe because **it only triggers a rebuild if a `yt-dlp` update is detected**, with no other side effects.
 
 This setup ensures the **system automatically stays up-to-date with `yt-dlp`**, minimizing downtime caused by outdated versions.
