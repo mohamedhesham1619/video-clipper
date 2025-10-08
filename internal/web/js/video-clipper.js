@@ -1339,10 +1339,7 @@ const VideoClipper = (function () {
                 const result = await response.json();
                 if (result.processId) {
                     state.currentProcessId = result.processId;
-                    // Save processID to sessionStorage
-                    console.log('Setting ProcessId in sessionStorage:', result.processId);
                     sessionStorage.setItem('ProcessId', result.processId);
-                    console.log('Current sessionStorage:', JSON.stringify({...sessionStorage}));
                     setupSSEConnection(result.processId);
                 } else {
                     throw new Error('No process ID received from server');
