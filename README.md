@@ -24,10 +24,9 @@
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [System Workflow Diagram](#system-workflow-diagram)
+- [Infrastructure & Scaling](#infrastructure--scaling)
 - [Key Design Decisions](#key-design-decisions)
   - [Why `FFmpeg` is Used?](#why-ffmpeg-is-used)
-  - [Why Google Cloud Storage (GCS) Instead of Local Disk?](#why-google-cloud-storage-gcs-instead-of-local-disk)
-  - [Why Save Locally Before Uploading to GCS?](#why-save-locally-before-uploading-to-gcs)
   - [How `yt-dlp` Frequent Updates Are Handled](#how-yt-dlp-frequent-updates-are-handled)
 
 
@@ -50,10 +49,8 @@
 - **Video Processing**: [yt-dlp](https://github.com/yt-dlp/yt-dlp), [ffmpeg](https://ffmpeg.org/)
 - **Real-time Communication**: Server-Sent Events (SSE)
 - **Containerization**: Docker
-- **Hosting**: Google Cloud Run
-- **Data & Storage**:
-  - Firestore (tracks created clips count)
-  - Google Cloud Storage (stores and serves video files)
+- **Hosting**: Amazon EC2
+- **Data Storage**: Firestore (tracks created clips count)
 - **Analytics**: Google Analytics and Microsoft Clarity
 
 
@@ -67,77 +64,82 @@ sequenceDiagram
   participant Client as Client
   participant Backend as Backend
   participant In-Memory Store as In-Memory Store
-  participant GCS as Google Cloud Storage
 
   %% Submit Phase
   Client ->> Backend: POST /submit (URL, start, end, quality)
   Backend -->> Backend: Start downloading & processing (yt-dlp + ffmpeg)
-  Backend ->> In-Memory Store: Store process {id, progressChan}
-  Backend ->> Client: Return { processID }
+  Backend ->> In-Memory Store: Store process {ID, progress channel, file path}
+  Backend ->> Client: Return { process ID }
 
   %% Progress Phase (SSE stream)
-  Client ->> Backend: GET /progress/{processID} (SSE)
-  Backend ->> In-Memory Store: Read from process's progressChan
+  Client ->> Backend: GET /progress/{process ID} (SSE)
+  Backend ->> In-Memory Store: Read from process's progress channel
 
   %% SSE Events
   Backend -->> Client: SSE event: title (video’s title)
   Backend -->> Client: SSE event: progress (periodic percentage updates)
 
-  %% Upload & URL Generation
-  Backend ->> GCS: Upload processed clip to GCS
-  Backend ->> Backend: Generate signed download URL
-
   %% Completion / Error
-  Backend -->> Client: SSE event: complete (includes signed download URL)
-  Backend -->> Client: SSE event: error (if process/upload/signing fails)
-  Backend ->> In-Memory Store: Clean up process resources
+  Backend -->> Client: SSE event: complete (includes download url)
+  Backend -->> Client: SSE event: error (if any error occurred)
 
+  
+ 
   %% Client Download
-  Client ->> GCS: Download file via signed URL
+  Client ->> Backend: GET /download/{process ID}
+  Backend ->> In-Memory Store: Get file path
+  Backend ->> Client: Serve file for download
+
+  Backend ->> In-Memory Store: Clean up resources
 
 ```
+
+## Infrastructure & Scaling
+
+Since launching in **July 2025**, the app has gained users steadily, and the infrastructure evolved to handle increasing traffic while **minimizing costs by staying within free tier limits**.
+
+
+### Phase 1 – Google Cloud Run
+*Free tier: 50 CPU hours, 1 GB outbound data per month*  
+ 
+The app initially ran on **Cloud Run** using autoscaling with a maximum of one instance, handling all tasks including downloading, serving, and cleaning up videos. This setup was sufficient for the first month’s traffic **(43 users)**.
+
+As traffic increased in August **(246 users)**, data transfer grew significantly, **exceeding Cloud Run’s 1 GB outbound data limit** and leading to the transition to the next phase.
+
+> **Note:** "Outbound data" refers to the amount of data sent from the server to users.
+
+### Phase 2 – Cloud Run + Cloud Storage
+*Free tier: Cloud Run (50 CPU hours, 1 GB outbound data) + Cloud Storage (100 GB outbound data) per month*  
+
+To handle the increasing data transfer, **Cloud Storage was integrated alongside Cloud Run** to offload downloads and reduce bandwidth usage. The backend uploaded processed videos to Cloud Storage and returned their download URLs to clients, allowing them to download directly from Cloud Storage instead of through Cloud Run.
+
+This setup took advantage of **Cloud Storage’s 100 GB of free outbound data**, which effectively handled bandwidth needs for September’s **942 users**. However, after 23 days, **CPU usage on Cloud Run exceeded the free tier limit**, prompting the transition to the next phase.
+
+
+### Phase 3 – Amazon EC2
+*Free tier: 750 hours, 100 GB outbound data per month*  
+
+This is the **current phase of the project**. After exceeding Cloud Run’s CPU time limit, the backend was **migrated to Amazon EC2** to gain more control and avoid the execution time restrictions of serverless environments.  
+
+**EC2 now handles all backend operations**, including downloading, processing, serving, and cleanup, providing **stable performance for 616 users** during the first week of October.
+
+
+
+
 ## Key Design Decisions
 
 ### Why `FFmpeg` is Used?
 
-While **`yt-dlp`** can handle the entire download-and-clip process by itself, the **progress information it exposes is limited**. Its `-progress` flag provides meaningful updates for full downloads, but when clipping, the output is too sparse to support real-time progress reporting to the client.  
 
-> 💡 **Decision**: Use `yt-dlp` only for extracting and downloading the requested clip, and pipe its output into `ffmpeg`.
+While `yt-dlp` can handle the entire download and clip process, the **progress information it exposes is limited**. Its `--progress` flag provides meaningful updates for full downloads, but during clipping, the output isn’t sufficient to support real-time client updates.
 
-**`ffmpeg`** then:  
+To address this, the app uses `yt-dlp` only for **extracting and downloading** the requested clip and then **pipes its output to `ffmpeg`**.
+
+`ffmpeg` then:
 - Produces the final output file.  
 - Exposes detailed progress data (e.g., current output duration).  
 
-By comparing this duration against the requested clip length, the app can calculate and share **accurate real-time progress percentages** with the client.  
-
----
-
-### Why Google Cloud Storage (GCS) Instead of Local Disk?
-
-The main reason for switching from local disk to GCS was **to minimize costs**.  
-
-Initially, the app was designed to **store clips directly on the local disk** of the Cloud Run instance and serve them from there. 
-
-This worked fine at the start, but once traffic increased, it quickly hit the **1 GB/month free egress limit** (egress = data transferred out of Google’s network to clients). 
-
-Switching to **Google Cloud Storage** solved this problem:  
-- It comes with **100 GB/month of free egress**.  
-- Lets clients download files directly via signed URLs, reducing backend bandwidth.  
-- Simplifies file management and cleanup.
-
-> *Fun fact: before moving to GCS, one user somehow managed to download 3 GB of clips in just 5 minutes.*    
-![Screenshot](https://res.cloudinary.com/ddozq3vu5/image/upload/v1757452871/brave_screenshot_console.cloud.google.com_ka9q7o.png)
-
-
----
-
-### Why Save Locally Before Uploading to GCS?
-
-Directly streaming `ffmpeg` output into GCS seemed like the cleanest design, but in practice it caused unreliable uploads (broken pipes, conversion failures, incomplete files).
-
-The safer approach was to **write the file to disk first** and then upload it to GCS. This guaranteed that the uploaded clip was fully valid and avoided mid-stream corruption.
-
-Because both Google Cloud Run and Google Cloud Storage are in the same region, the upload step is extremely fast. The data moves within Google’s internal network, so even large files transfer almost instantly.
+By comparing this duration against the requested clip length, the app calculates and shares **accurate real-time progress percentages** with the client.
 
 ---
 
@@ -147,14 +149,10 @@ Because both Google Cloud Run and Google Cloud Storage are in the same region, t
 
 - The **Dockerfile always downloads the latest** `yt-dlp` when building the container.
 
-- The system includes a **function that manages `yt-dlp` updates**:
-  - It **checks if a new `yt-dlp` version is available**.
-  - If a new version is available, it **triggers a container rebuild**.
+- The system includes a **function responsible for managing `yt-dlp` updates**:
+  - It **checks if a newer version is available**, and if so, **installs the update** to keep the local `yt-dlp` version updated.
+  - It is **called after each failed download**, since a failure might be caused by an outdated version.
+  - It is also **executed daily through an internal ticker**, ensuring regular updates even when no failures occur.
 
-- This function is **called when a download fails (because it may have failed due to an outdated** `yt-dlp`).
-
-- Also, there is a **public endpoint** `/check-ytdlp-update` that runs this function, which is called daily via [cron-job](https://cron-job.org/en/)
-
-  > **Safety note**: Exposing this endpoint publicly is safe because **it only triggers a rebuild if a `yt-dlp` update is detected**, with no other side effects.
 
 This setup ensures the **system automatically stays up-to-date with `yt-dlp`**, minimizing downtime caused by outdated versions.
