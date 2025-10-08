@@ -1,6 +1,84 @@
 // Video Clipper - Factory Function Pattern
 // Handles video clip requests with progress tracking via SSE
 
+// Function to generate a stable client fingerprint
+async function generateFingerprint() {
+    try {
+        // Collect and normalize browser and system information
+        const userAgentData = navigator.userAgentData || {};
+        
+        // Normalize each field
+        const fingerprintData = {
+            // Convert to string, trim, and normalize case
+            userAgent: String(navigator.userAgent || '').trim().toLowerCase(),
+            
+            // Normalize platform string
+            platform: String(
+                userAgentData.platform || 
+                navigator.platform || ''
+            ).trim().toLowerCase(),
+            
+            // Ensure numeric values are integers
+            hardwareConcurrency: Math.max(0, parseInt(navigator.hardwareConcurrency) || 0),
+            deviceMemory: Math.max(0, parseInt(navigator.deviceMemory) || 0),
+            
+            // Ensure screen dimensions are numbers and within reasonable bounds
+            screenWidth: Math.max(0, Math.min(9999, parseInt(window.screen.width) || 0)),
+            screenHeight: Math.max(0, Math.min(9999, parseInt(window.screen.height) || 0)),
+            
+            // Normalize timezone (case-insensitive)
+            timezone: String(
+                Intl.DateTimeFormat().resolvedOptions().timeZone || ''
+            ).trim().toLowerCase(),
+            
+            // Normalize languages: sort, lowercase, and filter out empty strings
+            languages: [...(navigator.languages || [])]
+                .map(lang => String(lang).trim().toLowerCase())
+                .filter(Boolean)
+                .sort()
+                .join(','),
+                
+            // Ensure color depth is a reasonable number
+            colorDepth: Math.max(1, Math.min(64, parseInt(window.screen.colorDepth) || 0))
+        };
+
+        // Convert the data to a JSON string
+        const dataString = JSON.stringify(fingerprintData);
+        
+        // Create a SHA-256 hash
+        const msgBuffer = new TextEncoder().encode(dataString);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        
+        // Convert to hex string (already 64 characters)
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch (error) {
+        console.error('Error generating fingerprint:', error);
+        // Fallback to a random 64-character hex string if fingerprinting fails
+        const randomValues = new Uint8Array(32);
+        crypto.getRandomValues(randomValues);
+        return Array.from(randomValues, b => b.toString(16).padStart(2, '0')).join('');
+    }
+}
+
+// Get or create client fingerprint
+async function getClientFingerprint() {
+    try {
+        let fingerprint = localStorage.getItem('X-Client-FP');
+        if (!fingerprint) {
+            fingerprint = await generateFingerprint();
+            localStorage.setItem('X-Client-FP', fingerprint);
+        }
+        return fingerprint;
+    } catch (error) {
+        console.error('Error in getClientFingerprint:', error);
+        // Fallback to a random 64-character hex string if fingerprint retrieval fails
+        const randomValues = new Uint8Array(32);
+        crypto.getRandomValues(randomValues);
+        return Array.from(randomValues, b => b.toString(16).padStart(2, '0')).join('');
+    }
+}
+
 const VideoClipper = (function () {
     // Private state
     let state = {
@@ -1212,9 +1290,15 @@ const VideoClipper = (function () {
 
             let response;
             try {
+                // Get client fingerprint
+                const clientFingerprint = await getClientFingerprint();
+                
                 response = await fetch('/submit', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-Client-FP': clientFingerprint
+                    },
                     body: JSON.stringify({
                         videoUrl,
                         clipStart,

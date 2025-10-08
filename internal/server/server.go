@@ -4,15 +4,9 @@ import (
 	"clipper/internal/config"
 	"clipper/internal/handlers"
 	"log/slog"
-	"net"
 	"net/http"
 	"os"
-	"strings"
 	"time"
-
-	"github.com/ulule/limiter/v3"
-	limiterMiddleware "github.com/ulule/limiter/v3/drivers/middleware/stdlib"
-	memoryStore "github.com/ulule/limiter/v3/drivers/store/memory"
 )
 
 type Server struct {
@@ -22,38 +16,14 @@ type Server struct {
 func New(cfg *config.Config) *Server {
 	mux := http.NewServeMux()
 
-	// Rate limiter: 4 requests per 2 hours per IP
-	limiterStore := memoryStore.NewStore()
-	rate := limiter.Rate{
-		Limit:  2,
-		Period: 2 * time.Hour,
-	}
-	limiterInstance := limiter.New(limiterStore, rate)
-
-	// Custom key getter: use CF-Connecting-IP (or fallback to RemoteAddr)
-	keyGetter := func(r *http.Request) string {
-		if ip := r.Header.Get("CF-Connecting-IP"); ip != "" {
-			return ip
-		}
-		if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
-			parts := strings.Split(xff, ",")
-			return strings.TrimSpace(parts[0])
-		}
-		host, _, err := net.SplitHostPort(r.RemoteAddr)
-		if err == nil {
-			return host
-		}
-		return r.RemoteAddr
-	}
-
-	limiterMw := limiterMiddleware.NewMiddleware(
-		limiterInstance,
-		limiterMiddleware.WithKeyGetter(keyGetter),
-	)
+	// Rate limiters
+	// 2 layers of protection: IP and fingerprint
+	ipLimiter := ipLimiterMiddleware(2, 2*time.Hour)
+	fpLimiter := fpLimiterMiddleware(2, 2*time.Hour)
 
 	// Main app routes
 	mux.HandleFunc("/", handlers.HomeHandler)
-	mux.Handle("/submit", limiterMw.Handler(handlers.SubmitHandler(cfg)))
+	mux.Handle("/submit", validateFPMiddleware(ipLimiter.Handler(fpLimiter.Handler(handlers.SubmitHandler(cfg)))))
 	mux.HandleFunc("/progress/", handlers.ProgressHandler)
 	mux.HandleFunc("/cancel/", handlers.CancelHandler)
 	mux.HandleFunc("/feedback", handlers.FeedbackHandler(cfg))
