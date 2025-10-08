@@ -25,7 +25,7 @@ func New(cfg *config.Config) *Server {
 	// Rate limiter: 4 requests per 2 hours per IP
 	limiterStore := memoryStore.NewStore()
 	rate := limiter.Rate{
-		Limit:  4,
+		Limit:  2,
 		Period: 2 * time.Hour,
 	}
 	limiterInstance := limiter.New(limiterStore, rate)
