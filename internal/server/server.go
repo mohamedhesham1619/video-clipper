@@ -18,8 +18,8 @@ func New(cfg *config.Config) *Server {
 
 	// Rate limiters
 	// 2 layers of protection: IP and fingerprint
-	ipLimiter := ipLimiterMiddleware(2, 2*time.Hour)
-	fpLimiter := fpLimiterMiddleware(2, 2*time.Hour)
+	ipLimiter := ipLimiterMiddleware(4, 2*time.Hour)
+	fpLimiter := fpLimiterMiddleware(4, 2*time.Hour)
 
 	// Main app routes
 	mux.HandleFunc("/", handlers.HomeHandler)
