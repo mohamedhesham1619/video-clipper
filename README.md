@@ -26,8 +26,9 @@
 - [System Workflow Diagram](#system-workflow-diagram)
 - [Infrastructure & Scaling](#infrastructure--scaling)
 - [Key Design Decisions](#key-design-decisions)
-  - [Why `FFmpeg` is Used?](#why-ffmpeg-is-used)
-  - [How `yt-dlp` Frequent Updates Are Handled](#how-yt-dlp-frequent-updates-are-handled)
+  - [How rate limiting is implemented?](#how-rate-limiting-is-implemented)
+  - [Why `FFmpeg` is used?](#why-ffmpeg-is-used)
+  - [How `yt-dlp` frequent updates are handled?](#how-yt-dlp-frequent-updates-are-handled)
 
 
 
@@ -98,6 +99,7 @@ sequenceDiagram
 
 Since launching in **July 2025**, the app has gained users steadily, and the infrastructure evolved to handle increasing traffic while **minimizing costs by staying within free tier limits**.
 
+---
 
 ### Phase 1 – Google Cloud Run
 *Free tier: 50 CPU hours, 1 GB outbound data per month*  
@@ -108,6 +110,8 @@ As traffic increased in August **(246 users)**, data transfer grew significantly
 
 > **Note:** "Outbound data" refers to the amount of data sent from the server to users.
 
+---
+
 ### Phase 2 – Cloud Run + Cloud Storage
 *Free tier: Cloud Run (50 CPU hours, 1 GB outbound data) + Cloud Storage (100 GB outbound data) per month*  
 
@@ -115,6 +119,8 @@ To handle the increasing data transfer, **Cloud Storage was integrated alongside
 
 This setup took advantage of **Cloud Storage’s 100 GB of free outbound data**, which effectively handled bandwidth needs for September’s **942 users**. However, after 23 days, **CPU usage on Cloud Run exceeded the free tier limit**, prompting the transition to the next phase.
 
+
+---
 
 ### Phase 3 – Amazon EC2
 *Free tier: 750 hours, 100 GB outbound data per month*  
@@ -128,7 +134,55 @@ This is the **current phase of the project**. After exceeding Cloud Run’s CPU 
 
 ## Key Design Decisions
 
-### Why `FFmpeg` is Used?
+### How rate limiting is implemented?
+
+The app initially used **IP-based rate limiting** to prevent abuse, limiting each IP to **4 requests every 2 hours**.
+
+However, testing showed that IP-based rate limiting alone is insufficient. For example, in this case, the user was able to bypass the limit, making **11 requests for the same video URL within 30 minutes using 3 different IPs**.
+
+![Rate limit bypass example](https://res.cloudinary.com/ddozq3vu5/image/upload/q_auto/v1760038360/Screenshot_from_2025-10-09_21-52-09_ap973z.png)
+
+<br>
+
+To address this, a second layer of protection using a **browser fingerprint** was added:
+
+- The fingerprint is generated from stable device and browser information, saved in the browser’s **local storage** and sent with each submit request.
+
+- Each request must pass **both layers**:
+  1. **IP layer**: checks if the client's IP has exceeded the rate limit.
+  2. **Fingerprint layer**: checks if the device/browser fingerprint has exceeded the rate limit.
+
+<br>
+
+Here’s how the new setup behaves when a user has already reached the rate limit:
+
+- **Case 1: Using a different browser on the same device**  
+  → **Detected** by the **IP layer**  
+  
+  All browsers on the same network share the same public IP address, so even if the user switches browsers, the IP limit still applies.
+
+- **Case 2: Changing IP (e.g., using a VPN) while using the same browser**  
+  → **Detected** by the **fingerprint layer**  
+  
+  The fingerprint identifies the same device/browser regardless of IP, preventing users from bypassing the limit by switching networks or using a VPN.
+
+- **Case 3: Changing both IP and browser**  
+  → **Not fully detected**  
+  
+  The fingerprint is generated from browser-specific information, and different browsers on the same device can produce different fingerprints. This makes it appear as a new user.  
+  This limitation is acceptable, as this case is relatively rare compared to the first two.
+
+
+
+
+
+
+
+
+
+---
+
+### Why `FFmpeg` is used?
 
 
 While `yt-dlp` can handle the entire download and clip process, the **progress information it exposes is limited**. Its `--progress` flag provides meaningful updates for full downloads, but during clipping, the output isn’t sufficient to support real-time client updates.
@@ -143,7 +197,7 @@ By comparing this duration against the requested clip length, the app calculates
 
 ---
 
-### How `yt-dlp` Frequent Updates Are Handled?
+### How `yt-dlp` frequent updates are handled?
 
 `yt-dlp` updates often to adapt to changes on video platforms, and an outdated version can cause downloads to fail. To handle this:
 
