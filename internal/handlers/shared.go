@@ -39,7 +39,7 @@ func (s *sharedData) cleanupDownloadProcess(processID string) {
 	}
 
 	// Remove the downloaded file
-	if err := os.Remove(downloadProcess.DownloadPath); err != nil {
+	if err := os.Remove(downloadProcess.DownloadPath); err != nil && !os.IsNotExist(err) {
 		slog.Error("Error removing download file", "error", err, "filePath", downloadProcess.DownloadPath)
 	}
 	
