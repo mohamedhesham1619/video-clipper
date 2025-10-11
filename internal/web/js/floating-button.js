@@ -152,7 +152,7 @@ class FloatingButton {
       }
       
       // Send to server
-      const response = await fetch('/feedback', {
+      const response = await fetch('/api/feedback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

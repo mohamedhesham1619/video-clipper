@@ -30,7 +30,7 @@ func FeedbackHandler(cfg *config.Config) http.HandlerFunc {
 			return
 		}
 
-		userIP := getUserIP(r)
+		userIP := GetUserIP(r)
 
 		slog.Info("Feedback received",
 			"message", feedback.Message,

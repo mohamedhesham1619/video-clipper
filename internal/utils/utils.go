@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"math"
 	"math/rand/v2"
 	"os/exec"
 	"regexp"
@@ -126,6 +127,39 @@ func GetVideoTitle(cfg *config.Config, videoRequest models.VideoRequest) (string
 	return videoTitle, nil
 }
 
+// GetActualQuality extracts resolution from video title and returns closest match
+func GetActualQuality(videoTitle string) string {
+	resolutions := []int{480, 720, 1080, 1440}
+
+	// Regex to match resolution pattern at the end (e.g., -720p.mp4, _1080p.mp4)
+	re := regexp.MustCompile(`(\d+)p\.[^\.]+$`)
+	matches := re.FindStringSubmatch(videoTitle)
+
+	if len(matches) < 2 {
+		return "" // No resolution found
+	}
+
+	// Parse the extracted resolution
+	foundRes, err := strconv.Atoi(matches[1])
+	if err != nil {
+		return ""
+	}
+
+	// Find closest resolution
+	closest := resolutions[0]
+	minDiff := math.Abs(float64(foundRes - closest))
+
+	for _, res := range resolutions[1:] {
+		diff := math.Abs(float64(foundRes - res))
+		if diff < minDiff {
+			minDiff = diff
+			closest = res
+		}
+	}
+
+	return strconv.Itoa(closest) + "p"
+}
+
 // calculate the clip duration in microseconds
 func calculateClipDuration(start, end string) (int64, error) {
 
@@ -146,34 +180,27 @@ func calculateClipDuration(start, end string) (int64, error) {
 
 }
 
-// parse clip timing info.
-// for ffmpeg to accurately extract the needed clip, it needs the start time and clip duration in seconds
-func ParseClipDuration(startTime, endTime string) (duration string, err error) {
+// CalculateDurationSeconds calculates the duration in seconds between two time strings in format "hh:mm:ss"
+func CalculateDurationSeconds(startTime, endTime string) (int, error) {
 	layout := "15:04:05"
 
 	t1, err := time.Parse(layout, startTime)
 	if err != nil {
-		return "", fmt.Errorf("invalid start time: %v", err)
+		return 0, fmt.Errorf("invalid start time: %v", err)
 	}
 
 	t2, err := time.Parse(layout, endTime)
 	if err != nil {
-		return "", fmt.Errorf("invalid end time: %v", err)
+		return 0, fmt.Errorf("invalid end time: %v", err)
 	}
 
-	// Calculate duration in seconds
-	durationSeconds := int(t2.Sub(t1).Seconds())
-
-	// Convert duration to string
-	duration = strconv.Itoa(durationSeconds)
-
-	return duration, nil
+	// Calculate and return duration in seconds
+	return int(t2.Sub(t1).Seconds()), nil
 }
 
-// FormatSecondsToMMSS converts a string representing seconds to mm:ss format.
-func FormatSecondsToMMSS(secondsStr string) string {
-	seconds, err := strconv.Atoi(secondsStr)
-	if err != nil || seconds < 0 {
+// FormatSecondsToMMSS converts seconds to mm:ss format.
+func FormatSecondsToMMSS(seconds int) string {
+	if seconds < 0 {
 		return "00:00"
 	}
 	minutes := seconds / 60

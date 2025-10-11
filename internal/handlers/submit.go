@@ -2,13 +2,13 @@ package handlers
 
 import (
 	"clipper/internal/config"
+	"clipper/internal/credits"
 	"clipper/internal/models"
 	"clipper/internal/utils"
 	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -26,18 +26,22 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 			return
 		}
 
-		// Read the request from the client
-		var videoRequest models.VideoRequest
-		if err := json.NewDecoder(r.Body).Decode(&videoRequest); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
-			return
-		}
+		// Read the request from the context
+		videoRequest := r.Context().Value("videoRequest").(models.VideoRequest)
 
 		// Log the request details
-		clipDurationInSeconds, _ := utils.ParseClipDuration(videoRequest.ClipStart, videoRequest.ClipEnd)
+		clipDurationInSeconds, err := utils.CalculateDurationSeconds(videoRequest.ClipStart, videoRequest.ClipEnd)
+		if err != nil {
+			slog.Error("Failed to calculate clip duration", "error", err)
+			http.Error(w, "Invalid clip duration", http.StatusBadRequest)
+			return
+		}
 		clipDurationFormatted := utils.FormatSecondsToMMSS(clipDurationInSeconds)
+
+		userIP := GetUserIP(r)
+
 		slog.Info("Received clip request",
-			"user ip", getUserIP(r),
+			"user ip", userIP,
 			"origin", r.Header.Get("Origin"),
 			"refer", r.Header.Get("Referer"),
 			"url", videoRequest.VideoURL,
@@ -55,20 +59,19 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 
 		}
 
-		// Check if duration exceeds 10 minutes (600 seconds)
-		if clipDurationInt, err := strconv.Atoi(clipDurationInSeconds); err == nil && clipDurationInt > 600 {
-			http.Error(w, "Clip duration cannot exceed 10 minutes", http.StatusBadRequest)
-			return
-		}
-
-		// Create a download process struct and initialize it with the progress channel and watcher
+		// Create a download process struct and initialize it with the needed data
+		// The credits will be deducted in the progress handler to only deduct credits when the download starts (to prevent deducting credits for failed requests)
 		var downloadProcess models.DownloadProcess
 
 		progressChan := make(chan models.ProgressEvent)
 		watcher := make(chan struct{})
 
+		fp := r.Header.Get("X-Client-FP")
+
 		downloadProcess.ProgressChan = progressChan
 		downloadProcess.Watcher = watcher
+		downloadProcess.UserIP = userIP
+		downloadProcess.UserFP = fp
 
 		// Add the download process to the shared data
 		processID := utils.GenerateID()
@@ -102,6 +105,20 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 				data.cleanupDownloadProcess(processID)
 				return
 			}
+
+			// Get the actual quality from the video title
+			actualQuality := utils.GetActualQuality(videoTitle)
+			if actualQuality == "" {
+				progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Could not get video info"}}
+				close(progressChan)
+				data.cleanupDownloadProcess(processID)
+				return
+			}
+
+			// Calculate the needed credits based on the actual quality and clip duration
+			// we don't use the quality from the request because it might be different from the actual quality retrieved from yt-dlp
+			neededCredits := credits.CalculateCreditCost(clipDurationInSeconds, actualQuality)
+			downloadProcess.NeededCredits = neededCredits
 
 			// Send the video title to the progress channel
 			// This is used to display the video title to the user
@@ -139,7 +156,7 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 
 			// If everything went well, send the download URL to the client
 			slog.Info("Download process finished successfully", "processId", processID, "videoTitle", videoTitle)
-			downloadUrl := fmt.Sprintf("download/%s", processID)
+			downloadUrl := fmt.Sprintf("api/download/%s", processID)
 
 			progressChan <- models.ProgressEvent{
 				Event: models.EventTypeComplete,
@@ -194,7 +211,7 @@ func handleProcessError(processName string, err error, progressChan chan models.
 	data.cleanupDownloadProcess(processID)
 }
 
-func getUserIP(r *http.Request) string {
+func GetUserIP(r *http.Request) string {
 	// 1. Cloudflare header
 	if ip := r.Header.Get("CF-Connecting-IP"); ip != "" {
 		return ip

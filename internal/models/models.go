@@ -9,6 +9,9 @@ type DownloadProcess struct {
 	YtDlpProcess  *exec.Cmd
 	FFmpegProcess *exec.Cmd
 	IsCancelled   bool
+	NeededCredits float64
+	UserIP        string
+	UserFP        string
 }
 
 type EventName string

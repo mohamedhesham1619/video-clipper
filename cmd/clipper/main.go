@@ -2,6 +2,7 @@ package main
 
 import (
 	"clipper/internal/config"
+	"clipper/internal/credits"
 	"clipper/internal/server"
 	"clipper/internal/utils"
 	"flag"
@@ -33,6 +34,12 @@ func main() {
 		slog.Warn("Failed to load .env file", "error", err)
 	}
 
+	// Load blocked domains into memory
+	err := utils.LoadBlockedDomainsFromFile("internal/data/blocked_domains.txt")
+	if err != nil {
+		slog.Error("Failed to load blocked domains", "error", err)
+	}
+
 	// Load configuration
 	cfg, err := config.Load()
 	if err != nil {
@@ -41,17 +48,15 @@ func main() {
 	}
 	defer cfg.Close()
 
-	// Load blocked domains into memory
-	err = utils.LoadBlockedDomainsFromFile("internal/data/blocked_domains.txt")
-	if err != nil {
-		slog.Error("Failed to load blocked domains", "error", err)
-	}
+	// Initialize credit store and start expired credits cleaner
+	creditsStore := credits.NewCreditStore(cfg.RateLimit.MaxCredits, cfg.RateLimit.ResetDuration)
+	creditsStore.StartExpiredCreditsCleaner(cfg.RateLimit.ResetDuration)
 
 	// Start yt-dlp daily updater
 	utils.StartYtDlpDailyUpdater()
 
 	// --- Server Initialization ---
-	srv := server.New(cfg)
+	srv := server.New(cfg, creditsStore)
 
 	if err := srv.Start(); err != nil {
 		slog.Error("Server error", "error", err)

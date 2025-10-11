@@ -14,7 +14,7 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fileID := strings.TrimPrefix(r.URL.Path, "/download/")
+	fileID := strings.TrimPrefix(r.URL.Path, "/api/download/")
 	if fileID == "" {
 		http.Error(w, "Invalid file ID", http.StatusBadRequest)
 		return

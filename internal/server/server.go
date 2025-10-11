@@ -2,35 +2,31 @@ package server
 
 import (
 	"clipper/internal/config"
+	"clipper/internal/credits"
 	"clipper/internal/handlers"
 	"log/slog"
 	"net/http"
 	"os"
-	"time"
 )
 
 type Server struct {
 	mux *http.ServeMux
 }
 
-func New(cfg *config.Config) *Server {
+func New(cfg *config.Config, creditsStore *credits.CreditsStore) *Server {
 	mux := http.NewServeMux()
 
-	// Rate limiters
-	// 2 layers of protection: IP and fingerprint
-	ipLimiter := ipLimiterMiddleware(4, 2*time.Hour)
-	fpLimiter := fpLimiterMiddleware(4, 2*time.Hour)
-
-	// Main app routes
-	mux.HandleFunc("/", handlers.HomeHandler)
-	mux.Handle("/submit", validateFPMiddleware(ipLimiter.Handler(fpLimiter.Handler(handlers.SubmitHandler(cfg)))))
-	mux.HandleFunc("/progress/", handlers.ProgressHandler)
-	mux.HandleFunc("/cancel/", handlers.CancelHandler)
-	mux.HandleFunc("/feedback", handlers.FeedbackHandler(cfg))
-	mux.HandleFunc("/stats/clips", handlers.StatsHandler(cfg))
-	mux.HandleFunc("/download/", handlers.DownloadHandler)
+	// API routes
+	mux.Handle("/api/submit", validateFPMiddleware(validateCreditsMiddleware(creditsStore, handlers.SubmitHandler(cfg))))
+	mux.HandleFunc("/api/progress/", handlers.ProgressHandler(creditsStore))
+	mux.HandleFunc("/api/cancel/", handlers.CancelHandler)
+	mux.HandleFunc("/api/feedback", handlers.FeedbackHandler(cfg))
+	mux.HandleFunc("/api/stats/clips", handlers.StatsHandler(cfg))
+	mux.HandleFunc("/api/download/", handlers.DownloadHandler)
+	mux.HandleFunc("/api/credits", handlers.CreditsHandler(creditsStore))
 
 	// Static page routes
+	mux.HandleFunc("/", handlers.HomeHandler)
 	mux.HandleFunc("/contact", handlers.ContactPageHandler)
 	mux.HandleFunc("/terms", handlers.TermsPageHandler)
 	mux.HandleFunc("/privacy", handlers.PrivacyPageHandler)

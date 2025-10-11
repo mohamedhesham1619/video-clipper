@@ -8,7 +8,7 @@ import (
 
 func CancelHandler(w http.ResponseWriter, r *http.Request) {
 
-	processID := strings.TrimPrefix(r.URL.Path, "/cancel/")
+	processID := strings.TrimPrefix(r.URL.Path, "/api/cancel/")
 	slog.Info("Received cancel request for process ID: ", "processID", processID, "reason", r.URL.Query().Get("reason"))
 
 	data.stopDownloadProcessAndCleanUp(processID)

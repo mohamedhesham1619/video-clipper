@@ -15,7 +15,7 @@
 
 <p align="center">
   <img 
-    src="https://img.shields.io/endpoint?url=https%3A%2F%2Fvideoclipper.online%2Fstats%2Fclips" 
+    src="https://img.shields.io/endpoint?url=https%3A%2F%2Fvideoclipper.online%2Fapi%2Fstats%2Fclips" 
     alt="Clips Created" 
   />
 </p>

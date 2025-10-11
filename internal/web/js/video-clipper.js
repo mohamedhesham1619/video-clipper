@@ -1,6 +1,143 @@
 // Video Clipper - Factory Function Pattern
 // Handles video clip requests with progress tracking via SSE
 
+// Global variable to store client fingerprint and credits
+let clientFingerprint = '';
+let availableCredits = 0;
+
+// Generate and store fingerprint immediately
+(async () => {
+    try {
+        clientFingerprint = await generateFingerprint();
+        
+        // Fetch credits using the generated fingerprint
+        try {
+            const response = await fetch('/api/credits', {
+                headers: {
+                    'X-Client-FP': clientFingerprint
+                }
+            });
+            const creditsData = await response.json();
+            console.log('Credits info:', creditsData);
+            // Update the credits display
+            const creditsDisplay = document.getElementById('credits-available');
+            if (creditsDisplay) {
+                if (creditsData.credits_left !== undefined) {
+                    availableCredits = creditsData.credits_left;
+                    creditsDisplay.textContent = availableCredits;
+                    // Update color based on credits
+                    creditsDisplay.style.fontWeight = '600';
+                    if (availableCredits > 0) {
+                        creditsDisplay.style.color = '#10B981'; // Green color for positive credits
+                    } else {
+                        creditsDisplay.style.color = '#EF4444'; // Red color for zero credits
+                    }
+                    
+                    // Update the credit cost display after credits are loaded
+                    if (typeof updateCreditCostDisplay === 'function') {
+                        // Update with the new credits
+                        updateCreditCostDisplay();
+                        // Also update the duration display to trigger cost calculation
+                        updateDurationDisplay();
+                    }
+                    
+                    // Show reset time if available
+                    const resetTimeElement = document.getElementById('credits-reset-time');
+                    if (creditsData.reset_time && resetTimeElement) {
+                        // Parse RFC3339 formatted time from server
+                        const resetDate = new Date(creditsData.reset_time);
+                        const now = new Date();
+                        const timeUntilReset = resetDate - now;
+                     
+                        // Format the reset time in Xh Ym or Xm format
+                        let resetTimeText;
+                        if (timeUntilReset < 0) {
+                            resetTimeText = 'Resets soon';
+                        } else {
+                            const hours = Math.floor(timeUntilReset / (1000 * 60 * 60));
+                            const minutes = Math.floor((timeUntilReset % (1000 * 60 * 60)) / (1000 * 60));
+                            const seconds = Math.floor((timeUntilReset % (1000 * 60)) / 1000);
+                            
+                            if (hours > 0) {
+                                resetTimeText = `Resets in ${hours}h${minutes > 0 ? ` ${minutes}m` : ''}`.trim();
+                            } else if (minutes > 0) {
+                                resetTimeText = `Resets in ${minutes}m${seconds > 0 ? ` ${seconds}s` : ''}`.trim();
+                            } else {
+                                resetTimeText = `Resets in ${seconds}s`;
+                            }
+                        }
+                        
+                        // Show the reset time element
+                        resetTimeElement.style.display = 'inline-block';
+                        
+                        // Handle hint for both desktop and mobile
+                        const mobileHint = document.getElementById('mobile-hint');
+                        const isMobile = window.innerWidth <= 768;
+                        
+                        const showHint = () => {
+                            if (mobileHint) {
+                                mobileHint.textContent = resetTimeText;
+                                mobileHint.style.display = 'block';
+                                // Hide on next click outside
+                                setTimeout(() => document.addEventListener('click', handleClickOutside), 0);
+                            }
+                        };
+                        
+                        const hideHint = () => {
+                            if (mobileHint) mobileHint.style.display = 'none';
+                            document.removeEventListener('click', handleClickOutside);
+                        };
+                        
+                        const handleClickOutside = (e) => {
+                            if (!resetTimeElement.contains(e.target)) {
+                                hideHint();
+                            }
+                        };
+                        
+                        // Desktop: show on hover, mobile: show on click
+                        if (!isMobile) {
+                            resetTimeElement.addEventListener('mouseenter', showHint);
+                            resetTimeElement.addEventListener('mouseleave', hideHint);
+                        } else {
+                            // Mobile: show on click
+                            resetTimeElement.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                
+                                if (mobileHint) {
+                                    const isVisible = mobileHint.style.display === 'block';
+                                    if (isVisible) {
+                                        hideHint();
+                                    } else {
+                                        showHint();
+                                    }
+                                }
+                            });
+                        }
+                        
+                    } else if (resetTimeElement) {
+                        resetTimeElement.style.display = 'none';
+                    }
+                } else {
+                    creditsDisplay.textContent = 'Unlimited';
+                    creditsDisplay.style.fontWeight = '600';
+                    creditsDisplay.style.color = '#10B981';
+                }
+            }
+        } catch (error) {
+            console.error('Failed to fetch credits:', error);
+        }
+    } catch (error) {
+        console.error('Failed to generate fingerprint:', error);
+    }
+})();
+
+// Function to get or generate client fingerprint
+async function getClientFingerprint() {
+    if (clientFingerprint) return clientFingerprint;
+    return await generateFingerprint();
+}
+
 // Function to generate a stable client fingerprint
 async function generateFingerprint() {
     try {
@@ -185,13 +322,15 @@ const VideoClipper = (function () {
             errorTimeout = null;
         }
         
-        // Hide action buttons and quality selector
-        const actionButtons = document.querySelector('.action-buttons');
+        // Hide download button, quality selector and credit cost display
+        const downloadButton = document.querySelector('.btn-download');
         const qualitySelector = document.querySelector('.quality-selector');
-
-        if (actionButtons) actionButtons.classList.add('hidden');
+        const creditCostDisplay = document.getElementById('credit-cost-display');
+        
+        if (downloadButton) downloadButton.classList.add('hidden');
         if (qualitySelector) qualitySelector.classList.add('hidden');
-
+        if (creditCostDisplay) creditCostDisplay.style.display = 'none';
+       
         // Create progress elements if they don't exist
         if (!state.progressContainer) {
             createProgressElements();
@@ -306,13 +445,28 @@ const VideoClipper = (function () {
             if (state.statusText) state.statusText.classList.remove('visible');
             if (state.progressContainer) state.progressContainer.classList.remove('visible');
             
-            // Show action buttons and clean up after transition
-            setTimeout(() => {
-                const actionButtons = document.querySelector('.action-buttons');
+            // Show download button, credit cost, and quality selector after transition
+            setTimeout(async () => {
+                const downloadButton = document.querySelector('.btn-download');
                 const qualitySelector = document.querySelector('.quality-selector');
-                if (actionButtons) actionButtons.classList.remove('hidden');
+                const creditCostDisplay = document.getElementById('credit-cost-display');
+                
+                // Update credits from server to get the latest values
+                try {
+                    await updateCreditsFromServer();
+                    updateCreditCostDisplay();
+                } catch (error) {
+                    console.error('Error updating credits:', error);
+                }
+                
+if (downloadButton) downloadButton.classList.remove('hidden');
                 if (qualitySelector) qualitySelector.classList.remove('hidden');
+                if (creditCostDisplay) creditCostDisplay.style.display = 'block';
                 if (state.progressContainer) state.progressContainer.style.display = 'none';
+                
+                // Ensure the reset time emoji remains visible
+                const creditsResetTime = document.getElementById('credits-reset-time');
+                if (creditsResetTime) creditsResetTime.style.display = 'inline-block';
             }, 300);
         }, 3000);
     }
@@ -690,10 +844,17 @@ const VideoClipper = (function () {
         }
     }
 
-    function handleCompleteEvent(event) {
+    async function handleCompleteEvent(event) {
         if (state.completeHandled) return;
         state.completeHandled = true;
         state.completeEventReceived = true;
+        
+        // Update credits after successful completion
+        try {
+            await updateCreditsFromServer();
+        } catch (e) {
+            console.error('Failed to update credits after completion:', e);
+        }
         
         // Mark that we're completing successfully to prevent connection error messages
         errorShown = true;
@@ -812,7 +973,7 @@ const VideoClipper = (function () {
         
         try {
             updateStatus('Cancelling...');
-            const response = await fetch(`/cancel/${state.currentProcessId}?reason=cancel-button-click`, {
+            const response = await fetch(`/api/cancel/${state.currentProcessId}?reason=cancel-button-click`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json'
@@ -831,6 +992,13 @@ const VideoClipper = (function () {
                 state.eventSource = null;
             }
             clearProcessId();
+            
+            // Update credits from server after cancellation
+            try {
+                await updateCreditsFromServer();
+            } catch (e) {
+                console.error('Failed to update credits after cancellation:', e);
+            }
             
             // Update UI to show cancellation state
             updateStatus('Download cancelled');
@@ -877,7 +1045,7 @@ const VideoClipper = (function () {
             state.eventSource = null;
         }
 
-        const progressUrl = `/progress/${processId}`;
+        const progressUrl = `/api/progress/${processId}`;
         state.eventSource = new EventSource(progressUrl);
         let errorShown = false;
         state.connectionClosedIntentionally = false;
@@ -1012,64 +1180,6 @@ const VideoClipper = (function () {
     const timeStringCache = new Map();
     const timeCache = new Map();
     
-    // Cache warning element and state
-    let warningElement = null;
-    const maxDuration = 10 * 60; // 10 minutes in seconds
-    let lastWarningState = null;
-    
-    function createDurationWarning() {
-        const durationSpan = document.getElementById('duration-value');
-        if (!durationSpan) return null;
-
-        warningElement = document.getElementById('duration-warning');
-        if (!warningElement) {
-            warningElement = document.createElement('div');
-            warningElement.id = 'duration-warning';
-            warningElement.className = 'duration-warning-text';
-            warningElement.innerHTML = '';
-            durationSpan.parentNode.appendChild(warningElement);
-        }
-        return warningElement;
-    }
-    
-    function updateDurationWarning(duration) {
-        // Lazy initialization
-        if (!warningElement) {
-            warningElement = createDurationWarning();
-            if (!warningElement) return false;
-        }
-        
-        // Determine warning state
-        let warningState;
-        if (duration > maxDuration) {
-            warningState = 'long';
-        } else if (duration <= 0) {
-            warningState = 'invalid';
-        } else {
-            warningState = 'none';
-        }
-        
-        // Only update if state changed
-        if (warningState !== lastWarningState) {
-            lastWarningState = warningState;
-            
-            if (warningState === 'long') {
-                warningElement.style.display = 'block';
-                warningElement.textContent = 'Maximum clip duration is 10 minutes. Please choose a shorter clip.';
-                return false;
-            } else if (warningState === 'invalid') {
-                warningElement.style.display = 'block';
-                warningElement.textContent = 'Please enter a valid time range.';
-                return false;
-            } else {
-                warningElement.style.display = 'none';
-                return true;
-            }
-        }
-        
-        return warningState === 'none';
-    }
-    
     function timeToSeconds(timeStr) {
         if (!timeStr) return 0;
         
@@ -1177,7 +1287,6 @@ const VideoClipper = (function () {
             if (durationDisplayCache.lastDuration !== '00:00:00') {
                 durationDisplayCache.lastDuration = '00:00:00';
                 durationSpan.textContent = '00:00:00';
-                updateDurationWarning(0);
             }
             return;
         }
@@ -1193,14 +1302,12 @@ const VideoClipper = (function () {
                 if (durationDisplayCache.lastDuration !== durationStr) {
                     durationDisplayCache.lastDuration = durationStr;
                     durationSpan.textContent = durationStr;
-                    updateDurationWarning(duration);
                 }
             } catch (e) {
                 console.error('Error calculating duration:', e);
                 if (durationDisplayCache.lastDuration !== '00:00:00') {
                     durationDisplayCache.lastDuration = '00:00:00';
                     durationSpan.textContent = '00:00:00';
-                    updateDurationWarning(0);
                 }
             }
         });
@@ -1215,32 +1322,13 @@ const VideoClipper = (function () {
     }
 
     async function handleSubmit(event) {
-        // Check duration first
-        const startTime = getFormElement('start-time').value;
-        const endTime = getFormElement('end-time').value;
-
-        if (startTime && endTime) {
-            try {
-                const start = timeToSeconds(startTime);
-                const end = timeToSeconds(endTime);
-                if (end > start) {
-                    const duration = end - start;
-                    if (!updateDurationWarning(duration)) {
-                        event.preventDefault();
-                        // Scroll to the duration display
-                        const durationDisplay = document.querySelector('.duration-display');
-                        if (durationDisplay) {
-                            durationDisplay.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }
-                        return false;
-                    }
-                }
-            } catch (e) {
-                console.error('Error validating duration:', e);
-            }
-        }
-
         event.preventDefault();
+
+        // Check if user has enough credits
+        if (availableCredits <= 0) {
+            showError('No credits available.');
+            return;
+        }
 
         if (!state.form) {
             console.error('Form element not found');
@@ -1280,6 +1368,14 @@ const VideoClipper = (function () {
                 throw new Error('End time must be after start time');
             }
 
+            // Final credit check before submission using the last calculated cost
+            const roundedCost = parseFloat(lastCalculatedCost.toFixed(2));
+            if (availableCredits < roundedCost) {
+                const errorMessage = `Not enough credits. This clip requires ${roundedCost} credits, but you only have ${availableCredits}.`;
+                showError(errorMessage);
+                return; // Exit early instead of throwing to prevent duplicate error handling
+            }
+
             showLoading();
             updateStatus('Getting video information...');
             updateProgress(0);
@@ -1291,9 +1387,10 @@ const VideoClipper = (function () {
             let response;
             try {
                 // Get client fingerprint
+                // Use the pre-generated fingerprint
                 const clientFingerprint = await getClientFingerprint();
                 
-                response = await fetch('/submit', {
+                response = await fetch('/api/submit', {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -2215,6 +2312,178 @@ const VideoClipper = (function () {
     }
 
     // Public API
+    // Store the last calculated cost to avoid recalculating
+    let lastCalculatedCost = 0;
+    
+    // Function to update credits from the server
+    async function updateCreditsFromServer() {
+        try {
+            const response = await fetch('/api/credits', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Client-FP': await getClientFingerprint()
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch credits');
+            }
+            
+            const data = await response.json();
+            
+            // Update available credits
+            if (data.credits_left !== undefined) {
+                availableCredits = data.credits_left;
+                const creditsDisplay = document.getElementById('credits-available');
+                if (creditsDisplay) {
+                    creditsDisplay.textContent = availableCredits;
+                    creditsDisplay.style.fontWeight = '600';
+                    creditsDisplay.style.color = availableCredits > 0 ? '#10B981' : '#EF4444';
+                    updateCreditCostDisplay();
+                }
+            }
+            
+            // Update reset time if available
+            if (data.reset_time) {
+                const resetTimeDisplay = document.getElementById('credits-reset-time');
+                if (resetTimeDisplay) {
+                    const resetDate = new Date(data.reset_time);
+                    const now = new Date();
+                    const timeUntilReset = resetDate - now;
+                    
+                    // Format the reset time in Xh Ym or Xm format
+                    let resetTimeText;
+                    if (timeUntilReset < 0) {
+                        resetTimeText = 'Resets soon';
+                    } else {
+                        const hours = Math.floor(timeUntilReset / (1000 * 60 * 60));
+                        const minutes = Math.floor((timeUntilReset % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((timeUntilReset % (1000 * 60)) / 1000);
+                        
+                        if (hours > 0) {
+                            resetTimeText = `Resets in ${hours}h${minutes > 0 ? ` ${minutes}m` : ''}`.trim();
+                        } else if (minutes > 0) {
+                            resetTimeText = `Resets in ${minutes}m${seconds > 0 ? ` ${seconds}s` : ''}`.trim();
+                        } else {
+                            resetTimeText = `Resets in ${seconds}s`;
+                        }
+                    }
+                    
+                    // Update the tooltip text (aria-label) for both desktop and mobile
+                    resetTimeDisplay.setAttribute('aria-label', resetTimeText);
+                    
+                    // Also update the mobile hint text if it exists
+                    const mobileHint = resetTimeDisplay.querySelector('#mobile-hint');
+                    if (mobileHint) {
+                        mobileHint.textContent = resetTimeText;
+                    }
+                }
+            }
+            
+            return data;
+        } catch (error) {
+            console.error('Error updating credits:', error);
+            throw error;
+        }
+    }
+    
+    // Calculate credit cost based on duration and quality
+    function calculateCreditCost() {
+        const startTime = document.getElementById('start-time').value || '00:00:00';
+        const endTime = document.getElementById('end-time').value || '00:00:00';
+        const quality = document.getElementById('video-quality').value;
+        
+        // Convert time to seconds
+        const startSeconds = timeToSeconds(startTime);
+        const endSeconds = timeToSeconds(endTime);
+        
+        // Calculate duration in seconds
+        const durationInSeconds = Math.max(0, endSeconds - startSeconds);
+        
+        // Define cost per minute for each quality
+        const costPerMinute = {
+            '480': 0.25,
+            '720': 0.5,
+            '1080': 1.0,
+            '1440': 2.0
+        };
+        
+        // Calculate and store total cost
+        const cost = costPerMinute[quality] * (durationInSeconds / 60);
+        lastCalculatedCost = cost;
+        return { cost, durationInSeconds };
+    }
+    
+    // Update credit cost display and control download button state
+    function updateCreditCostDisplay() {
+        const creditCostDisplay = document.getElementById('credit-cost-display');
+        const creditCostText = document.getElementById('credit-cost-text');
+        const downloadBtn = document.getElementById('download-btn');
+        
+        // Block download button if no credits available
+        if (availableCredits <= 0) {
+            if (downloadBtn) downloadBtn.disabled = true;
+            creditCostDisplay.style.display = 'block';
+            creditCostText.textContent = 'No credits available';
+            creditCostText.style.color = '#EF4444'; // Red color
+            return;
+        }
+        
+        try {
+            const { cost, durationInSeconds } = calculateCreditCost();
+            
+            // Only show if we have a valid duration and cost
+            if (durationInSeconds > 0 && cost > 0) {
+                const roundedCost = parseFloat(cost.toFixed(2));
+                const hasEnoughCredits = availableCredits >= roundedCost;
+                
+                if (hasEnoughCredits) {
+                    creditCostText.textContent = `Uses ${roundedCost} credits`;
+                    creditCostText.style.color = '#10B981'; // Green color
+                    if (downloadBtn) downloadBtn.disabled = false;
+                } else {
+                    creditCostText.textContent = `Needs ${roundedCost} credits`;
+                    creditCostText.style.color = '#EF4444'; // Red color
+                    if (downloadBtn) downloadBtn.disabled = true;
+                }
+                
+                creditCostDisplay.style.display = 'block';
+            } else {
+                creditCostDisplay.style.display = 'none';
+                if (downloadBtn) downloadBtn.disabled = true;
+            }
+        } catch (error) {
+            console.error('Error updating credit cost:', error);
+            creditCostDisplay.style.display = 'none';
+            if (downloadBtn) downloadBtn.disabled = true;
+        }
+    }
+    
+    // Add event listeners for credit cost calculation
+    function setupCreditCostListeners() {
+        const timeInputs = document.querySelectorAll('input[type="text"][pattern]');
+        const qualitySelect = document.getElementById('video-quality');
+        
+        // Update credit cost when time inputs change
+        timeInputs.forEach(input => {
+            input.addEventListener('input', () => {
+                // Only update if this is a valid time input
+                if (input.value && input.checkValidity()) {
+                    updateCreditCostDisplay();
+                }
+            });
+        });
+        
+        // Update credit cost when quality changes
+        if (qualitySelect) {
+            qualitySelect.addEventListener('change', updateCreditCostDisplay);
+        }
+        
+        // Initial update
+        updateCreditCostDisplay();
+    }
+    
     return {
         init: function () {
             try {
@@ -2222,7 +2491,7 @@ const VideoClipper = (function () {
                 const savedProcessId = sessionStorage.getItem('ProcessId');
                 if (savedProcessId) {
                     // Send cancel request and clear the process ID
-                    fetch(`/cancel/${savedProcessId}?reason=page-refresh`, { method: 'GET' })
+                    fetch(`/api/cancel/${savedProcessId}?reason=page-refresh`, { method: 'GET' })
                         .finally(() => {
                             // Clear the process ID after sending the cancel request
                             sessionStorage.removeItem('ProcessId');
@@ -2238,8 +2507,15 @@ const VideoClipper = (function () {
                 createProgressElements();
                 setupPasteButton();
                 setupTimeInputs();
+                setupCreditCostListeners();
 
                 state.form.addEventListener('submit', handleSubmit);
+
+                // Initialize credits and update display
+                updateCreditsFromServer().then(() => {
+                    // After credits are loaded, update the display
+                    updateCreditCostDisplay();
+                });
 
                 console.log('Video Clipper initialized');
             } catch (error) {

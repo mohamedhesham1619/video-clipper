@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
+	"time"
 
 	"cloud.google.com/go/firestore"
 )
@@ -31,11 +33,17 @@ type YouTubeConfig struct {
 	CookiePath string
 }
 
+type RateLimitConfig struct {
+	MaxCredits float64
+	ResetDuration time.Duration
+}
+
 type Config struct {
 	SMTP        SMTPConfig
 	App         AppConfig
 	GoogleCloud GoogleCloudConfig
 	YouTube     YouTubeConfig
+	RateLimit   RateLimitConfig
 }
 
 // Close closes the Firestore client
@@ -112,6 +120,25 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("failed to create Firestore client: %w", err)
 	}
 	cfg.GoogleCloud.Firestore = firestoreClient
+
+	// Initialize rate limit configuration
+	maxCredits := getEnv("MAX_CREDITS")
+	if maxCredits == "" {
+		return nil, fmt.Errorf("MAX_CREDITS environment variable is required")
+	}
+	cfg.RateLimit.MaxCredits, err = strconv.ParseFloat(maxCredits, 64)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert MAX_CREDITS environment variable to float64: %w", err)
+	}
+
+	resetDuration := getEnv("CREDITS_RESET_DURATION")
+	if resetDuration == "" {
+		return nil, fmt.Errorf("CREDITS_RESET_DURATION environment variable is required")
+	}
+	cfg.RateLimit.ResetDuration, err = time.ParseDuration(resetDuration)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert CREDITS_RESET_DURATION environment variable to time.Duration: %w", err)
+	}
 
 	return cfg, nil
 }
