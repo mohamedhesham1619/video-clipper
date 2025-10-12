@@ -39,7 +39,7 @@
 
 - **Real-Time Progress** –  Displays live progress updates during the download process.  
 
-- **Quality Selection** – Provides video quality options from 360p up to 2K.  
+- **Quality Selection** – Provides video quality options from 480p up to 2K.  
 
 
 ## Tech Stack
@@ -59,6 +59,7 @@
 
 The following diagram illustrates the end-to-end flow, from client submission to file download.
 
+<br>
 
 ```mermaid
 sequenceDiagram
@@ -99,11 +100,11 @@ sequenceDiagram
 
 Since launching in **July 2025**, the app has gained users steadily, and the infrastructure evolved to handle increasing traffic while **minimizing costs by staying within free tier limits**.
 
----
+<br>
 
 ### Phase 1 – Google Cloud Run
 *Free tier: 50 CPU hours, 1 GB outbound data per month*  
- 
+<br>
 The app initially ran on **Cloud Run** using autoscaling with a maximum of one instance, handling all tasks including downloading, serving, and cleaning up videos. This setup was sufficient for the first month’s traffic **(43 users)**.
 
 As traffic increased in August **(246 users)**, data transfer grew significantly, **exceeding Cloud Run’s 1 GB outbound data limit** and leading to the transition to the next phase.
@@ -114,7 +115,7 @@ As traffic increased in August **(246 users)**, data transfer grew significantly
 
 ### Phase 2 – Cloud Run + Cloud Storage
 *Free tier: Cloud Run (50 CPU hours, 1 GB outbound data) + Cloud Storage (100 GB outbound data) per month*  
-
+<br>
 To handle the increasing data transfer, **Cloud Storage was integrated alongside Cloud Run** to offload downloads and reduce bandwidth usage. The backend uploaded processed videos to Cloud Storage and returned their download URLs to clients, allowing them to download directly from Cloud Storage instead of through Cloud Run.
 
 This setup took advantage of **Cloud Storage’s 100 GB of free outbound data**, which effectively handled bandwidth needs for September’s **942 users**. However, after 23 days, **CPU usage on Cloud Run exceeded the free tier limit**, prompting the transition to the next phase.
@@ -124,19 +125,18 @@ This setup took advantage of **Cloud Storage’s 100 GB of free outbound data**,
 
 ### Phase 3 – Amazon EC2
 *Free tier: 750 hours, 100 GB outbound data per month*  
-
+<br>
 This is the **current phase of the project**. After exceeding Cloud Run’s CPU time limit, the backend was **migrated to Amazon EC2** to gain more control and avoid the execution time restrictions of serverless environments.  
 
 **EC2 now handles all backend operations**, including downloading, processing, serving, and cleanup, providing **stable performance for 616 users** during the first week of October.
 
-
-
+<br>
 
 ## Key Design Decisions
 
 ### How rate limiting is implemented?
 
-The app initially used **IP-based rate limiting** to prevent abuse, limiting each IP to **4 requests every 2 hours**.
+The app initially used **IP-based rate limiting** to prevent abuse and control bandwidth usage, limiting each IP to **4 requests every 2 hours**.
 
 However, testing showed that IP-based rate limiting alone is insufficient. For example, in this case, the user was able to bypass the limit, making **11 requests for the same video URL within 30 minutes using 3 different IPs**.
 
@@ -172,13 +172,24 @@ Here’s how the new setup behaves when a user has already reached the rate limi
   The fingerprint is generated from browser-specific information, and different browsers on the same device can produce different fingerprints. This makes it appear as a new user.  
   This limitation is acceptable, as this case is relatively rare compared to the first two.
 
+  <br>
+
+While this **two-layer rate limit** effectively prevents abuse and helps control **bandwidth costs**, it applies the same restriction to all users — even those downloading very short clips.  
 
 
+To make the system **fairer and more bandwidth-aware**, a **daily credit-based quota** was introduced.
+
+Each user (tracked by both IP and fingerprint) now receives a **daily allowance of 20 credits**, refreshed every 24 hours. Credits are consumed based on the **duration and quality** of the requested clip:
+
+| Quality | Cost per minute |
+|:---------|:----------------|
+| 480p | 0.25 credits |
+| 720p | 0.5 credits |
+| 1080p | 1.0 credit |
+| 1440p (2K) | 2.0 credits |
 
 
-
-
-
+The credit system merges the reliability of the old IP and fingerprint checks with a fairer, bandwidth-aware quota model — achieving the best of both worlds.
 
 ---
 
