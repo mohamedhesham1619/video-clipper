@@ -24,7 +24,7 @@ let availableCredits = 0;
             if (creditsDisplay) {
                 if (creditsData.credits_left !== undefined) {
                     availableCredits = creditsData.credits_left;
-                    creditsDisplay.textContent = availableCredits;
+                    creditsDisplay.textContent = availableCredits.toFixed(2);
                     // Update color based on credits
                     creditsDisplay.style.fontWeight = '600';
                     if (availableCredits > 0) {
@@ -435,7 +435,6 @@ const VideoClipper = (function () {
     function hideLoading(force = false) {
         // Don't hide loading if there's an error showing, unless forced
         if (!force && state.statusText && state.statusText.classList.contains('error')) {
-            console.log(`[${currentErrorId || 'no-error'}] Not hiding loading - error is showing`);
             return;
         }
         
@@ -559,27 +558,26 @@ if (downloadButton) downloadButton.classList.remove('hidden');
     let errorTimeout;
     let currentErrorId = 0;
     
-    function showError(message, isRateLimit = false) {
+    function showError(message) {
         // Generate a new error ID and get the current timestamp
         currentErrorId++;
         const errorId = currentErrorId;
         const errorTimestamp = Date.now();
-        const hideDelay = isRateLimit ? 15000 : 10000; // 15s for rate limits, 10s for others
+        const hideDelay = 10000; // 10s for all errors
         
-        console.log(`[${errorId}] Showing error (${isRateLimit ? 'rate-limited' : 'regular'}) at ${new Date(errorTimestamp).toISOString()} for ${hideDelay}ms:`, message);
         
         // Clear any existing timeout to prevent premature hiding
         if (errorTimeout) {
-            console.log(`[${errorId}] Clearing previous error timeout`);
             clearTimeout(errorTimeout);
             errorTimeout = null;
         }
         
+        // Always hide loading state when showing an error
+        hideLoading(true);
+        
         // Only clear the process ID for actual errors, not during page unload
         if (isPageUnloading || !navigator.onLine || !document.hasFocus()) {
-            console.log(`[${errorId}] Not clearing ProcessId - page is unloading or connection lost`);
         } else {
-            console.log(`[${errorId}] Clearing ProcessId due to error`);
             clearProcessId();
         }
 
@@ -605,7 +603,6 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                 
                 newCloseBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    console.log(`[${errorId}] Close button clicked, hiding error manually`);
                     
                     // Clear any pending timeout
                     if (errorTimeout) {
@@ -631,6 +628,9 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                         state.progressContainer.style.display = 'none';
                     }
                     
+                    // Ensure loading is hidden
+                    hideLoading(true);
+                    
                     // Reset error state flags
                     state.errorEventReceived = false;
                     
@@ -640,14 +640,12 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                         if (state.statusText) {
                             state.statusText.style.visibility = 'hidden';
                             state.statusText.classList.remove('error');
-                            console.log(`[${errorId}] Error manually closed, UI reset`);
                         }
                     }, 300); // Wait for opacity transition
                 });
             }
 
             // Update progress bar to show error state
-            console.log('Setting progress bar to error state');
             if (state.progressFill) {
                 // Override inline styles completely for error state
                 state.progressFill.style.cssText = `
@@ -661,19 +659,15 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                     display: block;
                     z-index: 1;
                 `;
-                console.log('Progress fill styled for error with red background');
-                console.log('Progress fill computed styles:', window.getComputedStyle(state.progressFill).background);
             }
             
             // Add error class to progress bar for CSS styling
             if (state.progressBar) {
                 state.progressBar.classList.add('error');
-                console.log('Error class added to progress bar');
                 
                 // Also add error class to progress fill for additional styling
                 if (state.progressFill) {
                     state.progressFill.classList.add('error');
-                    console.log('Error class added to progress fill');
                 }
             }
             
@@ -682,27 +676,23 @@ if (downloadButton) downloadButton.classList.remove('hidden');
             if (progressBarContainer) {
                 progressBarContainer.style.backgroundColor = '#fee2e2';
                 progressBarContainer.style.border = '2px solid #ef4444';
-                console.log('Progress bar container styled for error');
             }
             
             // Hide loading indicator during error
             if (state.progressLoading) {
                 state.progressLoading.style.display = 'none';
-                console.log('Loading indicator hidden');
             }
             
             // Ensure progress container is visible during error
             if (state.progressContainer) {
                 state.progressContainer.style.display = 'block';
                 state.progressContainer.classList.add('visible');
-                console.log('Progress container made visible for error');
             }
             
             // Store the current error ID in a closure for the timeout
             const hideError = () => {
                 // Double check this is still the current error
                 if (errorId !== currentErrorId) {
-                    console.log(`[${errorId}] Ignoring hide - newer error (${currentErrorId}) is active`);
                     return;
                 }
                 
@@ -710,12 +700,11 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                 const remaining = Math.max(0, hideDelay - elapsed);
                 
                 if (remaining > 0) {
-                    console.log(`[${errorId}] Still need to wait ${remaining}ms before hiding`);
                     errorTimeout = setTimeout(hideError, remaining);
                     return;
                 }
                 
-                console.log(`[${errorId}] Hiding error after ${elapsed}ms (${isRateLimit ? 'rate-limited' : 'regular'})`);
+                
                 if (state.statusText && state.statusText.classList.contains('error')) {
                     // Show action buttons immediately
                     const actionButtons = document.querySelector('.action-buttons');
@@ -731,6 +720,9 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                         state.progressContainer.classList.remove('visible');
                         state.progressContainer.style.display = 'none';
                     }
+                    
+                    // Ensure loading is hidden
+                    hideLoading(true);
                     
                     // Reset error state flags
                     state.errorEventReceived = false;
@@ -748,7 +740,6 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                 errorTimeout = null;
             };
             
-            console.log(`[${errorId}] Setting auto-hide for ${hideDelay}ms`);
             errorTimeout = setTimeout(hideError, hideDelay);
         }
     };
@@ -1064,13 +1055,7 @@ if (downloadButton) downloadButton.classList.remove('hidden');
             
             clearProcessId();
             
-            // For rate limit errors, show the message longer (15 seconds)
-            const isRateLimitError = message && (
-                message.toLowerCase().includes('too many requests') ||
-                message.includes('You have reached the maximum number of requests, please try again later')
-            );
-            
-            showError(message, isRateLimitError);
+            showError(message);
             // Don't call hideLoading here - showError will handle it
         };
 
@@ -1408,27 +1393,11 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                 clearTimeout(timeoutId);
 
                 if (!response.ok) {
-                    // For 429 errors, include the retry time from the x-ratelimit-reset header
-                    if (response.status === 429) {
-                        const resetTime = response.headers.get('x-ratelimit-reset');
-                        let errorMessage = 'You have reached the maximum number of requests. ';
-                        
-                        if (resetTime) {
-                            const resetDate = new Date(parseInt(resetTime) * 1000);
-                            const formattedTime = resetDate.toLocaleTimeString();
-                            errorMessage += `Please try again at ${formattedTime}.`;
-                        } else {
-                            errorMessage += 'Please try again later.';
-                        }
-                        
-                        throw new Error(errorMessage);
-                    }
-                    // For other errors, try to get the error message from the response
                     try {
                         const error = await response.json();
                         throw new Error(error.message || `Server error: ${response.status} ${response.statusText}`);
                     } catch (e) {
-                        // If we can't parse the error response, use a generic message
+                        throw new Error('Failed to process your request. Please try again.');
                         throw new Error(`Server error: ${response.status} ${response.statusText}`);
                     }
                 }
@@ -1447,22 +1416,21 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                     stack: error.stack,
                     timestamp: new Date().toISOString()
                 });
-                // Check if this is a rate limit error (429) or contains rate limit message
-                const isRateLimit = error.message && (
-                    error.message.includes('429') ||
-                    error.message.toLowerCase().includes('rate limit') ||
-                    error.message.toLowerCase().includes('too many requests') ||
-                    error.message.toLowerCase().includes('maximum number of requests')
-                );
-                
                 const errorMessage = error.message || 'Failed to process your request. Please try again.';
-                showError(errorMessage, isRateLimit);
+                showError(errorMessage);
                 // Don't call hideLoading here - showError will handle it
                 // Don't re-throw here as we've already handled the error
             }
         } catch (error) {
             console.error('Error in form submission:', error);
-            showError('An unexpected error occurred. Please try again.');
+            // Only show generic error for unexpected errors, not for validation errors
+            if (error.message.includes('must be after') || 
+                error.message.includes('Please enter') ||
+                error.message.includes('playlist link')) {
+                showError(error.message);
+            } else {
+                showError('An unexpected error occurred. Please try again.');
+            }
             // Don't call hideLoading here - showError will handle it
         }
     }
@@ -2337,7 +2305,7 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                 availableCredits = data.credits_left;
                 const creditsDisplay = document.getElementById('credits-available');
                 if (creditsDisplay) {
-                    creditsDisplay.textContent = availableCredits;
+                    creditsDisplay.textContent = availableCredits.toFixed(2);
                     creditsDisplay.style.fontWeight = '600';
                     creditsDisplay.style.color = availableCredits > 0 ? '#10B981' : '#EF4444';
                     updateCreditCostDisplay();
