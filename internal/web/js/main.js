@@ -377,36 +377,14 @@ function rotateContent() {
 const contentSuggestions = {
     sides: [
         {
-            html: `<a href="https://www.mvvitrk.com/click?pid=5677&offer_id=1&l=1759319109" 
-            rel="noopener sponsored" 
-            target="_blank"
-            onclick="gtag('event', 'ad_click', {
-                ad_name: 'Movavi',
-                ad_position: 'side',
-                transport: 'beacon'
-            });">
-            <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1759417807/300x600-v3_m07yv2.png" alt="Movavi Video Editor" style="width: 100%; height: 100%; object-fit: contain;"></a>`
-        },
-        {
-            html: `<a href="https://flixier.com?fpr=mh1619"
-            rel="noopener sponsored"
-            target="_blank"
-            onclick="gtag('event', 'ad_click', {
-                ad_name: 'Flixier',
-                ad_position: 'side',
-                transport: 'beacon'
-            });">
-            <img src="https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24623/120x600px-4.png" alt="Flixier Video Editor" style="width: 100%; height: 100%; object-fit: contain;"></a>`
-        },
-        {
             html: `<a rel="noopener sponsored"
-            href="https://renderforest.pxf.io/c/6416428/1275473/14885" target="_blank" id="1275473"
+            href="https://renderforest.pxf.io/c/6416428/1275464/14885" target="_blank" id="1275464"
             onclick="gtag('event', 'ad_click', {
                 ad_name: 'Renderforest',
                 ad_position: 'side',
                 transport: 'beacon'
             });">
-            <img src="//a.impactradius-go.com/display-ad/14885-1275473" border="0" alt="" width="300" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/1275473/14885" style="position:absolute;visibility:hidden;" border="0" />
+            <img src="//a.impactradius-go.com/display-ad/14885-1275464" border="0" alt="" width="301" height="601"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/1275464/14885" style="position:absolute;visibility:hidden;" border="0" />
             `
         },
         {
@@ -433,7 +411,8 @@ const contentSuggestions = {
             `
         },
         {
-            html: `<a href="https://partner.pcloud.com/r/146969" title="pCloud Premium" target="_blank" onclick="gtag('event', 'ad_click', {
+            html: `<a href="https://partner.pcloud.com/r/146969" title="pCloud Premium" target="_blank" 
+            onclick="gtag('event', 'ad_click', {
                 ad_name: 'pCloud Premium',
                 ad_position: 'side',
                 transport: 'beacon'
@@ -458,6 +437,17 @@ document.addEventListener('DOMContentLoaded', function () {
 function createToolCard(tool) {
     const card = document.createElement('div');
     card.className = 'recommended-card';
+    card.style.cssText = `
+        width: 300px !important;
+        height: 250px !important;
+        overflow: hidden;
+        position: relative;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        flex: 0 0 auto;
+        margin: 0 10px 20px;
+    `;
 
     const trackingOnClick = `onclick="gtag('event', 'ad_click', {
         ad_name: '${tool.name}',
@@ -466,44 +456,68 @@ function createToolCard(tool) {
     });"`;
 
     card.innerHTML = `
-        <div class="recommended-card-inner" style="display: flex; flex-direction: column; height: 100%;">
-            <a href="${tool.link}" rel="noopener sponsored" target="_blank" class="image-link" ${trackingOnClick}>
-                <div class="image-wrapper">
-                    <img src="${tool.image}" alt="${tool.header}" loading="lazy">
-                </div>
-            </a>
-            <div class="recommended-content" style="padding: 1.25rem !important;">
-                <h3 class="recommended-title" style="
-                    font-size: 1.1rem !important;
-                    font-weight: 600 !important;
-                    color: #1f2937 !important;
-                    margin: 0 0 1.5rem 0 !important;
-                    line-height: 1.3 !important;
+        <a href="${tool.link}" rel="noopener sponsored" target="_blank" class="card-link" ${trackingOnClick} style="
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+        ">
+            <div class="image-wrapper" style="
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+            ">
+                <img src="${tool.image}" alt="${tool.header}" loading="lazy" style="
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    transition: transform 0.5s ease;
+                ">
+            </div>
+            <div class="card-overlay" style="
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+                padding: 1.5rem;
+                transform: translateY(100%);
+                transition: transform 0.3s ease;
+                color: white;
+            ">
+                <h3 class="card-title" style="
+                    margin: 0;
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    margin-bottom: 0.5rem;
+                    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
                 ">
                     ${tool.header}
                 </h3>
-                <a href="${tool.link}" rel="noopener sponsored" target="_blank" class="learn-more-btn" ${trackingOnClick} style="
-                    display: inline-flex !important;
-                    align-items: center !important;
-                    justify-content: center !important;
-                    padding: 0.6rem 1.25rem !important;
-                    background-color: #4f46e5 !important;
-                    color: white !important;
-                    border-radius: 0.375rem !important;
-                    font-weight: 500 !important;
-                    font-size: 0.95rem !important;
-                    text-decoration: none !important;
-                    transition: background-color 0.2s ease !important;
-                    margin-top: auto !important;
-                    margin-left: auto !important;
-                    margin-right: auto !important;
-                    width: fit-content !important;
-                ">
-                    Learn more about ${tool.name} <i class="fas fa-arrow-right"></i>
-                </a>
             </div>
-        </div>
+        </a>
     `;
+
+    // Add hover effects
+    card.addEventListener('mouseenter', () => {
+        card.style.transform = 'translateY(-5px)';
+        card.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.15)';
+        const img = card.querySelector('img');
+        const overlay = card.querySelector('.card-overlay');
+        if (img) img.style.transform = 'scale(1.05)';
+        if (overlay) overlay.style.transform = 'translateY(0)';
+    });
+
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = 'translateY(0)';
+        card.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+        const img = card.querySelector('img');
+        const overlay = card.querySelector('.card-overlay');
+        if (img) img.style.transform = 'scale(1)';
+        if (overlay) overlay.style.transform = 'translateY(100%)';
+    });
 
     return card;
 }
@@ -529,57 +543,28 @@ const recommended_tools = [
         "name": "CapCut",
         "header": "Create Stunning Videos—Fast, Fun & Free",
         "link": "https://capcutaffiliateprogram.pxf.io/c/6416428/3069270/22474",
-        "image": "https://app.impact.com/display-ad/22474-3069270?v=0"
+        "image": "https://app.impact.com/display-ad/22474-2073399?v=0"
     },
     {
         "name": "Renderforest",
         "header": "Bring Your Ideas to Life—Animated, Branded & Ready",
         "link": "https://renderforest.pxf.io/qzvzVj",
-        "image": "https://app.impact.com/display-ad/14885-1957252?v=1"
+        "image": "https://app.impact.com/display-ad/14885-1958589?v=1"
     },
 
     {
         "name": "Pcloud",
         "header": "Smart Virtual Drive—Cloud Storage That Works Like Local",
         "link": "https://partner.pcloud.com/r/146969",
-        "image": "https://partner.pcloud.com/media/banners/personal/personal005300250.jpg"
-    },
-    {
-        "name": "Flixier",
-        "header": "Your Cloud-Powered Video Studio",
-        "link": "https://flixier.com?fpr=mh1619",
-        "image": "https://d2gdx5nv84sdx2.cloudfront.net/uploads/gjzkybfs/marketing_asset/banner/24602/720x300px.png"
+        "image": "https://partner.pcloud.com/media/banners/lifetime/lifetime006300250.png"
     },
     {
         "name": "Envato",
         "header": "Top-Quality Assets for Designers & Video Editors",
         "link": "https://1.envato.market/WyQOdP",
-        "image": "https://app.impact.com/display-ad/4662-377341?v=3"
+        "image": "https://app.impact.com/display-ad/4662-381165?v=3"
 
     },
-    {
-        "name": "Movavi",
-        "header": "Your do-it-all video-making bundle",
-        "link": "https://www.mvvitrk.com/click?pid=5677&offer_id=1&l=1759319109",
-        "image": "https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1759417834/336x280-v3_bpsexv.png"
-    }
 ];
 
-
-
-// Function to render recommended tools
-document.addEventListener('DOMContentLoaded', function () {
-    const recommendedGrid = document.querySelector('.recommended-grid');
-
-    if (recommendedGrid) {
-        // Clear any existing content
-        recommendedGrid.innerHTML = '';
-
-        // Create and append cards for each tool
-        recommended_tools.forEach((tool) => {
-            const card = createToolCard(tool);
-            recommendedGrid.appendChild(card);
-        });
-    }
-});
 
