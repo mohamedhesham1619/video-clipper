@@ -290,7 +290,7 @@ function rotateContent() {
 
             // Create inner container for consistent sizing
             const innerContainer = document.createElement('div');
-            innerContainer.style.cssText = 'max-width: 100%; max-height: 100%; width: 100%; padding: 10px; box-sizing: border-box;';
+            innerContainer.style.cssText = 'max-width: 100%; max-height: 100%; width: 100%; box-sizing: border-box;';
             innerContainer.innerHTML = content;
 
             // Ensure images maintain aspect ratio
@@ -378,13 +378,13 @@ const contentSuggestions = {
     sides: [
         {
             html: `<a rel="noopener sponsored"
-            href="https://renderforest.pxf.io/c/6416428/1275464/14885" target="_blank" id="1275464"
+            href="https://renderforest.pxf.io/c/6416428/1275470/14885?u=https%3A%2F%2Fwww.renderforest.com%2F" target="_blank" id="1275470"
             onclick="gtag('event', 'ad_click', {
                 ad_name: 'Renderforest',
                 ad_position: 'side',
                 transport: 'beacon'
             });">
-            <img src="//a.impactradius-go.com/display-ad/14885-1275464" border="0" alt="" width="301" height="601"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/1275464/14885" style="position:absolute;visibility:hidden;" border="0" />
+            <img src="//a.impactradius-go.com/display-ad/14885-1275470" border="0" alt="" width="300" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/1275470/14885" style="position:absolute;visibility:hidden;" border="0" />
             `
         },
         {
@@ -561,8 +561,8 @@ const recommended_tools = [
     {
         "name": "Envato",
         "header": "Top-Quality Assets for Designers & Video Editors",
-        "link": "https://1.envato.market/WyQOdP",
-        "image": "https://app.impact.com/display-ad/4662-381165?v=3"
+        "link": "https://1.envato.market/c/6416428/3323986/4662",
+        "image": "https://app.impact.com/display-ad/4662-3323986?v=0"
 
     },
 ];
