@@ -21,6 +21,7 @@ type SMTPConfig struct {
 type AppConfig struct {
 	Environment  string
 	DownloadPath string
+	DownloadDomain string
 }
 
 type GoogleCloudConfig struct {
@@ -66,6 +67,7 @@ func Load() (*Config, error) {
 		App: AppConfig{
 			Environment:  getEnv("ENV"),
 			DownloadPath: getEnv("DOWNLOAD_PATH"),
+			DownloadDomain: getEnv("DOWNLOAD_DOMAIN"),
 		},
 		GoogleCloud: GoogleCloudConfig{
 			ProjectID:       getEnv("GC_PROJECT_ID"),
@@ -87,6 +89,10 @@ func Load() (*Config, error) {
 
 	if cfg.GoogleCloud.ProjectID == "" {
 		return nil, fmt.Errorf("GC_PROJECT_ID environment variable is required")
+	}
+
+	if cfg.App.DownloadDomain == "" {
+		return nil, fmt.Errorf("DOWNLOAD_DOMAIN environment variable is required")
 	}
 
 	// Ensure download directory exists

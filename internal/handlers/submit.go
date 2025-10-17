@@ -156,7 +156,7 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 
 			// If everything went well, send the download URL to the client
 			slog.Info("Download process finished successfully", "processId", processID, "videoTitle", videoTitle)
-			downloadUrl := fmt.Sprintf("api/download/%s", processID)
+			downloadUrl := fmt.Sprintf("%s/api/download/%s", cfg.App.DownloadDomain, processID)
 
 			progressChan <- models.ProgressEvent{
 				Event: models.EventTypeComplete,
@@ -172,7 +172,7 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 			}
 
 			// Schedule cleanup of the download process
-			time.AfterFunc(20*time.Minute, func() {
+			time.AfterFunc(30*time.Minute, func() {
 				slog.Info("Cleaning up download process", "processId", processID)
 				data.cleanupDownloadProcess(processID)
 			})
