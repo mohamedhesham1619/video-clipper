@@ -3,8 +3,8 @@
 </div>
 
 <p align="center">
-  Free, fast, and simple tool to download only the parts you need from online videos.  
-  No login, no watermark — just paste a link, set your range, and download.
+  Simple tool to download only the parts you need from online videos.<br>
+  Just paste a link, choose your timestamps, and let it handle the rest.
 </p>
 
 <p align="center">
@@ -49,8 +49,8 @@
 - **Backend**: Go
 - **Video Processing**: [yt-dlp](https://github.com/yt-dlp/yt-dlp), [ffmpeg](https://ffmpeg.org/)
 - **Real-time Communication**: Server-Sent Events (SSE)
-- **Containerization**: Docker
-- **Hosting**: Amazon EC2
+- **Infrastructure**: Docker, Amazon EC2, nginx, Let's Encrypt
+- **CDN**: Cloudflare (caching & security), CloudFront (video delivery)
 - **Data Storage**: Firestore (tracks created clips count)
 - **Analytics**: Google Analytics and Microsoft Clarity
 
@@ -179,7 +179,7 @@ While this **two-layer rate limit** effectively prevents abuse and helps control
 
 To make the system **fairer and more bandwidth-aware**, a **daily credit-based quota** was introduced.
 
-Each user (tracked by both IP and fingerprint) now receives a **daily allowance of 20 credits**, refreshed every 24 hours. Credits are consumed based on the **duration and quality** of the requested clip:
+Each user (tracked by both IP and fingerprint) now receives a **daily allowance of 30 credits**, refreshed every 24 hours. Credits are consumed based on the **duration and quality** of the requested clip:
 
 | Quality | Cost per minute |
 |:---------|:----------------|
