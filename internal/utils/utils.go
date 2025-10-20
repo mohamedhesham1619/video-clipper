@@ -91,6 +91,11 @@ func SanitizeName(name string, opts *SanitizeOptions) string {
 	return sanitized
 }
 
+// IsYouTubeURL returns true if the URL is a YouTube link.
+func IsYouTubeURL(url string) bool {
+	return strings.Contains(url, "youtube.com") || strings.Contains(url, "youtu.be")
+}
+
 // getVideoTitle retrieves the video title using yt-dlp.
 func GetVideoTitle(cfg *config.Config, videoRequest models.VideoRequest) (string, error) {
 	args := []string{

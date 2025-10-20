@@ -14,8 +14,8 @@ RUN go build -o build/clipper ./cmd/clipper
 # Final stage
 FROM alpine:latest
 
-# Install Python3, pip, and ffmpeg
-RUN apk add --no-cache python3 py3-pip ffmpeg
+# Install Python3, pip, ffmpeg, and aria2
+RUN apk add --no-cache python3 py3-pip ffmpeg aria2
 
 # Install the latest yt-dlp from PyPI (pip)
 RUN pip install --upgrade yt-dlp --break-system-packages

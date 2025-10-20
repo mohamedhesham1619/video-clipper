@@ -59,11 +59,6 @@ func StartVideoDownloadProcesses(cfg *config.Config, videoRequest models.VideoRe
 	return ytdlpCmd, ffmpegCmd, nil
 }
 
-// IsYouTubeURL returns true if the URL is a YouTube link.
-func IsYouTubeURL(url string) bool {
-	return strings.Contains(url, "youtube.com") || strings.Contains(url, "youtu.be")
-}
-
 func prepareYtDlpCommand(cfg *config.Config, videoRequest models.VideoRequest) *exec.Cmd {
 
 	var formatString string
@@ -84,6 +79,10 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.VideoRequest) *
 		"--audio-quality", "0",
 		"--socket-timeout", "20",
 		"--retries", "2",
+		"--concurrent-fragments", "6",
+		"--buffer-size", "64K",
+		"--external-downloader", "aria2c",
+		"--external-downloader-args", "aria2c:-x 4 -s 4 -k 1M --max-tries=3",
 		"-o", "-", // Output to stdout
 	}
 	if IsYouTubeURL(videoRequest.VideoURL) {
