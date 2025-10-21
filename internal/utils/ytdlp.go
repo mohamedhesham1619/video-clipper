@@ -39,7 +39,7 @@ func getCurrentYtDlpVersion() (string, error) {
 }
 
 func updateYtDlp() error {
-	cmd := exec.Command("pip", "install", "--upgrade", "yt-dlp", "--break-system-packages")
+	cmd := exec.Command("pip", "install", "-U", "yt-dlp[default]", "--break-system-packages")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("failed to update yt-dlp: %v", err)
