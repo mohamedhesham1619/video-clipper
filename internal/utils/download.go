@@ -78,7 +78,9 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.VideoRequest) *
 		"--no-abort-on-error",
 		"--audio-quality", "0",
 		"--socket-timeout", "20",
-		"--retries", "2",
+		"--retries", "5",
+		"--retry-sleep", "3", // wait 3s between retries
+		"--force-overwrites", // ensures retry writes cleanly
 		"--concurrent-fragments", "6",
 		"--buffer-size", "64K",
 		"--external-downloader", "aria2c",
