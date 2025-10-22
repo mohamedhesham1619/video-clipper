@@ -35,7 +35,7 @@ func main() {
 	}
 
 	// Load blocked domains into memory
-	err := utils.LoadBlockedDomainsFromFile("internal/data/blocked_domains.txt")
+	err := utils.LoadBlockedDomainsFromFile("internal/blocklist/blocked_domains.txt")
 	if err != nil {
 		slog.Error("Failed to load blocked domains", "error", err)
 	}

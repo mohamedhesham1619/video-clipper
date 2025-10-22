@@ -22,7 +22,7 @@ RUN pip install -U "yt-dlp[default]" --break-system-packages
 
 WORKDIR /app
 
-COPY --from=builder /app/internal/data/blocked_domains.txt ./internal/data/
+COPY --from=builder /app/internal/blocklist/blocked_domains.txt ./internal/blocklist/
 COPY --from=builder /app/internal/web ./internal/web
 COPY --from=builder /app/build/clipper .
 
