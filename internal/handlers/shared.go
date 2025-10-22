@@ -108,15 +108,26 @@ func (s *sharedData) stopDownloadProcessAndCleanUp(processID string) {
 }
 
 // StopProcessIfRunning stops the process if it is still running.
-// Returns true if the process was running and was stopped.
-// Returns false if the process was not running (already finished or nil).
+// Returns true and nil if the process was running and stopped successfully.
+// Returns true and error if the process was running but could not be stopped.
+// Returns false and nil if the process was not running (already finished or nil).
 func stopProcessIfRunning(process *exec.Cmd) (bool, error) {
 	if process == nil {
 		return false, nil
 	}
 	if process.ProcessState == nil || !process.ProcessState.Exited() {
-		return true, process.Process.Kill()
+		if err := process.Process.Kill(); err != nil {
+			// If we can't stop the process, return true and the error
+			return true, err
+		}
+
+		// Reap the process to ensures we don't leave any zombie processes
+		// We don't care about the error here since we killed it
+		_ = process.Wait()
+		
+		return true, nil
 	}
+	
 	return false, nil
 }
 
