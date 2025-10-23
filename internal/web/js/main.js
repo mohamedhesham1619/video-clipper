@@ -378,14 +378,13 @@ const contentSuggestions = {
     sides: [
         {
             html: `<a rel="noopener sponsored"
-            href="https://renderforest.pxf.io/c/6416428/1275470/14885?u=https%3A%2F%2Fwww.renderforest.com%2F" target="_blank" id="1275470"
-            onclick="gtag('event', 'ad_click', {
+           href="https://renderforest.pxf.io/c/6416428/1275476/14885?u=https%3A%2F%2Fwww.renderforest.com%2F" target="_blank" id="1275476"
+           onclick="gtag('event', 'ad_click', {
                 ad_name: 'Renderforest',
                 ad_position: 'side',
                 transport: 'beacon'
             });">
-            <img src="//a.impactradius-go.com/display-ad/14885-1275470" border="0" alt="" width="300" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/1275470/14885" style="position:absolute;visibility:hidden;" border="0" />
-            `
+            <img src="//a.impactradius-go.com/display-ad/14885-1275476" border="0" alt="" width="300" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/1275476/14885" style="position:absolute;visibility:hidden;" border="0" />`
         },
         {
             html: `<a rel="noopener sponsored"
@@ -542,21 +541,14 @@ const recommended_tools = [
     {
         "name": "CapCut",
         "header": "Create Stunning Videos—Fast, Fun & Free",
-        "link": "https://capcutaffiliateprogram.pxf.io/c/6416428/3069270/22474",
-        "image": "https://app.impact.com/display-ad/22474-2073399?v=0"
+        "link": "https://capcutaffiliateprogram.pxf.io/c/6416428/3069221/22474",
+        "image": "https://app.impact.com/display-ad/22474-3069221?v=0"
     },
     {
         "name": "Renderforest",
         "header": "Bring Your Ideas to Life—Animated, Branded & Ready",
-        "link": "https://renderforest.pxf.io/qzvzVj",
-        "image": "https://app.impact.com/display-ad/14885-1958589?v=1"
-    },
-
-    {
-        "name": "Pcloud",
-        "header": "Smart Virtual Drive—Cloud Storage That Works Like Local",
-        "link": "https://partner.pcloud.com/r/146969",
-        "image": "https://partner.pcloud.com/media/banners/lifetime/lifetime006300250.png"
+        "link": "https://renderforest.pxf.io/c/6416428/1476990/14885",
+        "image": "https://app.impact.com/display-ad/14885-1476990?v=0"
     },
     {
         "name": "Envato",
@@ -565,6 +557,12 @@ const recommended_tools = [
         "image": "https://app.impact.com/display-ad/4662-3323986?v=0"
 
     },
+    {
+        "name": "Pcloud",
+        "header": "Smart Virtual Drive—Cloud Storage That Works Like Local",
+        "link": "https://partner.pcloud.com/r/146969",
+        "image": "https://partner.pcloud.com/media/banners/lifetime/lifetime006300250.png"
+    }
 ];
 
 
