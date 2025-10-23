@@ -169,7 +169,7 @@ func (cs *CreditsStore) cleanUpExpiredCredits() {
 	}
 }
 
-func (cs *CreditsStore) StartExpiredCreditsCleaner(interval time.Duration) *time.Ticker {
+func (cs *CreditsStore) StartExpiredCreditsCleaner(interval time.Duration) {
 	slog.Info("Cleaning up expired credits ... ")
 	ticker := time.NewTicker(interval)
 	go func() {
@@ -177,5 +177,4 @@ func (cs *CreditsStore) StartExpiredCreditsCleaner(interval time.Duration) *time
 			cs.cleanUpExpiredCredits()
 		}
 	}()
-	return ticker
 }

@@ -3,7 +3,6 @@ package utils
 import (
 	"clipper/internal/config"
 	"clipper/internal/models"
-	"context"
 	"fmt"
 	"log/slog"
 	"math"
@@ -14,8 +13,6 @@ import (
 	"strings"
 	"time"
 	"unicode"
-
-	"cloud.google.com/go/firestore"
 )
 
 func GenerateID() string {
@@ -107,7 +104,8 @@ func GetVideoTitle(cfg *config.Config, videoRequest models.VideoRequest) (string
 		"--ignore-errors",        // Prevents crashes on format issues
 		"--no-abort-on-error",    // Continues trying other formats
 		"--socket-timeout", "20", // Prevents hanging
-		"--retries", "2",
+		"--retries", "3",
+		"--retry-sleep", "3", // wait 3s between retries
 	}
 	if IsYouTubeURL(videoRequest.VideoURL) {
 		args = append(args, "--cookies", cfg.YouTube.CookiePath)
@@ -165,8 +163,8 @@ func GetActualQuality(videoTitle string) string {
 	return strconv.Itoa(closest) + "p"
 }
 
-// calculate the clip duration in microseconds
-func calculateClipDuration(start, end string) (int64, error) {
+// ParseTimeRangeToMicroseconds parses a time range in format "hh:mm:ss" and returns the duration in microseconds.
+func ParseTimeRangeToMicroseconds(start, end string) (int64, error) {
 
 	layout := "15:04:05"
 	startTime, err := time.Parse(layout, start)
@@ -220,14 +218,4 @@ func GetEgyptTime() string {
 		location = time.FixedZone("EET", 2*60*60) // fallback to UTC+2
 	}
 	return time.Now().In(location).Format("2006-01-02 3:04:05 PM")
-}
-
-func IncrementClipCount(client *firestore.Client) error {
-	_, err := client.Collection("stats").Doc("clips").Update(context.Background(), []firestore.Update{
-		{
-			Path:  "count",
-			Value: firestore.Increment(1),
-		},
-	})
-	return err
 }

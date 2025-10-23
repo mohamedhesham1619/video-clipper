@@ -1,4 +1,4 @@
-package utils
+package blocklist
 
 import (
 	"bufio"
@@ -8,13 +8,13 @@ import (
 	"strings"
 )
 
-// blockedDomainsMap holds all blocked domains in memory
+// blocklistMap holds all blocked domains in memory
 // Since the domains count is 437k, a map is used for O(1) lookups
 // The estimated memory usage is around 20-30MB
-var blockedDomainsMap = make(map[string]bool)
+var blocklistMap = make(map[string]bool)
 
-// LoadBlockedDomainsFromFile loads blocked domains from the file into blockedDomainsMap
-func LoadBlockedDomainsFromFile(filename string) error {
+// LoadFromFile loads blocked domains from the file into blocklistMap
+func LoadFromFile(filename string) error {
 	file, err := os.Open(filename)
 	if err != nil {
 		return err
@@ -31,7 +31,7 @@ func LoadBlockedDomainsFromFile(filename string) error {
 		}
 
 		baseDomain := line[2:] // Remove "*." prefix
-		blockedDomainsMap[baseDomain] = true
+		blocklistMap[baseDomain] = true
 	}
 
 	return nil
@@ -134,7 +134,7 @@ func isDomainBlocked(domain string) bool {
 	// For "sub.example.com", check: "sub.example.com", "example.com", "com"
 	for i := 0; i < len(parts); i++ {
 		suffix := strings.Join(parts[i:], ".")
-		if _, exist := blockedDomainsMap[suffix]; exist {
+		if _, exist := blocklistMap[suffix]; exist {
 			return true
 		}
 	}

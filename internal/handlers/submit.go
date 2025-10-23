@@ -1,9 +1,13 @@
 package handlers
 
 import (
+	"clipper/internal/blocklist"
 	"clipper/internal/config"
 	"clipper/internal/credits"
+	"clipper/internal/downloader"
 	"clipper/internal/models"
+	"clipper/internal/stats"
+	"clipper/internal/updater"
 	"clipper/internal/utils"
 	"encoding/json"
 	"fmt"
@@ -51,7 +55,7 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 		// Check if the URL is blocked
 		// Since most of the requests are for YouTube, we skip the blocked check for YouTube URLs
 		if !utils.IsYouTubeURL(videoRequest.VideoURL) {
-			if utils.IsBlocked(videoRequest.VideoURL) {
+			if blocklist.IsBlocked(videoRequest.VideoURL) {
 				slog.Warn("Blocked download request", "request", videoRequest)
 				http.Error(w, "Failed to process the video", http.StatusBadRequest) // Intentionally vague
 				return
@@ -92,8 +96,12 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 				// Clean up any resources associated with this process
 				data.cleanupDownloadProcess(processID)
 
-				// The download could fail if yt-dlp is outdated, so we check for updates and rebuild the container if necessary.
-				go utils.CheckAndUpdateYtDlp()
+				// Increment failed downloads count and send alert if threshold is reached
+				go stats.IncrementFailedDownloadsAndNotify(cfg.SMTP)
+
+				// The download could fail if yt-dlp is outdated, so we check for updates
+				go updater.CheckAndUpdateYtDlp()
+
 				return
 			}
 
@@ -106,7 +114,7 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 				return
 			}
 
-			// Get the actual quality from the video title
+			// Get the actual quality from the retrieved video title
 			actualQuality := utils.GetActualQuality(videoTitle)
 			if actualQuality == "" {
 				progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Could not get video info"}}
@@ -128,7 +136,7 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 			}
 
 			// StartVideoDownloadProcesses function start the download processes and doesn't wait for them to finish instead it returns the running commands
-			ytdlpCmd, ffmpegCmd, err := utils.StartVideoDownloadProcesses(cfg, videoRequest, videoTitle, &downloadProcess)
+			ytdlpCmd, ffmpegCmd, err := downloader.StartVideoDownloadProcesses(cfg, videoRequest, videoTitle, &downloadProcess)
 
 			// If there was an error during the download, send an error message on the channel and clean up.
 			if err != nil {
@@ -136,6 +144,8 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 				progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Failed to download video"}}
 				close(progressChan)
 				data.cleanupDownloadProcess(processID)
+				go stats.IncrementFailedDownloadsAndNotify(cfg.SMTP)
+				go updater.CheckAndUpdateYtDlp()
 				return
 			}
 
@@ -144,13 +154,16 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 			downloadProcess.FFmpegProcess = ffmpegCmd
 
 			// Wait for both processes to finish
-			// If any process fails, send an error message on the channel and clean up.
-			if err := ffmpegCmd.Wait(); err != nil {
-				handleProcessError("ffmpeg", err, progressChan, processID)
+			// If any process fails, send error message on the channel, increment failed downloads count and check for yt-dlp updates.
+			ffmpegErr := ffmpegCmd.Wait()
+			ytdlpErr := ytdlpCmd.Wait()
+			
+			if ffmpegErr != nil {
+				handleProcessError("ffmpeg", ffmpegErr, progressChan, processID, cfg.SMTP)
 				return
 			}
-			if err := ytdlpCmd.Wait(); err != nil {
-				handleProcessError("yt-dlp", err, progressChan, processID)
+			if ytdlpErr != nil {
+				handleProcessError("yt-dlp", err, progressChan, processID, cfg.SMTP)
 				return
 			}
 
@@ -166,12 +179,12 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 			close(progressChan)
 
 			// Increment clip count in Firestore
-			err = utils.IncrementClipCount(cfg.GoogleCloud.Firestore)
+			err = stats.IncrementClipCount(cfg.GoogleCloud.Firestore)
 			if err != nil {
 				slog.Error("Error incrementing clip count", "error", err)
 			}
 
-			// Schedule cleanup of the download process
+			// Schedule cleanup for the download process
 			time.AfterFunc(30*time.Minute, func() {
 				slog.Info("Cleaning up download process", "processId", processID)
 				data.cleanupDownloadProcess(processID)
@@ -201,14 +214,16 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 }
 
 // handleProcessError handles process failures and cleans up resources
-func handleProcessError(processName string, err error, progressChan chan models.ProgressEvent, processID string) {
-	slog.Error(processName+" process failed", "error", err)
+func handleProcessError(processName string, err error, progressChan chan models.ProgressEvent, processID string, smtpConfig config.SMTPConfig) {
+	slog.Error(processName+" process failed for process ID "+processID, "error", err)
 	progressChan <- models.ProgressEvent{
 		Event: models.EventTypeError,
 		Data:  map[string]string{"message": "Failed to process video"},
 	}
 	close(progressChan)
 	data.cleanupDownloadProcess(processID)
+	go stats.IncrementFailedDownloadsAndNotify(smtpConfig)
+	go updater.CheckAndUpdateYtDlp()
 }
 
 func GetUserIP(r *http.Request) string {

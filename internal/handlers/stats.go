@@ -8,6 +8,7 @@ import (
 	"net/http"
 )
 
+// StatsHandler returns a dynamic JSON response used to render the "Created Clips" badge on the GitHub README.
 func StatsHandler(cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 

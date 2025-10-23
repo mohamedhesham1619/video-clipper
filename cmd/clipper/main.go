@@ -1,13 +1,16 @@
 package main
 
 import (
+	"clipper/internal/blocklist"
 	"clipper/internal/config"
 	"clipper/internal/credits"
 	"clipper/internal/server"
-	"clipper/internal/utils"
+	"clipper/internal/stats"
+	"clipper/internal/updater"
 	"flag"
 	"log/slog"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -35,7 +38,7 @@ func main() {
 	}
 
 	// Load blocked domains into memory
-	err := utils.LoadBlockedDomainsFromFile("internal/blocklist/blocked_domains.txt")
+	err := blocklist.LoadFromFile("internal/blocklist/blocked_domains.txt")
 	if err != nil {
 		slog.Error("Failed to load blocked domains", "error", err)
 	}
@@ -53,11 +56,15 @@ func main() {
 	creditsStore.StartExpiredCreditsCleaner(cfg.RateLimit.ResetDuration)
 
 	// Start yt-dlp daily updater
-	utils.StartYtDlpDailyUpdater()
+	updater.StartYtDlpDailyUpdater()
+
+	// Start routine to periodically reset failed downloads count
+	stats.StartFailedDownloadsCountReset(3 * time.Hour)
 
 	// --- Server Initialization ---
 	srv := server.New(cfg, creditsStore)
 
+	// Start the server
 	if err := srv.Start(); err != nil {
 		slog.Error("Server error", "error", err)
 		os.Exit(1)

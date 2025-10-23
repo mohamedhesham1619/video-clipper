@@ -1,9 +1,10 @@
-package utils
+package downloader
 
 import (
 	"bufio"
 	"clipper/internal/config"
 	"clipper/internal/models"
+	"clipper/internal/utils"
 	"fmt"
 	"io"
 	"log/slog"
@@ -33,7 +34,7 @@ func StartVideoDownloadProcesses(cfg *config.Config, videoRequest models.VideoRe
 
 	// Calculate the total clip duration.
 	// This is used to calculate the progress percentage.
-	totalTime, err := calculateClipDuration(videoRequest.ClipStart, videoRequest.ClipEnd)
+	totalTime, err := utils.ParseTimeRangeToMicroseconds(videoRequest.ClipStart, videoRequest.ClipEnd)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error calculating clip duration in microseconds: %v", err)
 	}
@@ -63,7 +64,7 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.VideoRequest) *
 
 	var formatString string
 
-	if IsYouTubeURL(videoRequest.VideoURL) {
+	if utils.IsYouTubeURL(videoRequest.VideoURL) {
 		// Youtube often seperate the audio and video streams, so we need to prefer seperate streams to get the required video quality.
 		formatString = fmt.Sprintf("bestvideo[height<=%[1]v]+bestaudio/best[height<=%[1]v]/best", videoRequest.Quality)
 	} else {
@@ -87,7 +88,7 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.VideoRequest) *
 		"--external-downloader-args", "aria2c:-x 4 -s 4 -k 1M --max-tries=3",
 		"-o", "-", // Output to stdout
 	}
-	if IsYouTubeURL(videoRequest.VideoURL) {
+	if utils.IsYouTubeURL(videoRequest.VideoURL) {
 		args = append(args, "--cookies", cfg.YouTube.CookiePath)
 	}
 	args = append(args, videoRequest.VideoURL)
