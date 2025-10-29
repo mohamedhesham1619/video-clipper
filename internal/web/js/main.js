@@ -431,11 +431,16 @@ document.addEventListener('DOMContentLoaded', function () {
 // Recommended tools data
 // Function to create a tool card element
 function createToolCard(tool) {
+    const isMobileView = window.innerWidth <= 768;
     const card = document.createElement('div');
     card.className = 'recommended-card';
+    
+    const cardWidth = 300; // Same width for both mobile and desktop
+    const cardHeight = isMobileView ? 215 : 250; // 215px height for mobile, 250px for desktop
+    
     card.style.cssText = `
-        width: 300px !important;
-        height: 250px !important;
+        width: ${cardWidth}px !important;
+        height: ${cardHeight}px !important;
         overflow: hidden;
         position: relative;
         border-radius: 8px;
@@ -456,22 +461,20 @@ function createToolCard(tool) {
             display: block;
             width: 100%;
             height: 100%;
-            position: relative;
+            position: absolute;
+            top: 0;
+            left: 0;
             overflow: hidden;
             text-decoration: none;
         ">
-            <div class="image-wrapper" style="
+            <img src="${tool.image}" alt="${tool.header}" loading="lazy" style="
+                display: block;
                 width: 100%;
                 height: 100%;
-                overflow: hidden;
+                object-fit: cover;
+                object-position: center;
+                transition: transform 0.5s ease;
             ">
-                <img src="${tool.image}" alt="${tool.header}" loading="lazy" style="
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    transition: transform 0.5s ease;
-                ">
-            </div>
             <div class="card-overlay" style="
                 position: absolute;
                 bottom: 0;
@@ -521,17 +524,97 @@ function createToolCard(tool) {
 // Function to render recommended tools
 document.addEventListener('DOMContentLoaded', function () {
     const recommendedGrid = document.querySelector('.recommended-grid');
+    const swiperWrapper = document.querySelector('.recommended-grid .swiper-wrapper');
 
-    if (recommendedGrid) {
-        // Clear any existing content
-        recommendedGrid.innerHTML = '';
+    if (!recommendedGrid || !swiperWrapper) return;
 
-        // Create and append cards for each tool
-        recommended_tools.forEach((tool) => {
+    // Helper to detect mobile viewport
+    const isMobile = () => window.innerWidth <= 768;
+
+    // Choose data set based on viewport
+    function getToolsForViewport() {
+        try {
+            return isMobile() && typeof mobile_recommended_tools !== 'undefined'
+                ? mobile_recommended_tools
+                : recommended_tools;
+        } catch (_) {
+            return recommended_tools;
+        }
+    }
+
+    // Render slides/cards into the wrapper
+    function renderTools() {
+        swiperWrapper.innerHTML = '';
+        const tools = getToolsForViewport();
+        tools.forEach((tool) => {
             const card = createToolCard(tool);
-            recommendedGrid.appendChild(card);
+            const slide = document.createElement('div');
+            slide.className = 'swiper-slide';
+            slide.style.cssText = 'width: auto; height: auto;';
+            slide.appendChild(card);
+            swiperWrapper.appendChild(slide);
         });
     }
+
+    // Initialize Swiper only on mobile
+    function initSwiper() {
+        if (!isMobile()) return null;
+        const swiper = new Swiper('.recommended-grid.swiper', {
+            slidesPerView: 1.1,
+            spaceBetween: 16,
+            centeredSlides: false,
+            grabCursor: true,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            breakpoints: {
+                480: {
+                    slidesPerView: 1.15,
+                    spaceBetween: 20,
+                }
+            }
+        });
+        return swiper;
+    }
+
+    // Initial render and swiper setup
+    renderTools();
+    let swiperInstance = initSwiper();
+    let lastIsMobile = isMobile();
+
+    // Re-render and (re)init/destroy Swiper on breakpoint changes
+    let resizeTimer;
+    window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+            const nowIsMobile = isMobile();
+
+            // If breakpoint changed, re-render with the appropriate dataset
+            if (nowIsMobile !== lastIsMobile) {
+                // Destroy existing Swiper before DOM changes
+                if (swiperInstance) {
+                    swiperInstance.destroy(true, true);
+                    swiperInstance = null;
+                }
+
+                renderTools();
+
+                // Recreate Swiper if entering mobile
+                swiperInstance = initSwiper();
+                lastIsMobile = nowIsMobile;
+                return;
+            }
+
+            // If still in same mode, only init/destroy swiper as needed
+            if (nowIsMobile && !swiperInstance) {
+                swiperInstance = initSwiper();
+            } else if (!nowIsMobile && swiperInstance) {
+                swiperInstance.destroy(true, true);
+                swiperInstance = null;
+            }
+        }, 200);
+    });
 });
 
 const recommended_tools = [
@@ -561,5 +644,29 @@ const recommended_tools = [
         "image": "https://partner.pcloud.com/media/banners/lifetime/lifetime006300250.png"
     }
 ];
+
+const mobile_recommended_tools = [
+    {
+        "name": "CapCut",
+        "link": "https://capcutaffiliateprogram.pxf.io/c/6416428/3069221/22474?u=https%3A%2F%2Fwww.capcut.com%2F",
+        "image": "https://app.impact.com/display-ad/22474-3069270?v=0"
+    },
+    {
+        "name": "Renderforest",
+        "link": "https://renderforest.pxf.io/c/6416428/1476990/14885",
+        "image": "https://app.impact.com/display-ad/14885-1476991?v=0"
+    },
+    {
+        "name": "Pcloud",
+        "link": "https://partner.pcloud.com/r/146969",
+        "image": "https://partner.pcloud.com/media/banners/lifetime/lifetime012300250.png"
+    },
+    {
+        "name": "Envato",
+        "link": "https://1.envato.market/c/6416428/3323986/4662",
+        "image": "https://app.impact.com/display-ad/4662-3323992?v=0"
+
+    }
+]
 
 

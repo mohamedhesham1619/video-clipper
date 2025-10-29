@@ -18,7 +18,6 @@ let availableCredits = 0;
                 }
             });
             const creditsData = await response.json();
-            console.log('Credits info:', creditsData);
             // Update the credits display
             const creditsDisplay = document.getElementById('credits-available');
             if (creditsDisplay) {
@@ -733,7 +732,7 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                         if (state.statusText && state.statusText.classList.contains('error') && errorId === currentErrorId) {
                             state.statusText.style.visibility = 'hidden';
                             state.statusText.classList.remove('error');
-                            console.log(`[${errorId}] Error auto-hidden at ${new Date().toISOString()}`);
+                            
                         }
                     }, 300);
                 }
@@ -1061,14 +1060,6 @@ if (downloadButton) downloadButton.classList.remove('hidden');
 
         // Handle connection errors
         state.eventSource.onerror = () => {
-            console.log('Connection error event fired');
-            console.log('Error state:', {
-                errorShown,
-                completeHandled: state.completeHandled,
-                connectionClosedIntentionally: state.connectionClosedIntentionally,
-                completeEventReceived: state.completeEventReceived,
-                errorEventReceived: state.errorEventReceived
-            });
             
             // Only handle connection errors if the page is still focused, online, and not unloading
             if (!isPageUnloading && document.hasFocus() && navigator.onLine) {
@@ -1080,14 +1071,9 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                     // and we haven't received the complete event
                     // and we haven't received an error event from the server
                     if (!errorShown && !state.completeHandled && !state.connectionClosedIntentionally && !state.completeEventReceived && !state.errorEventReceived) {
-                        console.log('Showing connection error message');
                         showConnectionError('Connection to server was lost');
-                    } else {
-                        console.log('Skipping connection error message due to state flags');
                     }
                 }, 100); // 100ms delay to allow server events to be processed
-            } else {
-                console.log('Skipping connection error handling - page is unloading or browser is offline');
             }
         };
 
@@ -1102,8 +1088,6 @@ if (downloadButton) downloadButton.classList.remove('hidden');
         // Handle server-sent error messages
         state.eventSource.addEventListener('error', (event) => {
             if (!event.data) {
-                // No data in the event, just log it
-                console.log('Received error event with no data');
                 return;
             }
             
@@ -1112,11 +1096,9 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                 if (typeof event.data === 'string' && event.data.trim() !== '') {
                     data = JSON.parse(event.data);
                     if (data && data.message) {
-                        console.log('Showing server error message:', data.message);
                         showConnectionError(data.message);
                     }
                 } else {
-                    console.log('No message in error event, showing generic error');
                     showConnectionError('An error occurred during processing');
                 }
             } catch (e) {
@@ -1754,7 +1736,7 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                                 return;
                             }
                         } catch (err) {
-                            console.log('Clipboard API not available or permission denied');
+                            showError('Clipboard API not available or permission denied');
                         }
                     }
                     
@@ -2001,10 +1983,8 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                 line-height: 0.9;
                 padding: 0;
                 position: relative;
-                top: -6px;
                 transform: scale(0.9);
                 transform-origin: center top;
-                margin-top: -2px;
             `;
 
             // Remove progress info container and its children
@@ -2129,25 +2109,6 @@ if (downloadButton) downloadButton.classList.remove('hidden');
 
             // Initialize loading state
             state.progressLoading.style.display = 'block';
-        }
-    }
-
-    // Test function to manually trigger error state
-    function testErrorState() {
-        console.log('Testing error state...');
-        if (state.progressFill) {
-            state.progressFill.style.cssText = `
-                position: absolute;
-                top: 0;
-                left: 0;
-                height: 100%;
-                width: 100%;
-                background: #ff4444 !important;
-                transition: all 0.3s ease-out;
-                display: block;
-                z-index: 1;
-            `;
-            console.log('Test: Progress fill should now be red');
         }
     }
 
@@ -2278,6 +2239,27 @@ if (downloadButton) downloadButton.classList.remove('hidden');
             }
         });
     }
+
+
+    // Test function to manually trigger error state
+    function testErrorState() {
+        console.log('Testing error state...');
+        if (state.progressFill) {
+            state.progressFill.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 100%;
+                background: #ff4444 !important;
+                transition: all 0.3s ease-out;
+                display: block;
+                z-index: 1;
+            `;
+            console.log('Test: Progress fill should now be red');
+        }
+    }
+
 
     // Public API
     // Store the last calculated cost to avoid recalculating
@@ -2485,9 +2467,7 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                     updateCreditCostDisplay();
                 });
 
-                console.log('Video Clipper initialized');
             } catch (error) {
-                console.error('Initialization error:', error);
                 showError('Failed to initialize the application. Please refresh the page.');
             }
         },

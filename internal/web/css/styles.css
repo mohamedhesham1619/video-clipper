@@ -93,7 +93,7 @@
 /* Progress Bar Styles */
 .progress-container {
     position: relative;
-    margin: 0.5rem auto;
+    margin: 0 auto;
     padding: 0;
     width: 100%;
     max-width: 600px;
@@ -289,7 +289,7 @@
 /* Progress Container */
 .progress-container {
     position: relative;
-    margin: 1rem 0;
+    margin: 0.25rem 0;
     padding: 0.5rem 0;
     width: 100%;
 }
@@ -2324,7 +2324,7 @@ header.main-header {
 
 .subtitle {
     color: #6b7280;
-    margin: 0 auto 2rem;
+    margin: 0 auto 1rem;
     font-size: 1.2rem;
     max-width: 500px;
     width: calc(100% - 2rem);
@@ -2439,7 +2439,7 @@ header.main-header {
 
 .duration-display {
     text-align: left;
-    margin: 1.5rem 1rem;
+    margin: 1.25rem 1rem;
     font-size: 1rem;
     color: #4a5568;
     max-width: 500px;

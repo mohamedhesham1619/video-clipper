@@ -1,10 +1,8 @@
 // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded, initializing contact form...');
     
     // Function to show alerts
     function showAlert(message, type = 'info') {
-        console.log(`Showing alert: ${message} (${type})`);
         
         // Remove any existing alerts
         const existingAlert = document.querySelector('.alert');
@@ -65,10 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        console.log('Contact form found, setting up event listener...');
-        
         contactForm.addEventListener('submit', async function(e) {
-            console.log('Form submission started');
             e.preventDefault();
             
             try {
@@ -87,8 +82,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     email: email,
                     message: message 
                 };
-                
-                console.log('Form data:', data);
                 
                 // Simple validation
                 if (!data.message) {
@@ -142,7 +135,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     try {
-                        console.log('Sending request to /feedback...');
                         const response = await fetch('/api/feedback', {
                             method: 'POST',
                             headers: {
@@ -151,12 +143,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             body: JSON.stringify(data)
                         });
                         
-                        console.log('Response status:', response.status);
-                        
                         let responseData;
                         try {
                             responseData = await response.json();
-                            console.log('Response data:', responseData);
                         } catch (parseError) {
                             console.error('Error parsing JSON response:', parseError);
                             const text = await response.text();
@@ -199,8 +188,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 showAlert(error.message || 'There was an error sending your message. Please try again.', 'error');
             }
         });
-        
-        console.log('Contact form initialization complete');
     }
     
     // Initialize the contact form
