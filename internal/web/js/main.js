@@ -388,13 +388,13 @@ const contentSuggestions = {
         },
         {
             html: `<a rel="noopener sponsored"
-            href="https://1.envato.market/c/6416428/3279856/4662?subId1=ulvg&subId2=october" target="_blank" id="3279856"
-            onclick="gtag('event', 'ad_click', {
+           href="https://1.envato.market/c/6416428/3371584/4662" target="_blank" id="3371584"
+           onclick="gtag('event', 'ad_click', {
                 ad_name: 'Envato',
                 ad_position: 'side',
                 transport: 'beacon'
             });">
-            <img src="//a.impactradius-go.com/display-ad/4662-3279856" border="0" alt="" width="300" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/3279856/4662" style="position:absolute;visibility:hidden;" border="0" />`
+            <img src="//a.impactradius-go.com/display-ad/4662-3371584" border="0" alt="" width="300" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/3371584/4662" style="position:absolute;visibility:hidden;" border="0" />`
         },
         {
             html: `<a rel="noopener sponsored"
@@ -424,8 +424,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initial rotation for side panels
     rotateContent();
 
-    // Set up interval for side ads rotation (30 seconds)
-    setInterval(rotateContent, 30000);
+    // Set up interval for side ads rotation (40 seconds)
+    setInterval(rotateContent, 40000);
 });
 
 // Recommended tools data
@@ -648,24 +648,24 @@ const recommended_tools = [
 const mobile_recommended_tools = [
     {
         "name": "CapCut",
-        "link": "https://capcutaffiliateprogram.pxf.io/c/6416428/3069221/22474?u=https%3A%2F%2Fwww.capcut.com%2F",
+        "link": "https://capcutaffiliateprogram.pxf.io/c/6416428/3069270/22474?u=https%3A%2F%2Fwww.capcut.com",
         "image": "https://app.impact.com/display-ad/22474-3069270?v=0"
     },
     {
         "name": "Renderforest",
-        "link": "https://renderforest.pxf.io/c/6416428/1476990/14885",
-        "image": "https://app.impact.com/display-ad/14885-1476991?v=0"
+        "link": "https://renderforest.pxf.io/c/6416428/1477001/14885",
+        "image": "https://app.impact.com/display-ad/14885-1477001?v=0"
+    },
+    {
+        "name": "Envato",
+        "link": "https://1.envato.market/c/6416428/3371583/4662",
+        "image": "https://app.impact.com/display-ad/4662-3371583?v=0"
+
     },
     {
         "name": "Pcloud",
         "link": "https://partner.pcloud.com/r/146969",
-        "image": "https://partner.pcloud.com/media/banners/lifetime/lifetime012300250.png"
-    },
-    {
-        "name": "Envato",
-        "link": "https://1.envato.market/c/6416428/3323986/4662",
-        "image": "https://app.impact.com/display-ad/4662-3323992?v=0"
-
+        "image": "https://partner.pcloud.com/media/banners/lifetime/lifetime014300250.png"
     }
 ]
 
