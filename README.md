@@ -98,16 +98,16 @@ sequenceDiagram
 
 ## Infrastructure & Scaling
 
-Since launching in **July 2025**, the app has gained users steadily, and the infrastructure evolved to handle increasing traffic while **minimizing costs by staying within free tier limits**.
+Since launching in **July 2025**, the app has **gained users steadily**, requiring the **infrastructure to evolve to handle increasing traffic while minimizing costs by leveraging free tier resources**. This evolution occurred in multiple phases, each designed to meet the app’s needs at that stage.
 
 <br>
 
 ### Phase 1 – Google Cloud Run
 *Free tier: 50 CPU hours, 1 GB outbound data per month*  
 <br>
-The app initially ran on **Cloud Run** using autoscaling with a maximum of one instance, handling all tasks including downloading, serving, and cleaning up videos. This setup was sufficient for the first month’s traffic **(43 users)**.
+The app initially ran on **Cloud Run** using autoscaling with a maximum of one instance, handling all tasks including downloading, serving, and cleaning up videos. 
 
-As traffic increased in August **(246 users)**, data transfer grew significantly, **exceeding Cloud Run’s 1 GB outbound data limit** and leading to the transition to the next phase.
+This setup was sufficient for the first month’s traffic **(43 users)**, but as traffic increased in August **(246 users)**, data transfer grew significantly, **exceeding Cloud Run’s 1 GB outbound data limit** and leading to the transition to the next phase.
 
 > **Note:** "Outbound data" refers to the amount of data sent from the server to users.
 
@@ -123,12 +123,14 @@ This setup took advantage of **Cloud Storage’s 100 GB of free outbound data**,
 
 ---
 
-### Phase 3 – Amazon EC2
-*Free tier: 750 hours, 100 GB outbound data per month*  
+### Phase 3 – Amazon EC2 + CloudFront
+*Free tier: EC2 (750 hours, 100 GB outbound data) + CloudFront (1 TB outbound data) per month*  
 <br>
-This is the **current phase of the project**. After exceeding Cloud Run’s CPU time limit, the backend was **migrated to Amazon EC2** to gain more control and avoid the execution time restrictions of serverless environments.  
+This is the **current phase of the project**. After exceeding **Cloud Run’s CPU time limit**, the backend was **migrated to Amazon EC2** to gain more control and avoid the execution time restrictions of serverless environments.  
 
-**EC2 now handles all backend operations**, including downloading, processing, serving, and cleanup, providing **stable performance for 616 users** during the first week of October.
+**EC2 migration** solved execution limits, but **October traffic** **(3.5K users)** introduced **high outbound data demands**, which led to **CloudFront integration**.
+
+While **CloudFront** provides multiple benefits—such as caching and faster content delivery to users—its primary benefit is **1 TB of free outbound data per month**, which effectively handles **bandwidth needs** for the growing traffic.
 
 <br>
 
