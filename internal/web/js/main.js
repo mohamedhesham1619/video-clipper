@@ -27,6 +27,19 @@ function throttle(func, limit) {
     };
 }
 
+// Debounce function for resize events
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
 // Function to update paths in the header
 function updateHeaderPaths() {
     const isInPagesDir = window.location.pathname.includes('/pages/');
@@ -283,55 +296,54 @@ function rotateContent() {
                 return;
             }
 
-            // Create container for new content
-            const newContent = document.createElement('div');
-            newContent.className = 'content-item';
-            newContent.style.cssText = 'opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;';
+            // Use requestAnimationFrame to batch DOM operations
+            requestAnimationFrame(() => {
+                // Create container for new content
+                const newContent = document.createElement('div');
+                newContent.className = 'content-item';
+                newContent.style.cssText = 'opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; will-change: opacity;';
 
-            // Create inner container for consistent sizing
-            const innerContainer = document.createElement('div');
-            innerContainer.style.cssText = 'max-width: 100%; max-height: 100%; width: 100%; box-sizing: border-box;';
-            innerContainer.innerHTML = content;
+                // Create inner container for consistent sizing
+                const innerContainer = document.createElement('div');
+                innerContainer.style.cssText = 'max-width: 100%; max-height: 100%; width: 100%; box-sizing: border-box;';
+                innerContainer.innerHTML = content;
 
-            // Ensure images maintain aspect ratio
-            const images = innerContainer.getElementsByTagName('img');
-            Array.from(images).forEach(img => {
-                img.style.maxWidth = '100%';
-                img.style.maxHeight = '100%';
-                img.style.width = 'auto';
-                img.style.height = 'auto';
-                img.style.objectFit = 'contain';
-                img.style.display = 'block';
-                img.style.margin = '0 auto';
+                // Ensure images maintain aspect ratio
+                const images = innerContainer.getElementsByTagName('img');
+                Array.from(images).forEach(img => {
+                    img.style.cssText = 'max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: block; margin: 0 auto;';
+                });
+
+                newContent.appendChild(innerContainer);
+                panel.appendChild(newContent);
+
+                // Use double RAF for reliable transition
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        // Fade in new content
+                        newContent.style.transition = 'opacity 0.5s ease-in';
+                        newContent.style.opacity = '1';
+
+                        // Fade out and remove current content if it exists
+                        const currentContent = panel.querySelector('.content-item:not([style*="opacity: 0"])');
+                        if (currentContent && currentContent !== newContent) {
+                            currentContent.style.transition = 'opacity 0.5s ease-out';
+                            currentContent.style.opacity = '0';
+
+                            // Remove old content after transition
+                            currentContent.addEventListener('transitionend', function handler() {
+                                if (currentContent.parentNode === panel) {
+                                    panel.removeChild(currentContent);
+                                }
+                                currentContent.removeEventListener('transitionend', handler);
+                                resolve();
+                            }, { once: true });
+                        } else {
+                            resolve();
+                        }
+                    });
+                });
             });
-
-            newContent.appendChild(innerContainer);
-            panel.appendChild(newContent);
-
-            // Force reflow to ensure new content is in the DOM
-            void newContent.offsetHeight;
-
-            // Fade in new content (0.5s fade-in with ease-in timing function)
-            newContent.style.transition = 'opacity 0.5s ease-in';
-            newContent.style.opacity = '1';
-
-            // Fade out and remove current content if it exists (0.5s fade-out with ease-out timing function)
-            const currentContent = panel.querySelector('.content-item:not([style*="opacity: 0"])');
-            if (currentContent && currentContent !== newContent) {
-                currentContent.style.transition = 'opacity 0.5s ease-out';
-                currentContent.style.opacity = '0';
-
-                // Remove old content after transition
-                currentContent.addEventListener('transitionend', function handler() {
-                    if (currentContent.parentNode === panel) {
-                        panel.removeChild(currentContent);
-                    }
-                    currentContent.removeEventListener('transitionend', handler);
-                    resolve();
-                }, { once: true });
-            } else {
-                resolve();
-            }
         });
     };
 
@@ -421,11 +433,21 @@ const contentSuggestions = {
 
 // Initialize content rotation when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function () {
-    // Initial rotation for side panels
-    rotateContent();
-
-    // Set up interval for side ads rotation (40 seconds)
-    setInterval(rotateContent, 40000);
+    // Only initialize rotation on desktop
+    if (window.innerWidth > 768) {
+        // Defer initial rotation using requestIdleCallback
+        const startRotation = () => {
+            rotateContent();
+            // Set up interval for side ads rotation (40 seconds)
+            setInterval(rotateContent, 40000);
+        };
+        
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(startRotation, { timeout: 2000 });
+        } else {
+            setTimeout(startRotation, 1000);
+        }
+    }
 });
 
 // Recommended tools data
@@ -584,37 +606,43 @@ document.addEventListener('DOMContentLoaded', function () {
     let lastIsMobile = isMobile();
 
     // Re-render and (re)init/destroy Swiper on breakpoint changes
-    let resizeTimer;
-    window.addEventListener('resize', function () {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(function () {
-            const nowIsMobile = isMobile();
+    // Use debounce with longer delay to reduce INP impact
+    const handleResize = debounce(function () {
+        const nowIsMobile = isMobile();
 
-            // If breakpoint changed, re-render with the appropriate dataset
-            if (nowIsMobile !== lastIsMobile) {
-                // Destroy existing Swiper before DOM changes
-                if (swiperInstance) {
-                    swiperInstance.destroy(true, true);
-                    swiperInstance = null;
-                }
-
-                renderTools();
-
-                // Recreate Swiper if entering mobile
-                swiperInstance = initSwiper();
-                lastIsMobile = nowIsMobile;
-                return;
-            }
-
-            // If still in same mode, only init/destroy swiper as needed
-            if (nowIsMobile && !swiperInstance) {
-                swiperInstance = initSwiper();
-            } else if (!nowIsMobile && swiperInstance) {
+        // If breakpoint changed, re-render with the appropriate dataset
+        if (nowIsMobile !== lastIsMobile) {
+            // Destroy existing Swiper before DOM changes
+            if (swiperInstance) {
                 swiperInstance.destroy(true, true);
                 swiperInstance = null;
             }
-        }, 200);
-    });
+
+            // Use requestIdleCallback for non-critical re-rendering
+            const reRender = () => {
+                renderTools();
+                swiperInstance = initSwiper();
+                lastIsMobile = nowIsMobile;
+            };
+            
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(reRender, { timeout: 500 });
+            } else {
+                setTimeout(reRender, 0);
+            }
+            return;
+        }
+
+        // If still in same mode, only init/destroy swiper as needed
+        if (nowIsMobile && !swiperInstance) {
+            swiperInstance = initSwiper();
+        } else if (!nowIsMobile && swiperInstance) {
+            swiperInstance.destroy(true, true);
+            swiperInstance = null;
+        }
+    }, 300);
+    
+    window.addEventListener('resize', handleResize, { passive: true });
 });
 
 const recommended_tools = [

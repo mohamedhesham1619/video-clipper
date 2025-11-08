@@ -4,20 +4,25 @@
 // Global variable to store client fingerprint and credits
 let clientFingerprint = '';
 let availableCredits = 0;
+let fingerprintPromise = null;
 
-// Generate and store fingerprint immediately
-(async () => {
-    try {
-        clientFingerprint = await generateFingerprint();
-        
-        // Fetch credits using the generated fingerprint
-        try {
-            const response = await fetch('/api/credits', {
-                headers: {
-                    'X-Client-FP': clientFingerprint
-                }
-            });
-            const creditsData = await response.json();
+// Defer fingerprint generation using requestIdleCallback
+function initFingerprint() {
+    if (fingerprintPromise) return fingerprintPromise;
+    
+    fingerprintPromise = new Promise((resolve) => {
+        const generateAndFetch = async () => {
+            try {
+                clientFingerprint = await generateFingerprint();
+                
+                // Fetch credits using the generated fingerprint
+                try {
+                    const response = await fetch('/api/credits', {
+                        headers: {
+                            'X-Client-FP': clientFingerprint
+                        }
+                    });
+                    const creditsData = await response.json();
             // Update the credits display
             const creditsDisplay = document.getElementById('credits-available');
             if (creditsDisplay) {
@@ -126,10 +131,34 @@ let availableCredits = 0;
         } catch (error) {
             console.error('Failed to fetch credits:', error);
         }
-    } catch (error) {
-        console.error('Failed to generate fingerprint:', error);
-    }
-})();
+            } catch (error) {
+                console.error('Failed to generate fingerprint:', error);
+            }
+            resolve();
+        };
+        
+        // Use requestIdleCallback for non-critical initialization
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(generateAndFetch, { timeout: 2000 });
+        } else {
+            setTimeout(generateAndFetch, 100);
+        }
+    });
+    
+    return fingerprintPromise;
+}
+
+// Initialize on first user interaction or after a delay
+if ('requestIdleCallback' in window) {
+    requestIdleCallback(() => initFingerprint(), { timeout: 3000 });
+} else {
+    setTimeout(() => initFingerprint(), 1000);
+}
+
+// Also init on first interaction
+['click', 'touchstart', 'keydown'].forEach(evt => {
+    document.addEventListener(evt, () => initFingerprint(), { once: true, passive: true });
+});
 
 // Function to get or generate client fingerprint
 async function getClientFingerprint() {
@@ -199,6 +228,9 @@ async function generateFingerprint() {
 
 // Get or create client fingerprint
 async function getClientFingerprint() {
+    // Ensure fingerprint is initialized
+    await initFingerprint();
+    
     try {
         let fingerprint = localStorage.getItem('X-Client-FP');
         if (!fingerprint) {

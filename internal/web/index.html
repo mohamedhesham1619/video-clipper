@@ -329,7 +329,7 @@
             display: none !important;
         }
     </style>
-    <script src="/js/main.js"></script>
+    <script src="/js/main.js" defer></script>
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
@@ -961,9 +961,17 @@
         }
 
         // Run on page load
-        document.addEventListener('DOMContentLoaded', detectMobile);
-        // Also run on resize in case of orientation change
-        window.addEventListener('resize', detectMobile);
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', detectMobile);
+        } else {
+            detectMobile();
+        }
+        // Debounce resize handler
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(detectMobile, 200);
+        }, { passive: true });
     </script>
 
     <!-- Footer -->
@@ -1013,9 +1021,9 @@
     </footer>
 
     <!-- Floating button will be added here by floating-button.js -->
-    <script src="/js/video-clipper.js"></script>
-    <script src="/js/faq.js"></script>
-    <script src="/js/floating-button.js"></script>
+    <script src="/js/video-clipper.js" defer></script>
+    <script src="/js/faq.js" defer></script>
+    <script src="/js/floating-button.js" defer></script>
 
     <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
     <script>
