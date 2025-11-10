@@ -14,6 +14,17 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, filepath.Join("internal/web", "index.html"))
 }
 
+func GifHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/gif/" {
+		http.Redirect(w, r, "/gif", http.StatusMovedPermanently)
+		return
+	}
+	if r.URL.Path != "/gif" {
+		http.NotFound(w, r)
+		return
+	}
+	http.ServeFile(w, r, filepath.Join("internal/web", "gif.html"))
+}
 func ContactPageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/contact/" {
 		http.Redirect(w, r, "/contact", http.StatusMovedPermanently)

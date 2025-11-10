@@ -62,37 +62,6 @@ function updateHeaderPaths() {
         }
     });
 
-    // Set active link
-    setActiveLink();
-}
-
-// Set active navigation link
-function setActiveLink() {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    const pageName = currentPage.replace('.html', '');
-    const currentLocation = window.location.pathname;
-    const navLinks = document.querySelectorAll('.nav-links .nav-link');
-    const currentPageFromPath = currentLocation.split('/').pop() || 'index.html';
-
-    navLinks.forEach(link => {
-        // Remove active class from all links
-        link.classList.remove('active');
-
-        // Get the link's target page
-        const linkHref = link.getAttribute('href');
-        const linkPage = linkHref ? linkHref.split('/').pop() : '';
-        const linkPageName = link.getAttribute('data-page');
-
-        // Add active class if this link's page matches the current page
-        if ((currentPage === '' && linkPage === 'index.html') ||
-            (currentPage === linkPage) ||
-            (currentPage === '' && linkHref.endsWith('/')) ||
-            (pageName === linkPageName) ||
-            (pageName === 'index' && linkPageName === 'home') ||
-            (currentPageFromPath === linkPage)) {
-            link.classList.add('active');
-        }
-    });
 }
 
 // Mobile menu toggle
@@ -160,9 +129,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Setup mobile menu with cleanup
     const cleanupMobileMenu = setupMobileMenu();
-
-    // Set active link in navigation
-    setActiveLink();
 
     // Add throttled scroll handler
     const throttledScroll = throttle(handleScroll, 100);

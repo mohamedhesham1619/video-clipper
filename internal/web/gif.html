@@ -27,33 +27,38 @@
     </script>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description"
-        content="Need just a clip from an online video? Use this free tool to cut and download exactly what you want, with quality up to 2K. Works with YouTube and more.">
+        content="Convert any online video into a high-quality GIF — free, fast, and easy. Paste a video link, pick the part you want, adjust width, FPS, and speed, then download your animated GIF instantly.">
     <meta name="keywords"
-        content="video trimmer, video cutter, online video cutter, video clipper, trim video online, cut video online, free video trimmer, free video cutter, trim youtube video, cut tiktok video, video cliper online, youtube trimmer, tiktok cutter, facebook video trimmer, video trimmer online, best video trimmer, video downloader, online video trimmer">
+        content="video to gif, gif maker, gif converter, online gif maker, convert video to gif, gif converter, youtube to gif, tiktok to gif, facebook to gif, free gif maker, video clipper gif, animated gif maker">
     <meta name="author" content="VideoClipper">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://videoclipper.online/">
-    <meta property="og:title" content="VideoClipper - Free Online Video Cutter & Trimmer (No Signup)">
+    <meta property="og:url" content="https://videoclipper.online/gif">
+    <meta property="og:title" content="VideoClipper - Create GIFs from Online Videos (No Signup)">
     <meta property="og:description"
-        content="Need just a clip from an online video? Use this free tool to cut and download exactly what you want, with quality up to 2K. Works with YouTube and more.">
+        content="Convert any online video into a high-quality GIF — free, fast, and easy. Paste a video link, pick the part you want, adjust width, FPS, and speed, then download your animated GIF instantly.">
     <meta property="og:image" content="/images/preview.jpg">
     <meta property="og:site_name" content="VideoClipper">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://videoclipper.online/">
-    <meta name="twitter:title" content="VideoClipper - Free Online Video Cutter & Trimmer (No Signup)">
+    <meta name="twitter:url" content="https://videoclipper.online/gif">
+    <meta name="twitter:title" content="VideoClipper - Create GIFs from Online Videos (No Signup)">
     <meta name="twitter:description"
-        content="Need just a clip from an online video? Use this free tool to cut and download exactly what you want — up to 2K quality with live progress tracking. Works with YouTube, facebook, Instagram, X, Reddit, TikTok, and more.">
+        content="Convert any online video into a high-quality GIF — free, fast, and easy. Paste a video link, pick the part you want, adjust width, FPS, and speed, then download your animated GIF instantly.">
     <meta name="twitter:image" content="/images/preview.jpg">
 
-    <title>VideoClipper - Free Online Video Cutter & Trimmer (No Signup)</title>
-    <link rel="canonical" href="https://videoclipper.online" />
+    <title>VideoClipper - Create GIFs from Online Videos (No Signup)</title>
+    <link rel="canonical" href="https://videoclipper.online/gif" />
 
     <!-- Favicon and Site Icons -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -82,11 +87,160 @@
     </noscript>
     <!-- Preconnect to CDN -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    
+
     <!-- Preload Swiper CSS with fallback -->
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"></noscript>
-    
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    </noscript>
+
+    <style>
+        /* Responsive fixes */
+        @media screen and (max-width: 767px) {
+            .main-header .container {
+                padding: 0.5rem 1rem !important;
+            }
+
+            .main-header .logo h1 {
+                font-size: 1.25rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 200px;
+            }
+
+            .clip-card {
+                margin: 0.5rem;
+                padding: 1rem;
+            }
+
+            .content-row {
+                margin: 0 !important;
+            }
+
+            .main-content {
+                padding-left: 0.5rem !important;
+            }
+        }
+
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+        }
+
+        .tooltip i {
+            color: #6b7280;
+            font-size: 14px;
+            transition: color 0.2s ease;
+            cursor: default;
+        }
+
+        .tooltip:hover i,
+        .tooltip:focus i {
+            color: #4f46e5;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            max-width: 90vw;
+            background-color: #374151;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9em;
+            line-height: 1.4;
+            box-sizing: border-box;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #374151 transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext,
+        .tooltip:focus .tooltiptext,
+        .tooltip:focus-within .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Mobile-specific tooltip adjustments */
+        @media screen and (max-width: 767px) {
+            .tooltip {
+                position: relative;
+                -webkit-tap-highlight-color: transparent;
+                cursor: pointer;
+            }
+
+            .tooltip .tooltiptext {
+                position: absolute;
+                bottom: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 200px;
+                max-width: calc(100vw - 40px);
+                margin-bottom: 10px;
+                padding: 10px;
+                z-index: 1001;
+                background-color: #374151;
+                color: #fff;
+                border-radius: 6px;
+                text-align: left;
+                visibility: hidden;
+                opacity: 0;
+                transition: opacity 0.2s, visibility 0.2s;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            .tooltip.active .tooltiptext {
+                visibility: visible;
+                opacity: 1;
+            }
+
+            .tooltip .tooltiptext::after {
+                content: '';
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                margin-left: -5px;
+                border-width: 5px;
+                border-style: solid;
+                border-color: #374151 transparent transparent transparent;
+            }
+        }
+
+        .tooltiptext span {
+            color: #9ca3af;
+            font-size: 0.9em;
+            display: block;
+            margin-top: 4px;
+        }
+    </style>
+
     <!-- Load Swiper JS with defer -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
     <script>
@@ -334,12 +488,12 @@
         {
             "@context": "https://schema.org",
             "@type": "WebApplication",
-            "name": "VideoClipper - Free Online Video Cutter & Trimmer",
-            "headline": "Trim and Cut Videos Online for Free",
-            "description": "Need just a clip from an online video? Use this free tool to cut and download exactly what you want — up to 2K quality with live progress tracking. Works with YouTube, Facebook, Instagram, X, Reddit, TikTok, and more.",
-            "url": "https://videoclipper.online",
+            "name": "VideoClipper - Create GIFs from Online Videos (No Signup)",
+            "headline": "Convert Online Videos to GIFs Instantly",
+            "description": "Convert any online video into a high-quality GIF — free, fast, and easy. Paste a video link, pick the part you want, adjust width, FPS, and speed, then download your animated GIF instantly.",
+            "url": "https://videoclipper.online/gif",
             "applicationCategory": ["MultimediaApplication", "UtilityApplication"],
-            "applicationSubCategory": "Video Editing Tool",
+            "applicationSubCategory": "GIF Converter",
             "operatingSystem": ["Windows", "macOS", "Linux", "Android", "iOS", "Chrome OS"],
             "browserRequirements": "Requires JavaScript. Works in all modern browsers.",
             "offers": {
@@ -347,15 +501,14 @@
                 "price": "0",
                 "priceCurrency": "USD",
                 "availability": "InStock",
-                "url": "https://videoclipper.online"
+                "url": "https://videoclipper.online/gif"
             },
-            "screenshot": "https://videoclipper.online/images/screenshot.PNG",
             "thumbnailUrl": "https://videoclipper.online/images/icon-512.png",
             "featureList": [
-                "Cut video from any URL",
-                "Supports 1000+ sites including YouTube, TikTok, Reddit, Facebook, Instagram, Twitter, and more",
+            "Create GIFs from any online video URL",
+            "Supports 1000+ sites including YouTube, TikTok, Reddit, Facebook, Instagram, Twitter, and more",
                 "Precise start and end time selection",
-                "Multiple video quality options up to 2K",
+                "Adjust width, FPS, speed, and loop count",
                 "Real-time progress updates",
                 "No registration required",
                 "Fast and secure processing"
@@ -378,13 +531,56 @@
             },
             "mainEntityOfPage": {
                 "@type": "WebPage",
-                "@id": "https://videoclipper.online"
+                "@id": "https://videoclipper.online/gif"
             },
             "inLanguage": "en",
-            "datePublished": "2025-07-01",
-            "dateModified": "2025-08-22"
+            "datePublished": "2025-11-11",
+            "dateModified": "2025-11-11"
         }
     </script>
+    <!-- Compact overrides for GIF page -->
+    <style>
+        /* Reduce overall padding/margins within the clip card to make the form more compact */
+        .clip-card {
+            padding: 0.5rem 0.75rem !important;
+        }
+
+        .clip-card .video-icon {
+            margin-top: 0.5rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+
+        .clip-card h1 {
+            margin-bottom: 0.25rem !important;
+        }
+
+        /* Tighten vertical spacing between form groups */
+        .clip-form .form-group {
+            margin-bottom: 0.5rem !important;
+        }
+
+        /* Compact time inputs helper lines */
+        .clip-form .time-format-hint {
+            margin-top: 2px !important;
+            font-size: 0.85rem !important;
+        }
+
+        .clip-form .duration-display {
+            margin-top: 2px !important;
+            font-size: 0.9rem !important;
+        }
+
+        /* Reduce spacing for grouped rows */
+        .clip-form .time-inputs {
+            margin-bottom: 0.5rem !important;
+        }
+
+        /* Slightly tighter button padding for compactness while keeping prominence */
+        .clip-form .btn-download {
+            padding-top: 0.6rem !important;
+            padding-bottom: 0.6rem !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -406,8 +602,8 @@
                     <span></span>
                 </button>
                 <ul class="nav-links">
-                    <li><a href="/" class="nav-link active">Video&nbsp;Clipper</a></li>
-                    <li><a href="/gif" class="nav-link">GIF Maker</a></li>
+                    <li><a href="/" class="nav-link">Video Clipper</a></li>
+                    <li><a href="/gif" class="nav-link active">GIF Maker</a></li>
                     <li><a href="/supported-sites" class="nav-link">Supported Sites</a></li>
                     <li><a href="/faq" class="nav-link">FAQ</a></li>
                     <li><a href="/contact" class="nav-link">Contact</a></li>
@@ -430,9 +626,8 @@
                         <div class="video-icon">
                             <i class="fas fa-video"></i>
                         </div>
-                        <h1 style="white-space: nowrap;">Free Online Video Trimmer & Cutter</h1>
-                        <p class="subtitle">Paste any video URL, set start and end time, and download exactly the part
-                            you want.</p>
+                        <h1 style="white-space: nowrap; text-align: center;">Free Online Video to GIF Converter</h1>
+                        <p class="subtitle" style="text-align: center;">Paste any video URL, choose start and end time, and instantly create a high-quality GIF.</p>
                         <form id="clip-form" class="clip-form">
                             <div class="form-group">
                                 <label for="video-url">Video URL</label>
@@ -447,7 +642,8 @@
                             </div>
                             <div class="time-inputs">
                                 <div class="form-group time-group">
-                                    <label for="start-time" class="time-label" data-desktop="Start Time (hh:mm:ss)" data-mobile="Start Time"></label>
+                                    <label for="start-time" class="time-label" data-desktop="Start Time (hh:mm:ss)"
+                                        data-mobile="Start Time" style="margin-bottom: 0.1rem !important;"></label>
                                     <div class="input-with-icon left-icon">
                                         <i class="far fa-clock"></i>
                                         <input type="text" id="start-time" name="start-time" value="00:00:00"
@@ -455,46 +651,128 @@
                                     </div>
                                     <div class="time-format-hint">Format: hh:mm:ss</div>
                                     <div class="duration-display">
-                                        Clip Duration: <span id="duration-value">0 sec</span>
+                                        GIF Duration: <span id="duration-value">0 sec</span>
                                     </div>
                                 </div>
                                 <div class="form-group time-group">
-                                    <label for="end-time" class="time-label" data-desktop="End Time (hh:mm:ss)" data-mobile="End Time"></label>
+                                    <label for="end-time" class="time-label" data-desktop="End Time (hh:mm:ss)"
+                                        data-mobile="End Time" style="margin-bottom: 0.1rem !important;"></label>
                                     <div class="input-with-icon left-icon">
                                         <i class="far fa-clock"></i>
-                                        <input type="text" id="end-time" name="end-time" value="00:01:00"
+                                        <input type="text" id="end-time" name="end-time" value="00:00:10"
                                             pattern="[0-9]{1,2}:[0-9]{2}:[0-9]{2}" placeholder="00:00:00" required>
                                     </div>
                                     <div class="time-format-hint">Format: hh:mm:ss</div>
                                     <div class="duration-display credits-display">
-                                        <span class="credits-text" data-desktop="Credits Available: " data-mobile="Credits:"></span>
+                                        <span class="credits-text" data-desktop="Credits Available: "
+                                            data-mobile="Credits:"></span>
                                         <span class="credits-value-container">
-                                            <span id="credits-available" style="font-weight: 600; color: #2d3748;">-</span>
-                                            <span id="credits-reset-time" class="reset-time-icon" style="margin-left: 4px; cursor: pointer; display: none; position: relative;" role="button" tabindex="0" aria-label="Reset time">
+                                            <span id="credits-available"
+                                                style="font-weight: 600; color: #2d3748;">-</span>
+                                            <span id="credits-reset-time" class="reset-time-icon"
+                                                style="margin-left: 4px; cursor: pointer; display: none; position: relative;"
+                                                role="button" tabindex="0" aria-label="Reset time">
                                                 <span style="color: #eab308; font-size: 1.1em;">⏳</span>
-                                                <div id="mobile-hint" style="display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #374151; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; white-space: nowrap; margin-bottom: 5px; z-index: 1000;"></div>
+                                                <div id="mobile-hint"
+                                                    style="display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #374151; color: white; padding: 0.4px 8px; border-radius: 4px; font-size: 0.8rem; white-space: nowrap; margin-bottom: 5px; z-index: 1000;">
+                                                </div>
                                             </span>
                                         </span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="action-buttons" style="position: relative; margin-top: 4px;">
-                                <div id="credit-cost-display" style="position: absolute; top: -10px; left: 0; font-size: 1rem; font-weight: 500; display: none; text-align: left; padding-left: 4px; line-height: 1.2;">
-                                    <span id="credit-cost-text"></span>
-                                </div>
-                                <div class="action-group">
-                                    <button type="submit" class="btn-download">
-                                        <i class="fas fa-download"></i> Download Clip
-                                    </button>
-                                    <div class="quality-selector">
-                                        <label for="video-quality">Quality:</label>
-                                        <select id="video-quality" name="video-quality">
-                                            <option value="480">480p — 0.25 credit/min</option>
-                                            <option value="720" selected>720p — 0.5 credit/min</option>
-                                            <option value="1080">1080p — 1 credit/min</option>
-                                            <option value="1440">2K — 2 credits/min</option>
-                                        </select>
+                            <div class="time-inputs"
+                                style="display: flex; flex-wrap: nowrap; gap: 10px; margin-bottom: 15px;">
+                                <div class="form-group time-group" style="flex: 1; min-width: 0; position: relative;">
+                                    <div style="position: relative; display: flex; align-items: center; gap: 4px;">
+                                        <label for="gif-width" style="font-size: 0.9em;">Width</label>
+                                        <div class="tooltip">
+                                            <i class="far fa-circle-question"></i>
+                                            <span class="tooltiptext">
+                                                Set the GIF width in pixels<br><span
+                                                    style="color: #d1d5db; font-size: 0.9em;">Larger width = bigger
+                                                    file</span>
+                                            </span>
+                                        </div>
                                     </div>
+                                    <select id="gif-width" name="gif-width" style="width: 100%;"
+                                        title="Set the GIF width in pixels. Larger width = bigger file.">
+                                        <option value="320">320px</option>
+                                        <option value="480" selected>480px</option>
+                                        <option value="720">720px</option>
+                                    </select>
+                                </div>
+                                <div class="form-group time-group" style="flex: 1; min-width: 0; position: relative;">
+                                    <div style="position: relative; display: flex; align-items: center; gap: 4px;">
+                                        <label for="gif-fps" style="font-size: 0.9em;">FPS</label>
+                                        <div class="tooltip">
+                                            <i class="far fa-circle-question"></i>
+                                            <span class="tooltiptext">
+                                                Frames per second<br><span
+                                                    style="color: #d1d5db; font-size: 0.9em;">Higher = smoother GIF,
+                                                    larger file</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <select id="gif-fps" name="gif-fps" style="width: 100%;"
+                                        title="Frames per second. Higher = smoother GIF, larger file.">
+                                        <option value="10">10 fps</option>
+                                        <option value="15" selected>15 fps</option>
+                                        <option value="20">20 fps</option>
+                                    </select>
+                                </div>
+                                <div class="form-group time-group" style="flex: 1; min-width: 0; position: relative;">
+                                    <div style="position: relative; display: flex; align-items: center; gap: 4px;">
+                                        <label for="gif-loop-count" style="font-size: 0.9em;">Loops</label>
+                                        <div class="tooltip">
+                                            <i class="far fa-circle-question"></i>
+                                            <span class="tooltiptext">
+                                                Loop count<br><span style="color: #d1d5db; font-size: 0.9em;">How many
+                                                    times the GIF repeats</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <select id="gif-loop-count" name="gif-loop-count" style="width: 100%;"
+                                        title="How many times the GIF repeats. Infinite = loops forever.">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="0" selected>Infinite</option>
+                                    </select>
+                                </div>
+                                <div class="form-group time-group" style="flex: 1; min-width: 0; position: relative;">
+                                    <div style="position: relative; display: flex; align-items: center; gap: 4px;">
+                                        <label for="gif-playback-speed" style="font-size: 0.9em;">Speed</label>
+                                        <div class="tooltip">
+                                            <i class="far fa-circle-question"></i>
+                                            <span class="tooltiptext">
+                                                Playback speed<br><span style="color: #d1d5db; font-size: 0.9em;">1x =
+                                                    normal speed</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <select id="gif-playback-speed" name="gif-playback-speed" style="width: 100%;"
+                                        title="Playback speed. 1x = normal, 0.5x = slower, 2x = faster.">
+                                        <option value="0.5">0.5x</option>
+                                        <option value="1" selected>1x</option>
+                                        <option value="1.5">1.5x</option>
+                                        <option value="2">2x</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: nowrap;">
+                                    <button type="submit" class="btn-download"
+                                        style="flex: 1; max-width: none; width: auto;">
+                                        <i class="fas fa-magic"></i> Generate GIF
+                                    </button>
+                                    <label
+                                        style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin: 0; white-space: nowrap; flex-shrink: 0;">
+                                        <input type="checkbox" id="gif-optimize-size" name="gif-optimize-size"
+                                            style="width: 20px; height: 20px; cursor: pointer;">
+                                        <span>Optimize Size</span>
+                                    </label>
                                 </div>
                             </div>
                         </form>
@@ -505,23 +783,21 @@
         </section>
 
         <!-- Submagic Ad Banner -->
-        <div class="ad-banner" style="width: 100%; background-color: white; padding: 0.5rem 0; margin-top: -4rem; position: relative; z-index: 1; text-align: center;">
+        <div class="ad-banner"
+            style="width: 100%; background-color: white; padding: 0.5rem 0; margin-top: -4rem; position: relative; z-index: 1; text-align: center;">
             <div class="container" style="max-width: 1200px; margin: 0 auto;">
                 <h1 style="font-size: 2.5em; font-weight: 800; margin: 0 0 0.5rem; line-height: 1.2; color: #000;">
                     Create viral shorts <span style="color: #ff4f01;">in seconds with AI</span>
                 </h1>
-                <p style="color: #6b7280; font-size: 1.25em; margin: 0.5rem 0 1.5rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+                <p
+                    style="color: #6b7280; font-size: 1.25em; margin: 0.5rem 0 1.5rem; max-width: 800px; margin-left: auto; margin-right: auto;">
                     The new way to edit videos. From raw footage to viral shorts in 3 clicks.
                 </p>
-                <a href="https://submagic.co/?via=mh19"
-                   class="primary-button"
-                   rel="noopener sponsored"
-                   target="_blank"
-                   style="display: inline-block; background-color: #ff4f01; color: white; text-decoration: none; font-weight: 700; 
+                <a href="https://submagic.co/?via=mh19" class="primary-button" rel="noopener sponsored" target="_blank"
+                    style="display: inline-block; background-color: #ff4f01; color: white; text-decoration: none; font-weight: 700; 
                           padding: 0.75rem 1.5rem; border-radius: 12px; font-size: 1.25em; margin-bottom: 1rem; transition: transform 0.2s;"
-                   onmouseover="this.style.transform='scale(1.03)'"
-                   onmouseout="this.style.transform='scale(1)'"
-                   onclick="gtag('event', 'ad_click', {
+                    onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'"
+                    onclick="gtag('event', 'ad_click', {
                        ad_name: 'submagic',
                        ad_position: 'bottom',
                        transport: 'beacon'
@@ -529,10 +805,8 @@
                     Create Free Shorts
                 </a>
                 <div style="display: flex; align-items: center; justify-content: center; gap: 0.5em; margin: 0.5rem 0;">
-                    <img src="https://cdn.prod.website-files.com/6469e2294ac68c3d5caea327/64b52db3d97c954b4a00e35e_rating-stars%20(3).png" 
-                         alt="" 
-                         style="height: 20px; width: auto;" 
-                         loading="lazy">
+                    <img src="https://cdn.prod.website-files.com/6469e2294ac68c3d5caea327/64b52db3d97c954b4a00e35e_rating-stars%20(3).png"
+                        alt="" style="height: 20px; width: auto;" loading="lazy">
                     <span style="color: #6b7280; font-size: 0.9em;">4.9 out of 5</span>
                 </div>
                 <p style="color: #6b7280; font-size: 0.9em; margin: 0.2rem 0 0;">
@@ -547,18 +821,22 @@
                     padding: 1rem 0 !important;
                     position: static !important;
                 }
+
                 .ad-banner h1 {
                     font-size: 1.8em !important;
                     padding: 0 1rem;
                 }
+
                 .ad-banner p {
                     font-size: 1.1em !important;
                     padding: 0 1rem;
                 }
+
                 .ad-banner .primary-button {
                     font-size: 1.1em !important;
                     padding: 0.6rem 1.2rem !important;
                 }
+
                 /* Ensure content above has enough space */
                 .video-clipper {
                     margin-bottom: 1rem !important;
@@ -700,28 +978,26 @@
 
         <!-- How It Works Section -->
         <section id="get-started" class="content-section">
-            <h2>Trim and Cut YouTube, TikTok, and Facebook Videos Online for Free</h2>
+            <h2>Create GIFs from YouTube, TikTok, and Facebook Videos Online for Free</h2>
             <div class="features">
                 <div class="feature">
                     <i class="fas fa-bolt"></i>
-                    <h3>Cut Videos from 1,000+ Sites Without Installing Software</h3>
-                    <p>VideoClipper lets you paste a link from YouTube, TikTok, Instagram, Facebook, Reddit, Twitter
-                        (X), Vimeo, Twitch, and more — then cut exactly the part you need. Select start and end times,
-                        choose your quality up to 2K, and download instantly. No watermark, no signup, and no extra
-                        software required.</p>
+                    <h3>Make GIFs from 1,000+ Sites — Right in Your Browser</h3>
+                    <p>VideoClipper GIF Maker lets you paste a video link from YouTube, TikTok, Instagram, Facebook, Reddit,
+                        Twitter (X), Vimeo, Twitch, and more — then turn any part of it into a GIF. Just select the start and
+                        end time, set your preferred width or speed, and generate your animated GIF instantly.</p>
                 </div>
                 <div class="feature">
                     <i class="far fa-lightbulb"></i>
-                    <h3>Fast & Easy Online Video Trimmer</h3>
-                    <p>Whether you want to trim a short highlight from a YouTube video, cut a TikTok video before
-                        sharing, or cut part of an Instagram Reel,
-                        our online video trimmer works directly in your browser in just a few clicks.</p>
+                    <h3>Fast & Simple Online GIF Creator</h3>
+                    <p>Convert highlights, funny moments, or short clips into GIFs directly from your browser. No registration,
+                        no software needed — just paste a link, adjust settings, and download your GIF in seconds.</p>
                 </div>
                 <div class="feature">
-                    <i class="fas fa-tv"></i>
-                    <h3>High-Quality Output — Up to 2K</h3>
-                    <p>Enjoy crystal-clear playback with resolutions from 360p to 1440p (2K). Our service ensures your
-                        trimmed video look and sound great on any device.</p>
+                    <i class="fas fa-images"></i>
+                    <h3>Customizable Output — Smooth and High Quality</h3>
+                    <p>Control your GIF’s width, FPS, loop count, and speed to get the perfect result. Enjoy smooth animation
+                        and sharp image quality optimized for sharing anywhere.</p>
                 </div>
             </div>
         </section>
@@ -802,32 +1078,21 @@
             <div class="faq-container">
                 <div class="faq-item">
                     <button class="faq-question">
-                        What is VideoClipper?
+                        What is VideoClipper GIF Maker?
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>VideoClipper is a free online video trimmer and cutter that lets you extract and trim a
-                            specific part or clip from a video — no installation or login required.</p>
+                        <p>VideoClipper GIF Maker is a free online tool that lets you convert any part of an online video into an animated GIF — no installation or login required.</p>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <button class="faq-question">
-                        What video quality can I download?
+                        How do I create a GIF from a video?
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>VideoClipper supports downloading videos in up to 2K quality.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <button class="faq-question">
-                        What are the supported video formats?
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="faq-answer">
-                        <p>VideoClipper allows users to download clips in MP4 format.</p>
+                        <p>Simply paste a video link from YouTube, TikTok, Facebook, Instagram, or other supported platforms. Then select the start and end time, adjust width, FPS, or speed if you like, and click “Generate GIF.”</p>
                     </div>
                 </div>
 
@@ -847,12 +1112,21 @@
 
                 <div class="faq-item">
                     <button class="faq-question">
-                        Is VideoClipper safe to use?
+                        Can I adjust GIF settings?
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>Yes, it's secure and doesn't ask for login credentials, installations, or access to your
-                            personal data.</p>
+                        <p>Yes. You can customize the GIF width, frame rate (FPS), playback speed, and loop count before creating your GIF.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Is VideoClipper GIF Maker safe to use?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes. VideoClipper runs directly in your browser and never asks for your login information or personal data. All processing is secure and temporary.</p>
                     </div>
                 </div>
 
@@ -865,6 +1139,7 @@
                 </div>
             </div>
         </section>
+
         <script type="application/ld+json">
             {
               "@context": "https://schema.org",
@@ -872,26 +1147,18 @@
               "mainEntity": [
                 {
                   "@type": "Question",
-                  "name": "What is VideoClipper?",
+                  "name": "What is VideoClipper GIF Maker?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "VideoClipper is a free online video trimmer and cutter that lets you trim and download specific parts or clips from a video — no installation or login required."
+                    "text": "VideoClipper GIF Maker is a free online tool that lets you convert any part of an online video into an animated GIF — no installation or login required."
                   }
                 },
                 {
                   "@type": "Question",
-                  "name": "What video quality is supported?",
+                  "name": "How do I create a GIF from a video?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "You can download clips in resolutions up to 2K, depending on the source video quality."
-                  }
-                },
-                {
-                  "@type": "Question",
-                  "name": "What are the supported video formats?",
-                  "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "VideoClipper allows users to download clips in MP4 format."
+                    "text": "Paste a video link from YouTube, TikTok, Facebook, Instagram, or other supported platforms. Then choose the start and end times, adjust width, FPS, or speed, and click 'Create GIF' to generate your animation."
                   }
                 },
                 {
@@ -899,27 +1166,35 @@
                   "name": "What websites are supported?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "VideoClipper supports over 1,000 video platforms. Popular supported sites include YouTube, Facebook, Instagram, TikTok, Twitter (X), Vimeo, Twitch, Reddit, Coursera, LinkedIn, and Udemy. You can check out the full list of major supported sites on our Supported Sites page."
+                    "text": "VideoClipper supports over 1,000 platforms including YouTube, TikTok, Facebook, Instagram, X (Twitter), Reddit, Vimeo, and more. You can view the full list on our Supported Sites page."
                   }
                 },
                 {
                   "@type": "Question",
-                  "name": "Is VideoClipper safe to use?",
+                  "name": "Can I adjust GIF settings?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Yes, it's secure and doesn't ask for login credentials, installations, or access to your personal data."
+                    "text": "Yes. You can customize the width, frame rate (FPS), playback speed, and loop count before creating your GIF."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Is VideoClipper GIF Maker safe to use?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes. VideoClipper is secure, runs directly in your browser, and doesn’t require login, installation, or access to personal data."
                   }
                 }
               ]
             }
             </script>
-
-        <script type="application/ld+json">
+            
+            <script type="application/ld+json">
             {
               "@context": "https://schema.org",
               "@type": "HowTo",
-              "name": "How to Trim and Cut Videos Online",
-              "description": "Step-by-step guide to trimming and cutting videos using VideoClipper's free online tool.",
+              "name": "How to Create a GIF from an Online Video",
+              "description": "Follow these simple steps to convert an online video into a GIF using VideoClipper’s free GIF Maker.",
               "totalTime": "PT2M",
               "estimatedCost": {
                 "@type": "MonetaryAmount",
@@ -930,29 +1205,65 @@
                 {
                   "@type": "HowToStep",
                   "name": "Paste Video URL",
-                  "text": "Copy and paste the URL of the video you want to trim into the input field."
+                  "text": "Copy and paste the link of the online video you want to convert into a GIF."
                 },
                 {
                   "@type": "HowToStep",
-                  "name": "Set Start and End Times",
-                  "text": "Use the time inputs to set the exact start and end points for your video clip."
+                  "name": "Set Clip Duration",
+                  "text": "Select the start and end time of the section you want to turn into a GIF. The maximum length is 30 seconds."
                 },
                 {
                   "@type": "HowToStep",
-                  "name": "Select Video Quality",
-                  "text": "Choose your preferred video quality from the dropdown menu (360p to 2K)."
+                  "name": "Adjust GIF Settings",
+                  "text": "Optionally adjust width, frame rate (FPS), speed, and loop count to customize your GIF."
                 },
                 {
                   "@type": "HowToStep",
-                  "name": "Download Your Clip",
-                  "text": "Click the 'Download Clip' button to process and save your trimmed video."
+                  "name": "Create and Download GIF",
+                  "text": "Click the 'Generate GIF' button to generate your GIF and download it instantly."
                 }
               ]
             }
             </script>
+            
     </main>
 
     <script>
+        // Simple tooltip toggle for mobile
+        document.addEventListener('DOMContentLoaded', () => {
+            const tooltips = document.querySelectorAll('.tooltip');
+
+            tooltips.forEach(tooltip => {
+                tooltip.addEventListener('click', (e) => {
+                    e.stopPropagation();
+
+                    // Close all other tooltips
+                    document.querySelectorAll('.tooltip').forEach(t => {
+                        if (t !== tooltip) {
+                            t.classList.remove('active');
+                        }
+                    });
+
+                    // Toggle current tooltip
+                    tooltip.classList.toggle('active');
+                });
+            });
+
+            // Close tooltips when clicking outside
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.tooltip').forEach(tooltip => {
+                    tooltip.classList.remove('active');
+                });
+            });
+
+            // Close tooltips when scrolling
+            document.addEventListener('scroll', () => {
+                document.querySelectorAll('.tooltip').forEach(tooltip => {
+                    tooltip.classList.remove('active');
+                });
+            }, { passive: true });
+        });
+
         // Detect mobile devices and add is-mobile class to body
         function detectMobile() {
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -981,31 +1292,39 @@
         <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;" itemscope
             itemtype="https://schema.org/WPFooter">
             <!-- Main Footer Content -->
-                        <div
+            <div
                 style="display: flex; justify-content: space-between; align-items: center; gap: 30px; flex-wrap: nowrap; width: 100%; overflow: hidden;">
                 <!-- Left Side: Logo, Title, and Description in one line -->
-                <div style="display: flex; align-items: center; gap: 15px; white-space: nowrap; flex-shrink: 1; min-width: 0;">
+                <div
+                    style="display: flex; align-items: center; gap: 15px; white-space: nowrap; flex-shrink: 1; min-width: 0;">
                     <img src="/images/icon-48.png" alt="VideoClipper Logo"
                         style="width: 30px; height: 30px; object-fit: contain; flex-shrink: 0;">
                     <h3 style="margin: 0; font-size: 1.3rem; font-weight: 600; color: #2c3e50; flex-shrink: 0;">
                         VideoClipper
                     </h3>
-                    <p style="margin: 0; font-size: 0.95rem; color: #6c757d; white-space: nowrap;">
+                    <span
+                        style="color: #495057; font-size: 0.95rem; margin-left: 5px; text-overflow: ellipsis; overflow: hidden;">
                         Free Online GIF Maker & Video Trimmer
-                    </p>
+                    </span>
                 </div>
 
                 <!-- Right Side: Quick Links -->
                 <nav style="display: flex; gap: 20px; align-items: center; flex-shrink: 0;">
                     <a href="/"
-                        style="color: #1a56db; text-decoration: none; transition: color 0.2s; font-weight: 600; white-space: nowrap;" class="active">Video&nbsp;Clipper</a>
-                    <a href="/gif" style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">GIF Maker</a>
+                        style="color: #495057; text-decoration: none; transition: color 0.2s; font-weight: 500; white-space: nowrap;">Video
+                        Clipper</a>
+                    <a href="/gif"
+                        style="color: #1a56db; text-decoration: none; transition: color 0.2s; font-weight: 600;">GIF
+                        Maker</a>
                     <a href="/supported-sites"
-                        style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">Supported Sites</a>
-                    <a href="/faq" style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">FAQ</a>
+                        style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">Supported
+                        Sites</a>
+                    <a href="/faq"
+                        style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">FAQ</a>
                     <a href="/contact"
                         style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">Contact</a>
-                    <a href="/terms" style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">Terms</a>
+                    <a href="/terms"
+                        style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">Terms</a>
                     <a href="/privacy"
                         style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">Privacy</a>
                 </nav>
@@ -1023,7 +1342,7 @@
     </footer>
 
     <!-- Floating button will be added here by floating-button.js -->
-    <script src="/js/video-clipper.js" defer></script>
+    <script src="/js/gif.js" defer></script>
     <script src="/js/faq.js" defer></script>
     <script src="/js/floating-button.js" defer></script>
 

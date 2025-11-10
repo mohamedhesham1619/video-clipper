@@ -5,3 +5,4 @@ ui/
 clipper.json
 firestore_key.json
 clips/
+internal/web/js/gif.js

@@ -494,8 +494,8 @@
 
 /* Adjust time inputs container */
 .time-inputs {
-    gap: 0.75rem;
-    margin: 0.75rem 0;
+    gap: 0.5rem;
+    margin: 0.5rem 0;
     display: flex;
     flex-wrap: wrap;
 }
@@ -537,7 +537,7 @@
 /* Time label styling */
 .time-group .time-label {
     display: block;
-    margin-bottom: 0.25rem;
+    margin: 0.5rem 0 0.1rem 0;  /* Increased top margin to 0.5rem */
     position: relative;
     font-size: 0;
 }
@@ -564,6 +564,13 @@
     color: #666;
     margin-top: 0.25rem;
     text-align: center;
+}
+
+/* Desktop spacing between form and ad */
+@media screen and (min-width: 768px) {
+    .clip-card {
+        margin-bottom: 2rem;
+    }
 }
 
 /* Mobile styles */
@@ -2285,7 +2292,7 @@ header.main-header {
 /* Clip Card Adjustments */
 .clip-card {
     max-width: var(--content-width);
-    margin: 0 auto;
+    margin: 0 auto 2rem auto;
     position: relative;
     min-height: auto !important;
     z-index: 1;
@@ -2383,7 +2390,7 @@ header.main-header {
 .time-inputs {
     display: flex;
     justify-content: space-between;
-    margin: 0.1rem auto 0.2rem;
+    margin: 0.25rem auto 0.1rem;
     max-width: 500px;
     width: calc(100% - 2rem);
     box-sizing: border-box;

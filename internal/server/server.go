@@ -27,6 +27,7 @@ func New(cfg *config.Config, creditsStore *credits.CreditsStore) *Server {
 
 	// Static page routes
 	mux.HandleFunc("/", handlers.HomeHandler)
+	mux.HandleFunc("/gif", handlers.GifHandler)
 	mux.HandleFunc("/contact", handlers.ContactPageHandler)
 	mux.HandleFunc("/terms", handlers.TermsPageHandler)
 	mux.HandleFunc("/privacy", handlers.PrivacyPageHandler)
