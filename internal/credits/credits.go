@@ -7,20 +7,6 @@ import (
 	"time"
 )
 
-// CostPerMin holds the credit cost per minute for each quality
-var CostPerMin = map[string]float64{
-	"480p":  0.25,
-	"720p":  0.5,
-	"1080p": 1.0,
-	"1440p": 2.0,
-}
-
-// CalculateCreditCost calculates the credit cost based on the duration and quality
-// The quality is expected to be in the format "480p", "720p", "1080p", "1440p"
-func CalculateCreditCost(durationInSeconds int, quality string) float64 {
-	return CostPerMin[quality] * float64(durationInSeconds) / 60.0
-}
-
 // CreditsInfo holds the credit information for a user
 type CreditsInfo struct {
 	CreditsLeft float64

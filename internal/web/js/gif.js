@@ -1,5 +1,3 @@
-// Video Clipper - Factory Function Pattern
-// Handles video clip requests with progress tracking via SSE
 
 // Global variable to store client fingerprint and credits
 let clientFingerprint = '';
@@ -252,6 +250,9 @@ const VideoClipper = (function () {
     let state = {
         form: null,
         progressBar: null,
+        progressFill: null,
+        progressLoading: null,
+        progressBubble: null,
         progressContainer: null,
         statusText: null,
         actionButtons: null,
@@ -326,15 +327,13 @@ const VideoClipper = (function () {
                 }
             }
 
-            // Update ARIA attributes
-            state.progressBar.setAttribute('aria-valuenow', safePercent);
-            state.progressBar.setAttribute('aria-valuetext', `${safePercent}% complete`);
-        }
-
-        // Update aria attributes for accessibility
-        if (state.progressContainer) {
-            state.progressContainer.setAttribute('aria-valuenow', percent);
-            state.progressContainer.setAttribute('aria-valuetext', `${Math.round(percent)}% complete`);
+            // Update ARIA attributes for accessibility
+            if (state.progressBar) {
+                state.progressBar.setAttribute('aria-valuenow', roundedPercent);
+                state.progressBar.setAttribute('aria-valuemin', '0');
+                state.progressBar.setAttribute('aria-valuemax', '100');
+                state.progressBar.setAttribute('aria-valuetext', `${roundedPercent} percent complete`);
+            }
         }
     }
 
@@ -353,14 +352,22 @@ const VideoClipper = (function () {
             errorTimeout = null;
         }
         
-        // Hide download button, quality selector and credit cost display
+        // Hide download button, credit cost display, and GIF settings
         const downloadButton = document.querySelector('.btn-download');
-        const qualitySelector = document.querySelector('.quality-selector');
         const creditCostDisplay = document.getElementById('credit-cost-display');
+        const gifWidth = document.getElementById('gif-width');
+        const gifFps = document.getElementById('gif-fps');
+        const gifSpeed = document.getElementById('gif-playback-speed');
+        const gifLoops = document.getElementById('gif-loop-count');
         
         if (downloadButton) downloadButton.classList.add('hidden');
-        if (qualitySelector) qualitySelector.classList.add('hidden');
         if (creditCostDisplay) creditCostDisplay.style.display = 'none';
+        
+        // Hide GIF settings fields and their parent containers
+        if (gifWidth && gifWidth.parentElement) gifWidth.parentElement.style.display = 'none';
+        if (gifFps && gifFps.parentElement) gifFps.parentElement.style.display = 'none';
+        if (gifSpeed && gifSpeed.parentElement) gifSpeed.parentElement.style.display = 'none';
+        if (gifLoops && gifLoops.parentElement) gifLoops.parentElement.style.display = 'none';
        
         // Create progress elements if they don't exist
         if (!state.progressContainer) {
@@ -475,11 +482,14 @@ const VideoClipper = (function () {
             if (state.statusText) state.statusText.classList.remove('visible');
             if (state.progressContainer) state.progressContainer.classList.remove('visible');
             
-            // Show download button, credit cost, and quality selector after transition
+            // Show download button, credit cost, and GIF settings after transition
             setTimeout(async () => {
                 const downloadButton = document.querySelector('.btn-download');
-                const qualitySelector = document.querySelector('.quality-selector');
                 const creditCostDisplay = document.getElementById('credit-cost-display');
+                const gifWidth = document.getElementById('gif-width');
+                const gifFps = document.getElementById('gif-fps');
+                const gifSpeed = document.getElementById('gif-playback-speed');
+                const gifLoops = document.getElementById('gif-loop-count');
                 
                 // Update credits from server to get the latest values
                 try {
@@ -489,10 +499,15 @@ const VideoClipper = (function () {
                     console.error('Error updating credits:', error);
                 }
                 
-if (downloadButton) downloadButton.classList.remove('hidden');
-                if (qualitySelector) qualitySelector.classList.remove('hidden');
+                if (downloadButton) downloadButton.classList.remove('hidden');
                 if (creditCostDisplay) creditCostDisplay.style.display = 'block';
                 if (state.progressContainer) state.progressContainer.style.display = 'none';
+                
+                // Show GIF settings fields and their parent containers
+                if (gifWidth && gifWidth.parentElement) gifWidth.parentElement.style.display = '';
+                if (gifFps && gifFps.parentElement) gifFps.parentElement.style.display = '';
+                if (gifSpeed && gifSpeed.parentElement) gifSpeed.parentElement.style.display = '';
+                if (gifLoops && gifLoops.parentElement) gifLoops.parentElement.style.display = '';
                 
                 // Ensure the reset time emoji remains visible
                 const creditsResetTime = document.getElementById('credits-reset-time');
@@ -547,7 +562,9 @@ if (downloadButton) downloadButton.classList.remove('hidden');
             state.progressBar.style.animation = '';
             state.progressBar.style.width = '100%';
             state.progressBar.setAttribute('aria-valuenow', '0');
-            state.progressBar.setAttribute('aria-valuetext', '0% complete');
+            state.progressBar.setAttribute('aria-valuemin', '0');
+            state.progressBar.setAttribute('aria-valuemax', '100');
+            state.progressBar.setAttribute('aria-valuetext', '0 percent complete');
             state.progressBar.classList.remove('error');
         }
         
@@ -632,7 +649,11 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                 closeBtn.replaceWith(closeBtn.cloneNode(true));
                 const newCloseBtn = state.statusText.querySelector('.close-status');
                 
-                newCloseBtn.addEventListener('click', (e) => {
+                // Ensure button is keyboard accessible
+                newCloseBtn.setAttribute('type', 'button');
+                newCloseBtn.setAttribute('tabindex', '0');
+                
+                const handleClose = (e) => {
                     e.stopPropagation();
                     
                     // Clear any pending timeout
@@ -646,9 +667,7 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                     
                     // Show action buttons immediately
                     const actionButtons = document.querySelector('.action-buttons');
-                    const qualitySelector = document.querySelector('.quality-selector');
                     if (actionButtons) actionButtons.classList.remove('hidden');
-                    if (qualitySelector) qualitySelector.classList.remove('hidden');
                     
                     // Reset progress bar and UI immediately
                     resetProgressBar();
@@ -673,6 +692,16 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                             state.statusText.classList.remove('error');
                         }
                     }, 300); // Wait for opacity transition
+                };
+                
+                newCloseBtn.addEventListener('click', handleClose);
+                
+                // Add keyboard support for Enter and Space keys
+                newCloseBtn.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleClose(e);
+                    }
                 });
             }
 
@@ -739,9 +768,7 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                 if (state.statusText && state.statusText.classList.contains('error')) {
                     // Show action buttons immediately
                     const actionButtons = document.querySelector('.action-buttons');
-                    const qualitySelector = document.querySelector('.quality-selector');
                     if (actionButtons) actionButtons.classList.remove('hidden');
-                    if (qualitySelector) qualitySelector.classList.remove('hidden');
                     
                     // Reset progress bar and UI immediately
                     resetProgressBar();
@@ -788,16 +815,16 @@ if (downloadButton) downloadButton.classList.remove('hidden');
             const title = (data.title || '').replace(/&[^;]+;/g, '').trim();
 
             // Create status message with title
-            state.statusText.setAttribute('data-status', 'extracting');
-            const statusHTML = `
-                <div class="status-message">
-                    <div style="color: #000000;">Extracting the required clip from:</div>
-                    <div class="truncate-title" title="${title.replace(/"/g, '&quot;')}">${title}</div>
-                </div>
-            `;
-
-            // Update the status with our custom HTML
             if (state.statusText) {
+                state.statusText.setAttribute('data-status', 'extracting');
+                const statusHTML = `
+                    <div class="status-message">
+                        <div style="color: #000000;">Generating the required GIF from:</div>
+                        <div class="truncate-title" title="${title.replace(/"/g, '&quot;')}">${title}</div>
+                    </div>
+                `;
+
+                // Update the status with our custom HTML
                 state.statusText.innerHTML = statusHTML;
                 state.statusText.classList.add('visible');
 
@@ -815,7 +842,8 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                 }
             }
         } catch (e) {
-            console.error('Error parsing title event:', e);
+            console.error('Error in handleTitleEvent:', e);
+            // Don't show error to user for title parsing failures - not critical
         }
     }
 
@@ -862,24 +890,28 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                 }
             }
         } catch (e) {
-            console.error('Error parsing progress event:', e);
+            console.error('Error in handleProgressEvent:', e);
+            // Show error to user if progress parsing fails
+            showError('Error processing progress update. Please try again.');
         }
     }
 
     async function handleCompleteEvent(event) {
-        if (state.completeHandled) return;
-        state.completeHandled = true;
-        state.completeEventReceived = true;
-        
-        // Update credits after successful completion
         try {
-            await updateCreditsFromServer();
-        } catch (e) {
-            console.error('Failed to update credits after completion:', e);
-        }
-        
-        // Mark that we're completing successfully to prevent connection error messages
-        errorShown = true;
+            if (state.completeHandled) return;
+            state.completeHandled = true;
+            state.completeEventReceived = true;
+            
+            // Update credits after successful completion
+            try {
+                await updateCreditsFromServer();
+            } catch (e) {
+                console.error('Failed to update credits after completion:', e);
+                // Don't fail the entire completion if credit update fails
+            }
+            
+            // Mark that we're completing successfully to prevent connection error messages
+            errorShown = true;
         
         // First ensure progress is at 100% before starting download
         const completeProgress = (callback) => {
@@ -955,16 +987,16 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                         trackClipAndShowSupport();
                     }, 3000);
                 } else {
-                throw new Error('Invalid download URL received');
+                    throw new Error('Invalid download URL received');
                 }
             } catch (error) {
-                console.error('Error handling complete event:', error);
+                console.error('Error in startDownload:', error);
                 updateStatus('Error starting download. Please try again.');
                 showError('Error processing download. ' + (error.message || 'Please try again.'));
                 
                 // Still show completion state even if there was an error with the download
                 if (state.progressFill) {
-                state.progressFill.style.background = '#10b981';
+                    state.progressFill.style.background = '#10b981';
                     state.progressFill.style.width = '100%';
                     state.progressFill.style.transition = 'all 0.3s ease-out';
                     if (state.progressLoading) {
@@ -974,20 +1006,27 @@ if (downloadButton) downloadButton.classList.remove('hidden');
             }
         };
         
-        // Start the completion sequence - wait for progress to reach 100% before download
-        completeProgress(() => {
-            // Mark that we're closing the connection intentionally
-            state.connectionClosedIntentionally = true;
-            
-            // Close the SSE connection since we're done
-            if (state.eventSource) {
-                state.eventSource.close();
-                state.eventSource = null;
-            }
-            
-            clearProcessId();
-            startDownload();
-        });
+            // Start the completion sequence - wait for progress to reach 100% before download
+            completeProgress(() => {
+                // Mark that we're closing the connection intentionally
+                state.connectionClosedIntentionally = true;
+                
+                // Close the SSE connection since we're done
+                if (state.eventSource) {
+                    state.eventSource.close();
+                    state.eventSource = null;
+                }
+                
+                clearProcessId();
+                startDownload();
+            });
+        } catch (error) {
+            console.error('Error in handleCompleteEvent:', error);
+            showError('Error completing download. ' + (error.message || 'Please try again.'));
+            // Reset UI to allow retry
+            hideLoading(true);
+            resetProgressBar();
+        }
     }
 
     async function cancelCurrentOperation() {
@@ -1061,37 +1100,43 @@ if (downloadButton) downloadButton.classList.remove('hidden');
     }
 
     function setupSSEConnection(processId) {
-        // Close any existing connection
-        if (state.eventSource) {
-            state.eventSource.close();
-            state.eventSource = null;
-        }
-
-        const progressUrl = `/api/progress/${processId}`;
-        state.eventSource = new EventSource(progressUrl);
-        let errorShown = false;
-        state.connectionClosedIntentionally = false;
-
-        const showConnectionError = (message) => {
-            if (errorShown || state.completeHandled) return;
-            errorShown = true;
-            
-            // Mark that we've received an error event to prevent connection error messages
-            state.errorEventReceived = true;
-            
+        try {
+            // Close any existing connection
             if (state.eventSource) {
                 state.eventSource.close();
                 state.eventSource = null;
             }
-            
-            clearProcessId();
-            
-            showError(message);
-            // Don't call hideLoading here - showError will handle it
-        };
+
+            if (!processId) {
+                throw new Error('Invalid process ID');
+            }
+
+            const progressUrl = `/api/progress/${processId}`;
+            state.eventSource = new EventSource(progressUrl);
+            let errorShown = false;
+            state.connectionClosedIntentionally = false;
+
+            const showConnectionError = (message) => {
+                if (errorShown || state.completeHandled) return;
+                errorShown = true;
+                
+                // Mark that we've received an error event to prevent connection error messages
+                state.errorEventReceived = true;
+                
+                if (state.eventSource) {
+                    state.eventSource.close();
+                    state.eventSource = null;
+                }
+                
+                clearProcessId();
+                
+                showError(message);
+                // Don't call hideLoading here - showError will handle it
+            };
 
         // Handle connection errors
-        state.eventSource.onerror = () => {
+        state.eventSource.onerror = (error) => {
+            console.error('SSE connection error:', error);
             
             // Only handle connection errors if the page is still focused, online, and not unloading
             if (!isPageUnloading && document.hasFocus() && navigator.onLine) {
@@ -1169,6 +1214,12 @@ if (downloadButton) downloadButton.classList.remove('hidden');
         state.eventSource.addEventListener('complete', () => {
             window.removeEventListener('error', errorHandler);
         }, { once: true });
+        } catch (error) {
+            console.error('Error in setupSSEConnection:', error);
+            showError('Failed to establish connection. ' + (error.message || 'Please try again.'));
+            hideLoading(true);
+            resetProgressBar();
+        }
     };
 
     function validateTimeFormat(timeStr) {
@@ -1254,6 +1305,7 @@ if (downloadButton) downloadButton.classList.remove('hidden');
         startTimeInput: null,
         endTimeInput: null,
         durationSpan: null,
+        durationWarning: null,
         lastStartTime: '',
         lastEndTime: '',
         lastDuration: ''
@@ -1265,7 +1317,8 @@ if (downloadButton) downloadButton.classList.remove('hidden');
             durationDisplayCache.startTimeInput = getFormElement('start-time');
             durationDisplayCache.endTimeInput = getFormElement('end-time');
             durationDisplayCache.durationSpan = document.getElementById('duration-value');
-            if (!durationDisplayCache.durationSpan) return;
+            durationDisplayCache.durationWarning = document.querySelector('#duration-warning');
+            if (!durationDisplayCache.durationSpan || !durationDisplayCache.durationWarning) return;
         }
 
         const { startTimeInput, endTimeInput, durationSpan } = durationDisplayCache;
@@ -1301,6 +1354,20 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                 if (durationDisplayCache.lastDuration !== durationStr) {
                     durationDisplayCache.lastDuration = durationStr;
                     durationSpan.textContent = durationStr;
+                    
+                    // Show warning if duration exceeds 30 seconds
+                    if (duration > 30 && durationDisplayCache.durationWarning) {
+                        const warningText = durationDisplayCache.durationWarning.querySelector('.warning-text');
+                        if (warningText) {
+                            warningText.innerHTML = 'GIFs are limited to 30 seconds. For longer clips, please use the regular <a href="/" style="color: #3b82f6; text-decoration: underline;">Video Clipper</a> instead.';
+                        }
+                        durationDisplayCache.durationWarning.style.display = 'flex';
+                        durationDisplayCache.durationWarning.style.alignItems = 'center';
+                        // Force a reflow to ensure the element is visible
+                        void durationDisplayCache.durationWarning.offsetHeight;
+                    } else if (durationDisplayCache.durationWarning) {
+                        durationDisplayCache.durationWarning.style.display = 'none';
+                    }
                 }
             } catch (e) {
                 console.error('Error calculating duration:', e);
@@ -1336,41 +1403,69 @@ if (downloadButton) downloadButton.classList.remove('hidden');
         }
 
         try {
+            // Get form values
             const videoUrl = getFormElement('video-url').value.trim();
-            
-            // Check if it's a YouTube playlist URL
-            if ((videoUrl.includes('youtube') || videoUrl.includes('youtu.be')) && videoUrl.includes('list=')) {
-                throw new Error('It looks like you used a playlist link. Please copy the video link from the Share button instead.');
-            }
-            
-            const clipStart = getFormElement('start-time').value;
-            const clipEnd = getFormElement('end-time').value;
-            const quality = getFormElement('video-quality').value;
+            const videoStart = getFormElement('start-time').value;
+            const videoEnd = getFormElement('end-time').value;
+            const width = parseInt(getFormElement('gif-width').value, 10);
+            const fps = parseInt(getFormElement('gif-fps').value, 10);
+            const loops = parseInt(getFormElement('gif-loop-count').value, 10);
+            const speed = parseFloat(getFormElement('gif-playback-speed').value);
 
-            // Input validation
+            // Validate videoUrl (empty check)
             if (!videoUrl) {
                 throw new Error('Please enter a video URL');
             }
 
-            if (!clipStart || !clipEnd) {
+            // Validate videoUrl (playlist detection)
+            if ((videoUrl.includes('youtube') || videoUrl.includes('youtu.be')) && videoUrl.includes('list=')) {
+                throw new Error('It looks like you used a playlist link. Please copy the video link from the Share button instead.');
+            }
+
+            // Validate videoStart and videoEnd (time format)
+            if (!videoStart || !videoEnd) {
                 throw new Error('Please specify both start and end times');
             }
 
-            if (!validateTimeFormat(clipStart) || !validateTimeFormat(clipEnd)) {
-                throw new Error('Please enter times in HH:MM:SS or MM:SS format');
+            if (!validateTimeFormat(videoStart) || !validateTimeFormat(videoEnd)) {
+                throw new Error('Please enter times in HH:MM:SS format');
             }
 
-            const startSeconds = timeToSeconds(clipStart);
-            const endSeconds = timeToSeconds(clipEnd);
+            // Validate time range (end must be after start)
+            const startSeconds = timeToSeconds(videoStart);
+            const endSeconds = timeToSeconds(videoEnd);
 
             if (startSeconds >= endSeconds) {
                 throw new Error('End time must be after start time');
             }
 
+            // Validate duration limit for GIFs
+            const duration = endSeconds - startSeconds;
+            if (duration > 30) {
+                throw new Error('GIFs are limited to 30 seconds. For longer clips, please use the regular <a href="/" style="color: #3b82f6; text-decoration: underline;">Video Clipper</a> instead.');
+            }
+
+            // Validate numeric parameters
+            if (isNaN(width) || width <= 0) {
+                throw new Error('Invalid width value');
+            }
+
+            if (isNaN(fps) || fps <= 0) {
+                throw new Error('Invalid FPS value');
+            }
+
+            if (isNaN(loops) || loops < 0) {
+                throw new Error('Invalid loops value');
+            }
+
+            if (isNaN(speed) || speed <= 0) {
+                throw new Error('Invalid speed value');
+            }
+
             // Final credit check before submission using the last calculated cost
             const roundedCost = parseFloat(lastCalculatedCost.toFixed(2));
             if (availableCredits < roundedCost) {
-                const errorMessage = `Not enough credits. This clip requires ${roundedCost} credits, but you only have ${availableCredits}.`;
+                const errorMessage = `Not enough credits. This GIF requires ${roundedCost} credits, but you only have ${availableCredits}.`;
                 showError(errorMessage);
                 return; // Exit early instead of throwing to prevent duplicate error handling
             }
@@ -1386,21 +1481,27 @@ if (downloadButton) downloadButton.classList.remove('hidden');
             let response;
             try {
                 // Get client fingerprint
-                // Use the pre-generated fingerprint
                 const clientFingerprint = await getClientFingerprint();
                 
-                response = await fetch('/api/submit', {
+                // Construct GifRequest payload matching models.go format
+                const gifRequest = {
+                    videoUrl: videoUrl,
+                    videoStart: videoStart,
+                    videoEnd: videoEnd,
+                    width: width,
+                    fps: fps,
+                    loops: loops,
+                    speed: speed
+                };
+
+                // Send POST request to /api/gif/submit with X-Client-FP header
+                response = await fetch('/api/gif/submit', {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
                         'X-Client-FP': clientFingerprint
                     },
-                    body: JSON.stringify({
-                        videoUrl,
-                        clipStart,
-                        clipEnd,
-                        quality: parseInt(quality, 10) || 720  // Convert quality to integer with fallback to 720
-                    }),
+                    body: JSON.stringify(gifRequest),
                     signal: controller.signal
                 });
 
@@ -1412,10 +1513,10 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                         throw new Error(error.message || `Server error: ${response.status} ${response.statusText}`);
                     } catch (e) {
                         throw new Error('Failed to process your request. Please try again.');
-                        throw new Error(`Server error: ${response.status} ${response.statusText}`);
                     }
                 }
 
+                // Handle response and extract Process_ID
                 const result = await response.json();
                 if (result.processId) {
                     state.currentProcessId = result.processId;
@@ -1440,7 +1541,9 @@ if (downloadButton) downloadButton.classList.remove('hidden');
             // Only show generic error for unexpected errors, not for validation errors
             if (error.message.includes('must be after') || 
                 error.message.includes('Please enter') ||
-                error.message.includes('playlist link')) {
+                error.message.includes('playlist link') ||
+                error.message.includes('Invalid') ||
+                error.message.includes('GIFs are limited')) {
                 showError(error.message);
             } else {
                 showError('An unexpected error occurred. Please try again.');
@@ -1876,10 +1979,12 @@ if (downloadButton) downloadButton.classList.remove('hidden');
             durationDisplayCache.startTimeInput = getFormElement('start-time');
             durationDisplayCache.endTimeInput = getFormElement('end-time');
             durationDisplayCache.durationSpan = document.getElementById('duration-value');
+            durationDisplayCache.durationWarning = document.getElementById('duration-warning');
             
             if (!durationDisplayCache.startTimeInput || 
                 !durationDisplayCache.endTimeInput || 
-                !durationDisplayCache.durationSpan) {
+                !durationDisplayCache.durationSpan ||
+                !durationDisplayCache.durationWarning) {
                 return;
             }
         }
@@ -1993,18 +2098,34 @@ if (downloadButton) downloadButton.classList.remove('hidden');
             state.cancelButton.className = 'cancel-button';
             state.cancelButton.innerHTML = '✕';
             state.cancelButton.title = 'Cancel download';
+            state.cancelButton.setAttribute('aria-label', 'Cancel GIF generation');
+            state.cancelButton.setAttribute('type', 'button');
+            state.cancelButton.setAttribute('tabindex', '0');
             
-            state.cancelButton.addEventListener('click', () => {
+            const handleCancel = () => {
                 if (state.currentProcessId && !state.completeHandled) {
                     if (confirm('Are you sure you want to cancel this download?')) {
                         cancelCurrentOperation();
                     }
+                }
+            };
+            
+            state.cancelButton.addEventListener('click', handleCancel);
+            
+            // Add keyboard support for Enter and Space keys
+            state.cancelButton.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleCancel();
                 }
             });
 
             // Create status text
             state.statusText = document.createElement('div');
             state.statusText.className = 'status-text';
+            state.statusText.setAttribute('role', 'status');
+            state.statusText.setAttribute('aria-live', 'polite');
+            state.statusText.setAttribute('aria-atomic', 'true');
             state.statusText.style.cssText = `
                 margin: 0 auto 0;
                 text-align: center;
@@ -2033,6 +2154,12 @@ if (downloadButton) downloadButton.classList.remove('hidden');
             // Create progress bar
             state.progressBar = document.createElement('div');
             state.progressBar.className = 'progress-bar';
+            state.progressBar.setAttribute('role', 'progressbar');
+            state.progressBar.setAttribute('aria-valuenow', '0');
+            state.progressBar.setAttribute('aria-valuemin', '0');
+            state.progressBar.setAttribute('aria-valuemax', '100');
+            state.progressBar.setAttribute('aria-valuetext', '0 percent complete');
+            state.progressBar.setAttribute('aria-label', 'GIF generation progress');
 
             // Create loading overlay
             state.progressLoading = document.createElement('div');
@@ -2301,7 +2428,9 @@ if (downloadButton) downloadButton.classList.remove('hidden');
     let creditCalcElements = {
         startTime: null,
         endTime: null,
-        quality: null
+        gifWidth: null,
+        fps: null,
+        playbackSpeed: null,
     };
     
     // Initialize credit calculation elements
@@ -2309,7 +2438,9 @@ if (downloadButton) downloadButton.classList.remove('hidden');
         creditCalcElements = {
             startTime: document.getElementById('start-time'),
             endTime: document.getElementById('end-time'),
-            quality: document.getElementById('video-quality')
+            gifWidth: document.getElementById('gif-width'),
+            fps: document.getElementById('gif-fps'),
+            playbackSpeed: document.getElementById('gif-playback-speed')
         };
     }
     
@@ -2381,126 +2512,192 @@ if (downloadButton) downloadButton.classList.remove('hidden');
             
             return data;
         } catch (error) {
-            console.error('Error updating credits:', error);
+            console.error('Error in updateCreditsFromServer:', error);
+            // Don't show error to user - this is a background operation
+            // Just log and rethrow for caller to handle if needed
             throw error;
         }
     }
     
     // Calculate credit cost based on duration and quality
     function calculateCreditCost() {
-        // Initialize elements if not already done
-        if (!creditCalcElements.startTime) {
-            initCreditCalcElements();
+        try {
+            // Initialize elements if not already done
+            if (!creditCalcElements.startTime) {
+                initCreditCalcElements();
+            }
+            
+            const startTime = creditCalcElements.startTime?.value || '00:00:00';
+            const endTime = creditCalcElements.endTime?.value || '00:00:00';
+            const width = parseInt(creditCalcElements.gifWidth?.value) || 480;
+            const fps = parseInt(creditCalcElements.fps?.value) || 15;
+            const speed = parseFloat(creditCalcElements.playbackSpeed?.value) || 1.0;
+            
+            // Convert time to seconds
+            const startSeconds = timeToSeconds(startTime);
+            const endSeconds = timeToSeconds(endTime);
+            
+            // Calculate duration in seconds
+            const durationInSeconds = Math.max(0, endSeconds - startSeconds);
+            
+            if (durationInSeconds < 1) return { cost: 0, durationInSeconds: 0 };
+
+            // Base credit based on width (per 10 seconds)
+            const baseCredits = {
+                320: .5,
+                480: 1,
+                720: 1.5
+            };
+            
+            // Get the base credit for the selected width (default to 480 if not found)
+            const selectedWidth = width in baseCredits ? width : 480;
+            
+            // FPS multipliers
+            const fpsMultipliers = {
+                10: 0.75,
+                15: 1.0,
+                20: 1.5
+            };
+            
+            // Get the FPS multiplier (default to 15 if not found)
+            const selectedFps = fps in fpsMultipliers ? fps : 15;
+            
+            // Speed multipliers
+            const speedMultipliers = {
+                0.5: 2,
+                1.0: 1.0,
+                1.5: 0.75,
+                2.0: 0.5
+            };
+            
+            // Get the speed multiplier (default to 1.0 if not found)
+            const selectedSpeed = speed in speedMultipliers ? speed : 1.0;       
+            
+            // Calculate total credits
+            const credits = baseCredits[selectedWidth] *
+                          (durationInSeconds / 10) *
+                          fpsMultipliers[selectedFps] *
+                          speedMultipliers[selectedSpeed];
+            
+            lastCalculatedCost = credits;
+            return { cost: credits, durationInSeconds };
+        } catch (error) {
+            console.error('Error in calculateCreditCost:', error);
+            // Return safe defaults on error
+            return { cost: 0, durationInSeconds: 0 };
         }
-        
-        const startTime = (creditCalcElements.startTime && creditCalcElements.startTime.value) || '00:00:00';
-        const endTime = (creditCalcElements.endTime && creditCalcElements.endTime.value) || '00:00:00';
-        const quality = (creditCalcElements.quality && creditCalcElements.quality.value) || '1080';
-        
-        // Convert time to seconds
-        const startSeconds = timeToSeconds(startTime);
-        const endSeconds = timeToSeconds(endTime);
-        
-        // Calculate duration in seconds
-        const durationInSeconds = Math.max(0, endSeconds - startSeconds);
-        
-        // Define cost per minute for each quality
-        const costPerMinute = {
-            '480': 0.25,
-            '720': 0.5,
-            '1080': 1.0,
-            '1440': 2.0
-        };
-        
-        // Calculate and store total cost
-        const cost = costPerMinute[quality] * (durationInSeconds / 60);
-        lastCalculatedCost = cost;
-        return { cost, durationInSeconds };
     }
     
     // Update credit cost display and control download button state
     function updateCreditCostDisplay() {
-        const creditCostDisplay = document.getElementById('credit-cost-display');
-        const creditCostText = document.getElementById('credit-cost-text');
-        const downloadBtn = document.getElementById('download-btn');
-        
-        // Block download button if no credits available
-        if (availableCredits <= 0) {
-            if (downloadBtn) downloadBtn.disabled = true;
-            creditCostDisplay.style.display = 'block';
-            creditCostText.textContent = 'No credits available';
-            creditCostText.style.color = '#EF4444'; // Red color
-            return;
-        }
-        
         try {
-            const { cost, durationInSeconds } = calculateCreditCost();
+            const creditCostDisplay = document.getElementById('credit-cost-display');
+            const creditCostText = document.getElementById('credit-cost-text');
+            const downloadBtn = document.getElementById('download-btn');
             
-            // Only show if we have a valid duration and cost
-            if (durationInSeconds > 0 && cost > 0) {
-                const roundedCost = parseFloat(cost.toFixed(2));
-                const hasEnoughCredits = availableCredits >= roundedCost;
+            // Guard against missing elements
+            if (!creditCostDisplay || !creditCostText) {
+                console.warn('Credit cost display elements not found');
+                return;
+            }
+            
+            // Block download button if no credits available
+            if (availableCredits <= 0) {
+                if (downloadBtn) downloadBtn.disabled = true;
+                creditCostDisplay.style.display = 'block';
+                creditCostText.textContent = 'No credits available';
+                creditCostText.style.color = '#EF4444'; // Red color
+                return;
+            }
+            
+            try {
+                const { cost, durationInSeconds } = calculateCreditCost();
                 
-                if (hasEnoughCredits) {
-                    creditCostText.textContent = `Uses ${roundedCost} credits`;
-                    creditCostText.style.color = '#10B981'; // Green color
-                    if (downloadBtn) downloadBtn.disabled = false;
-                } else {
-                    creditCostText.textContent = `Needs ${roundedCost} credits`;
-                    creditCostText.style.color = '#EF4444'; // Red color
+                // Block download if cost exceeds available credits
+                if (cost > availableCredits) {
                     if (downloadBtn) downloadBtn.disabled = true;
+                    creditCostDisplay.style.display = 'block';
+                    creditCostText.textContent = `Needs ${cost.toFixed(2)} credits`;
+                    creditCostText.style.color = '#EF4444'; // Red color
+                    return;
                 }
                 
-                creditCostDisplay.style.display = 'block';
-            } else {
+                // Only show if we have a valid duration and cost
+                if (durationInSeconds > 0 && cost > 0) {
+                    const roundedCost = parseFloat(cost.toFixed(2));
+                    const hasEnoughCredits = availableCredits >= roundedCost;
+                    
+                    if (hasEnoughCredits) {
+                        creditCostText.textContent = `Uses ${roundedCost} credits`;
+                        creditCostText.style.color = '#10B981'; // Green color
+                        if (downloadBtn) downloadBtn.disabled = false;
+                    } else {
+                        creditCostText.textContent = `Needs ${roundedCost} credits`;
+                        creditCostText.style.color = '#EF4444'; // Red color
+                        if (downloadBtn) downloadBtn.disabled = true;
+                    }
+                    
+                    creditCostDisplay.style.display = 'block';
+                } else {
+                    creditCostDisplay.style.display = 'none';
+                    if (downloadBtn) downloadBtn.disabled = true;
+                }
+            } catch (error) {
+                console.error('Error calculating credit cost:', error);
                 creditCostDisplay.style.display = 'none';
                 if (downloadBtn) downloadBtn.disabled = true;
             }
         } catch (error) {
-            console.error('Error updating credit cost:', error);
-            creditCostDisplay.style.display = 'none';
-            if (downloadBtn) downloadBtn.disabled = true;
+            console.error('Error in updateCreditCostDisplay:', error);
+            // Fail silently - this is a UI update function
         }
     }
     
-    // Add event listeners for credit cost calculation
+    // Add event listeners for all form controls that affect credit cost
     function setupCreditCostListeners() {
-        // Initialize elements if not already done
-        if (!creditCalcElements.startTime) {
-            initCreditCalcElements();
-        }
+        // Time range inputs
+        const timeInputs = document.querySelectorAll('input[type="text"][pattern]');
         
-        const timeInputs = [
-            creditCalcElements.startTime,
-            creditCalcElements.endTime
-        ].filter(Boolean);
-        
-        const qualitySelect = creditCalcElements.quality;
+        // Form controls that affect credit cost
+        const creditControls = [
+            'gif-width',    // Width selector
+            'gif-fps',      // FPS selector
+            'gif-playback-speed' // Playback speed
+        ];
         
         // Update credit cost when time inputs change
         timeInputs.forEach(input => {
-            if (input) {
-                input.addEventListener('input', () => {
-                    // Only update if this is a valid time input
-                    if (input.value && input.checkValidity()) {
-                        updateCreditCostDisplay();
-                    }
-                });
-            }
+            input.addEventListener('input', () => {
+                // Only update if this is a valid time input
+                if (input.value && input.checkValidity()) {
+                    updateCreditCostDisplay();
+                }
+            });
         });
         
-        // Update credit cost when quality changes
-        if (qualitySelect) {
-            qualitySelect.addEventListener('change', updateCreditCostDisplay);
-        }
+        // Add change listeners to all credit-affecting controls
+        creditControls.forEach(id => {
+            const element = document.getElementById(id) || 
+                          document.querySelector(`input[name="${id}"]`);
+            if (element) {
+                element.addEventListener('change', updateCreditCostDisplay);
+                // Also update on input for range/slider and select elements
+                if (element.type === 'range' || element.tagName === 'SELECT') {
+                    element.addEventListener('input', updateCreditCostDisplay);
+                }
+            }
+        });
         
         // Initial update
         updateCreditCostDisplay();
     }
     
     return {
-        init: function () {
+        init: function() {
             try {
+                // Initialize credit calculation elements
+                initCreditCalcElements();
+                
                 // Check for existing processID in sessionStorage and cancel it
                 const savedProcessId = sessionStorage.getItem('ProcessId');
                 if (savedProcessId) {
@@ -2514,7 +2711,10 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                 }
 
                 state.form = document.getElementById('clip-form');
-                if (!state.form) return;
+                if (!state.form) {
+                    console.error('Form element not found');
+                    return;
+                }
 
                 state.actionButtons = state.form.querySelector('.action-buttons');
 
@@ -2526,12 +2726,18 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                 state.form.addEventListener('submit', handleSubmit);
 
                 // Initialize credits and update display
-                updateCreditsFromServer().then(() => {
-                    // After credits are loaded, update the display
-                    updateCreditCostDisplay();
-                });
+                updateCreditsFromServer()
+                    .then(() => {
+                        // After credits are loaded, update the display
+                        updateCreditCostDisplay();
+                    })
+                    .catch(error => {
+                        console.error('Failed to load initial credits:', error);
+                        // Don't show error to user - credits will show as 0
+                    });
 
             } catch (error) {
+                console.error('Error in init:', error);
                 showError('Failed to initialize the application. Please refresh the page.');
             }
         },

@@ -4,7 +4,7 @@ import (
 	"clipper/internal/blocklist"
 	"clipper/internal/config"
 	"clipper/internal/credits"
-	"clipper/internal/downloader"
+	"clipper/internal/downloader/clip"
 	"clipper/internal/models"
 	"clipper/internal/stats"
 	"clipper/internal/updater"
@@ -17,13 +17,8 @@ import (
 	"time"
 )
 
-type response struct {
-	Status    string `json:"status"` // "started", "error"
-	ProcessId string `json:"processId,omitempty"`
-}
-
-// SubmitHandler handles the submission of a new video download request
-func SubmitHandler(cfg *config.Config) http.HandlerFunc {
+// SubmitClipHandler handles the submission of a new clip download request
+func SubmitClipHandler(cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -31,7 +26,7 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 		}
 
 		// Read the request from the context
-		videoRequest := r.Context().Value("videoRequest").(models.VideoRequest)
+		videoRequest := r.Context().Value("videoRequest").(models.ClipRequest)
 
 		// Log the request details
 		clipDurationInSeconds, err := utils.CalculateDurationSeconds(videoRequest.ClipStart, videoRequest.ClipEnd)
@@ -85,7 +80,7 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 		go func() {
 
 			// Get the video title and send it to the progress channel
-			videoTitle, err := utils.GetVideoTitle(cfg, videoRequest)
+			videoTitle, err := utils.GetVideoTitle(cfg, videoRequest.Quality, videoRequest.VideoURL)
 			if err != nil {
 				slog.Error("Error getting video title", "error", err, "request", videoRequest)
 
@@ -106,17 +101,15 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 			}
 
 			// Getting the video title takes some time, so we check if the user cancelled the request while we were getting the video title
-			// If the user cancelled the request, we stop the download process and clean up resources
 			if downloadProcess.IsCancelled {
 				slog.Warn("Skipping download start as process was cancelled", "processID", processID)
 				close(progressChan)
-				data.cleanupDownloadProcess(processID)
 				return
 			}
 
 			// Get the actual quality from the retrieved video title
 			actualQuality := utils.GetActualQuality(videoTitle)
-			if actualQuality == "" {
+			if actualQuality == 0 {
 				progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Could not get video info"}}
 				close(progressChan)
 				data.cleanupDownloadProcess(processID)
@@ -125,7 +118,7 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 
 			// Calculate the needed credits based on the actual quality and clip duration
 			// we don't use the quality from the request because it might be different from the actual quality retrieved from yt-dlp
-			neededCredits := credits.CalculateCreditCost(clipDurationInSeconds, actualQuality)
+			neededCredits := credits.CalculateClipCreditCost(clipDurationInSeconds, actualQuality)
 			downloadProcess.NeededCredits = neededCredits
 
 			// Send the video title to the progress channel
@@ -136,7 +129,7 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 			}
 
 			// StartVideoDownloadProcesses function start the download processes and doesn't wait for them to finish instead it returns the running commands
-			ytdlpCmd, ffmpegCmd, err := downloader.StartVideoDownloadProcesses(cfg, videoRequest, videoTitle, &downloadProcess)
+			ytdlpCmd, ffmpegCmd, err := clip.StartClipDownloadProcesses(cfg, videoRequest, videoTitle, &downloadProcess)
 
 			// If there was an error during the download, send an error message on the channel and clean up.
 			if err != nil {
@@ -157,7 +150,7 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 			// If any process fails, send error message on the channel, increment failed downloads count and check for yt-dlp updates.
 			ffmpegErr := ffmpegCmd.Wait()
 			ytdlpErr := ytdlpCmd.Wait()
-			
+
 			if ffmpegErr != nil {
 				handleProcessError("ffmpeg", ffmpegErr, progressChan, processID, cfg.SMTP)
 				return
@@ -179,22 +172,22 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 			close(progressChan)
 
 			// Increment clip count in Firestore
-			err = stats.IncrementClipCount(cfg.GoogleCloud.Firestore)
+			err = stats.IncrementStat(cfg.GoogleCloud.Firestore, "clips")
 			if err != nil {
 				slog.Error("Error incrementing clip count", "error", err)
 			}
 
 			// Schedule cleanup for the download process
 			time.AfterFunc(30*time.Minute, func() {
-				slog.Info("Cleaning up download process", "processId", processID)
+				slog.Info("Cleaning up clip process", "processId", processID)
 				data.cleanupDownloadProcess(processID)
 			})
 
 		}()
 
-		// If the client didn't request the progress handler within 10 seconds, we assume that the client disconnected and stop the download process.
+		// If the client didn't request the progress handler within 5 seconds, we assume that the client disconnected and stop the download process.
 		// This will not block the submit handler, as it runs in a separate goroutine.
-		time.AfterFunc(10*time.Second, func() {
+		time.AfterFunc(5*time.Second, func() {
 
 			select {
 			case <-watcher:
@@ -208,7 +201,7 @@ func SubmitHandler(cfg *config.Config) http.HandlerFunc {
 		})
 
 		// Respond with the process ID
-		json.NewEncoder(w).Encode(response{Status: "started", ProcessId: processID})
+		json.NewEncoder(w).Encode(map[string]string{"processId": processID})
 
 	}
 }

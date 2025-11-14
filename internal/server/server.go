@@ -17,7 +17,8 @@ func New(cfg *config.Config, creditsStore *credits.CreditsStore) *Server {
 	mux := http.NewServeMux()
 
 	// API routes
-	mux.Handle("/api/submit", validateFPMiddleware(validateCreditsMiddleware(creditsStore, handlers.SubmitHandler(cfg))))
+	mux.Handle("/api/submit", validateFingerPrintMiddleware(validateClipRequestMiddleware(creditsStore, handlers.SubmitClipHandler(cfg))))
+	mux.Handle("/api/gif/submit", validateFingerPrintMiddleware(validateGIFRequestMiddleware(creditsStore, handlers.SubmitGIFHandler(cfg))))
 	mux.HandleFunc("/api/progress/", handlers.ProgressHandler(creditsStore))
 	mux.HandleFunc("/api/cancel/", handlers.CancelHandler)
 	mux.HandleFunc("/api/feedback", handlers.FeedbackHandler(cfg))

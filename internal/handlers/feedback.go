@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"clipper/internal/config"
-	"clipper/internal/models"
 	"clipper/internal/utils"
 	"encoding/json"
 	"fmt"
@@ -11,6 +10,16 @@ import (
 	"net/smtp"
 )
 
+type feedbackRequest struct {
+	Message string `json:"message"`
+	Email   string `json:"email,omitempty"`
+}
+
+type feedbackResponse struct {
+	Status  string `json:"status"`
+	Message string `json:"message"`
+}
+
 func FeedbackHandler(cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -18,7 +27,7 @@ func FeedbackHandler(cfg *config.Config) http.HandlerFunc {
 			return
 		}
 
-		var feedback models.FeedbackRequest
+		var feedback feedbackRequest
 		if err := json.NewDecoder(r.Body).Decode(&feedback); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
@@ -47,7 +56,7 @@ func FeedbackHandler(cfg *config.Config) http.HandlerFunc {
 			slog.Info("Feedback email sent successfully")
 		}
 
-		response := models.FeedbackResponse{
+		response := feedbackResponse{
 			Status:  "success",
 			Message: "Thank you for your feedback!",
 		}
@@ -57,7 +66,7 @@ func FeedbackHandler(cfg *config.Config) http.HandlerFunc {
 	}
 }
 
-func sendFeedbackEmail(cfg *config.Config, feedback models.FeedbackRequest, userAgent, ip string) error {
+func sendFeedbackEmail(cfg *config.Config, feedback feedbackRequest, userAgent, ip string) error {
 	smtpHost := cfg.SMTP.Host
 	smtpPort := cfg.SMTP.Port
 	smtpUser := cfg.SMTP.Username

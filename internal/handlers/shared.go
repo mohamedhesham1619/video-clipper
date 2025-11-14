@@ -31,7 +31,7 @@ func (s *sharedData) getDownloadProcess(processID string) (*models.DownloadProce
 }
 
 func (s *sharedData) cleanupDownloadProcess(processID string) {
-	
+
 	downloadProcess, exists := s.getDownloadProcess(processID)
 	if !exists {
 		slog.Warn("Couldn't cleanup download process because it doesn't exist", "processID", processID)
@@ -39,10 +39,13 @@ func (s *sharedData) cleanupDownloadProcess(processID string) {
 	}
 
 	// Remove the downloaded file
-	if err := os.Remove(downloadProcess.DownloadPath); err != nil && !os.IsNotExist(err) {
-		slog.Error("Error removing download file", "error", err, "filePath", downloadProcess.DownloadPath)
+	if downloadProcess.DownloadPath != "" {
+		if err := os.Remove(downloadProcess.DownloadPath); err != nil && !os.IsNotExist(err) {
+			slog.Error("Error removing downloaded file", "error", err, "filePath", downloadProcess.DownloadPath)
+		}
 	}
-	
+
+	// Remove the download process from the processes map
 	s.mu.Lock()
 	delete(s.downloadProcesses, processID)
 	s.mu.Unlock()
@@ -66,7 +69,7 @@ func (s *sharedData) notifyWatcher(processID string) (alreadyNotified bool) {
 
 		return false
 	}
-	
+
 	return true
 }
 
@@ -78,27 +81,34 @@ func (s *sharedData) notifyWatcher(processID string) (alreadyNotified bool) {
 func (s *sharedData) stopDownloadProcessAndCleanUp(processID string) {
 	downloadProcess, exists := s.getDownloadProcess(processID)
 	if !exists {
-		slog.Warn("Couldn't stop download process because it doesn't exist", "processID", processID)
 		return
 	}
 
 	downloadProcess.IsCancelled = true
+
 	ffmpegProcess := downloadProcess.FFmpegProcess
 	ytdlpProcess := downloadProcess.YtDlpProcess
 
-	ffmpegStopped, err := stopProcessIfRunning(ffmpegProcess)
-	if err != nil {
-		slog.Error("Failed to stop ffmpeg process", "error", err, "processID", processID)
+	var wasFFmpegRunning, wasYtdlpRunning bool
+	var err error
+
+	if ffmpegProcess != nil {
+		wasFFmpegRunning, err = stopProcessIfRunning(ffmpegProcess)
+		if err != nil {
+			slog.Error("Failed to stop ffmpeg process", "error", err, "processID", processID)
+		}
 	}
 
-	ytdlpStopped, err := stopProcessIfRunning(ytdlpProcess)
-	if err != nil {
-		slog.Error("Failed to stop yt-dlp process", "error", err, "processID", processID)
+	if ytdlpProcess != nil {
+		wasYtdlpRunning, err = stopProcessIfRunning(ytdlpProcess)
+		if err != nil {
+			slog.Error("Failed to stop yt-dlp process", "error", err, "processID", processID)
+		}
 	}
 
-	// If either process was running and was stopped, it's a true cancellation, so clean up.
+	// If either process was running and stopped successfully, it's a true cancellation, so clean up.
 	// If neither was running, the download process was already complete, so we let the submit handler clean up.
-	if ffmpegStopped || ytdlpStopped {
+	if wasFFmpegRunning || wasYtdlpRunning {
 		s.cleanupDownloadProcess(processID)
 		slog.Warn("Download process stopped and resources cleaned up", "processID", processID)
 	} else {
@@ -124,10 +134,10 @@ func stopProcessIfRunning(process *exec.Cmd) (bool, error) {
 		// Reap the process to ensures we don't leave any zombie processes
 		// We don't care about the error here since we killed it
 		_ = process.Wait()
-		
+
 		return true, nil
 	}
-	
+
 	return false, nil
 }
 

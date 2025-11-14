@@ -1,4 +1,4 @@
-package downloader
+package clip
 
 import (
 	"bufio"
@@ -10,12 +10,10 @@ import (
 	"log/slog"
 	"os/exec"
 	"path/filepath"
-	"strconv"
-	"strings"
 )
 
-// StartVideoDownloadProcesses starts the video download processes and returns the running commands.
-func StartVideoDownloadProcesses(cfg *config.Config, videoRequest models.VideoRequest, videoTitle string, downloadProcess *models.DownloadProcess) (ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd, err error) {
+// StartClipDownloadProcesses starts the video download processes and returns the running commands.
+func StartClipDownloadProcesses(cfg *config.Config, videoRequest models.ClipRequest, videoTitle string, downloadProcess *models.DownloadProcess) (ytdlpCmd *exec.Cmd, ffmpegCmd *exec.Cmd, err error) {
 
 	// Build the download path and save it to the download process struct.
 	downloadPath := filepath.Join(cfg.App.DownloadPath, videoTitle)
@@ -34,7 +32,7 @@ func StartVideoDownloadProcesses(cfg *config.Config, videoRequest models.VideoRe
 
 	// Calculate the total clip duration.
 	// This is used to calculate the progress percentage.
-	totalTime, err := utils.ParseTimeRangeToMicroseconds(videoRequest.ClipStart, videoRequest.ClipEnd)
+	totalTimeInMS, err := utils.ParseTimeRangeToMicroseconds(videoRequest.ClipStart, videoRequest.ClipEnd)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error calculating clip duration in microseconds: %v", err)
 	}
@@ -45,7 +43,7 @@ func StartVideoDownloadProcesses(cfg *config.Config, videoRequest models.VideoRe
 	if err != nil {
 		return nil, nil, fmt.Errorf("error creating ffmpeg stdout pipe: %v", err)
 	}
-	go parseAndSendProgress(ffmpegStdout, downloadProcess.ProgressChan, totalTime)
+	go utils.ParseAndSendProgress(ffmpegStdout, downloadProcess.ProgressChan, totalTimeInMS)
 
 	// Start both commands and do not wait for them to finish.
 	if err := ytdlpCmd.Start(); err != nil {
@@ -60,7 +58,7 @@ func StartVideoDownloadProcesses(cfg *config.Config, videoRequest models.VideoRe
 	return ytdlpCmd, ffmpegCmd, nil
 }
 
-func prepareYtDlpCommand(cfg *config.Config, videoRequest models.VideoRequest) *exec.Cmd {
+func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest) *exec.Cmd {
 
 	var formatString string
 
@@ -142,33 +140,5 @@ func logPipe(pipe io.ReadCloser, prefix string) {
 	scanner := bufio.NewScanner(pipe)
 	for scanner.Scan() {
 		slog.Debug(prefix, "output", scanner.Text())
-	}
-}
-
-// parseAndSendProgress reads from ffmpeg's progress pipe, parses the progress, and sends it to the progress channel.
-func parseAndSendProgress(pipe io.ReadCloser, progressChan chan models.ProgressEvent, totalTime int64) {
-	scanner := bufio.NewScanner(pipe)
-	for scanner.Scan() {
-		line := scanner.Text()
-
-		if strings.Contains(line, "out_time_ms") {
-			outTime, err := strconv.ParseInt(strings.Split(line, "=")[1], 10, 64)
-
-			if err != nil {
-				slog.Error("error parsing out_time_ms from ffmpeg", "error", err)
-				continue
-			}
-
-			// Convert to float64 to avoid integer division truncation and get precise percentage
-			progress := (float64(outTime) / float64(totalTime)) * 100
-
-			progressChan <- models.ProgressEvent{
-				Event: models.EventTypeProgress,
-				Data: map[string]string{
-					"progress": fmt.Sprintf("%d", int(progress)),
-				},
-			}
-
-		}
 	}
 }

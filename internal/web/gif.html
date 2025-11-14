@@ -34,7 +34,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description"
-        content="Convert any online video into a high-quality GIF — free, fast, and easy. Paste a video link, pick the part you want, adjust width, FPS, and speed, then download your animated GIF instantly.">
+        content="Free online GIF maker: create GIFs from any online video. Customize width, frame rate, loops, and playback speed, then download instantly — no watermark.">
     <meta name="keywords"
         content="video to gif, gif maker, gif converter, online gif maker, convert video to gif, gif converter, youtube to gif, tiktok to gif, facebook to gif, free gif maker, video clipper gif, animated gif maker">
     <meta name="author" content="VideoClipper">
@@ -43,21 +43,21 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://videoclipper.online/gif">
-    <meta property="og:title" content="VideoClipper - Create GIFs from Online Videos (No Signup)">
+    <meta property="og:title" content="Free Online Video to GIF Converter (No Signup)">
     <meta property="og:description"
-        content="Convert any online video into a high-quality GIF — free, fast, and easy. Paste a video link, pick the part you want, adjust width, FPS, and speed, then download your animated GIF instantly.">
+        content="Free online GIF maker: create GIFs from any online video. Customize width, frame rate, loops, and playback speed, then download instantly — no watermark.">
     <meta property="og:image" content="/images/preview.jpg">
     <meta property="og:site_name" content="VideoClipper">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://videoclipper.online/gif">
-    <meta name="twitter:title" content="VideoClipper - Create GIFs from Online Videos (No Signup)">
+    <meta name="twitter:title" content="Free Online Video to GIF Converter (No Signup)">
     <meta name="twitter:description"
-        content="Convert any online video into a high-quality GIF — free, fast, and easy. Paste a video link, pick the part you want, adjust width, FPS, and speed, then download your animated GIF instantly.">
+        content="Free online GIF maker: create GIFs from any online video. Customize width, frame rate, loops, and playback speed, then download instantly — no watermark.">
     <meta name="twitter:image" content="/images/preview.jpg">
 
-    <title>VideoClipper - Create GIFs from Online Videos (No Signup)</title>
+    <title>Free Online Video to GIF Converter (No Signup)</title>
     <link rel="canonical" href="https://videoclipper.online/gif" />
 
     <!-- Favicon and Site Icons -->
@@ -96,6 +96,40 @@
     </noscript>
 
     <style>
+        /* Base styles for mobile */
+        @media screen and (max-width: 900px) {
+            body {
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                overflow-x: hidden;
+            }
+            
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 15px !important;
+                margin: 0 auto !important;
+                box-sizing: border-box;
+            }
+            
+            .main-content {
+                width: 100% !important;
+                padding: 0 !important;
+                margin: 0 auto !important;
+            }
+            
+            .clip-card {
+                width: 100% !important;
+                margin: 0 auto !important;
+                padding: 15px !important;
+                box-sizing: border-box;
+            }
+        }
+        
         /* Responsive fixes */
         @media screen and (max-width: 767px) {
             .main-header .container {
@@ -488,12 +522,12 @@
         {
             "@context": "https://schema.org",
             "@type": "WebApplication",
-            "name": "VideoClipper - Create GIFs from Online Videos (No Signup)",
+            "name": "VideoClipper - Video to GIF Converter (No Signup)",
             "headline": "Convert Online Videos to GIFs Instantly",
-            "description": "Convert any online video into a high-quality GIF — free, fast, and easy. Paste a video link, pick the part you want, adjust width, FPS, and speed, then download your animated GIF instantly.",
+            "description": "Free online GIF maker: create GIFs from any online video. Customize width, frame rate, loops, and playback speed, then download instantly — no watermark.",
             "url": "https://videoclipper.online/gif",
             "applicationCategory": ["MultimediaApplication", "UtilityApplication"],
-            "applicationSubCategory": "GIF Converter",
+            "applicationSubCategory": "GIF Maker",
             "operatingSystem": ["Windows", "macOS", "Linux", "Android", "iOS", "Chrome OS"],
             "browserRequirements": "Requires JavaScript. Works in all modern browsers.",
             "offers": {
@@ -505,7 +539,7 @@
             },
             "thumbnailUrl": "https://videoclipper.online/images/icon-512.png",
             "featureList": [
-            "Create GIFs from any online video URL",
+            "Make GIFs from any online video URL",
             "Supports 1000+ sites including YouTube, TikTok, Reddit, Facebook, Instagram, Twitter, and more",
                 "Precise start and end time selection",
                 "Adjust width, FPS, speed, and loop count",
@@ -534,8 +568,8 @@
                 "@id": "https://videoclipper.online/gif"
             },
             "inLanguage": "en",
-            "datePublished": "2025-11-11",
-            "dateModified": "2025-11-11"
+            "datePublished": "2025-11-12",
+            "dateModified": "2025-11-12"
         }
     </script>
     <!-- Compact overrides for GIF page -->
@@ -583,7 +617,7 @@
     </style>
 </head>
 
-<body>
+<body class="gif-page">
     <header class="main-header" role="banner"
         style="padding: 0 !important; min-height: 85px; display: flex; align-items: center;">
         <div class="container" style="padding: 0.5rem 5% !important; display: flex; align-items: center; height: 100%;">
@@ -627,7 +661,7 @@
                             <i class="fas fa-video"></i>
                         </div>
                         <h1 style="white-space: nowrap; text-align: center;">Free Online Video to GIF Converter</h1>
-                        <p class="subtitle" style="text-align: center;">Paste any video URL, choose start and end time, and instantly create a high-quality GIF.</p>
+                        <p class="subtitle" style="text-align: center;">Make GIFs from online videos — fully adjustable to fit your needs.</p>
                         <form id="clip-form" class="clip-form">
                             <div class="form-group">
                                 <label for="video-url">Video URL</label>
@@ -681,6 +715,10 @@
                                     </div>
                                 </div>
                             </div>
+                            <div id="duration-warning" class="duration-warning" style="display: none; background-color: #fef2f2; border-left: 3px solid #ef4444; color: #b91c1c; padding: 8px 16px; margin: 1px 0 12px 0; border-radius: 6px; font-size: 0.9em; line-height: 1.4; width: 100%; box-sizing: border-box;">
+                                <i class="fas fa-exclamation-triangle" style="margin-right: 8px; min-width: 16px;"></i>
+                                <span class="warning-text" style="flex: 1;"></span>
+                            </div>
                             <div class="time-inputs"
                                 style="display: flex; flex-wrap: nowrap; gap: 10px; margin-bottom: 15px;">
                                 <div class="form-group time-group" style="flex: 1; min-width: 0; position: relative;">
@@ -689,9 +727,8 @@
                                         <div class="tooltip">
                                             <i class="far fa-circle-question"></i>
                                             <span class="tooltiptext">
-                                                Set the GIF width in pixels<br><span
-                                                    style="color: #d1d5db; font-size: 0.9em;">Larger width = bigger
-                                                    file</span>
+                                                How wide your GIF will be<br><span
+                                                    style="color: #d1d5db; font-size: 0.9em;">Wider GIFs are clearer but larger</span>
                                             </span>
                                         </div>
                                     </div>
@@ -727,13 +764,12 @@
                                         <div class="tooltip">
                                             <i class="far fa-circle-question"></i>
                                             <span class="tooltiptext">
-                                                Loop count<br><span style="color: #d1d5db; font-size: 0.9em;">How many
-                                                    times the GIF repeats</span>
+                                                How many <strong>additional times</strong> the GIF repeats after the first play.<br><span style="color: #d1d5db; font-size: 0.9em;">Infinite makes it play forever.</span>
                                             </span>
                                         </div>
                                     </div>
                                     <select id="gif-loop-count" name="gif-loop-count" style="width: 100%;"
-                                        title="How many times the GIF repeats. Infinite = loops forever.">
+                                        title="How many additional times the GIF repeats after the first play. Infinite = loops forever.">
                                         <option value="1">1</option>
                                         <option value="2">2</option>
                                         <option value="3">3</option>
@@ -746,8 +782,7 @@
                                         <div class="tooltip">
                                             <i class="far fa-circle-question"></i>
                                             <span class="tooltiptext">
-                                                Playback speed<br><span style="color: #d1d5db; font-size: 0.9em;">1x =
-                                                    normal speed</span>
+                                                How fast the GIF plays<br><span style="color: #d1d5db; font-size: 0.9em;">below 1× makes the GIF slower and longer than the original video <br> above 1× makes it faster and shorter than the original video.</span>
                                             </span>
                                         </div>
                                     </div>
@@ -762,17 +797,16 @@
                             </div>
 
                             <div class="form-group">
+                                <div id="credit-cost-display" style="position: relative; margin-bottom: 10px; font-size: 1.1rem; font-weight: 600; display: none; text-align: left; padding: 4px 0; line-height: 1.3;">
+                                    <span id="credit-cost-text"></span>
+                                </div>
                                 <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: nowrap;">
-                                    <button type="submit" class="btn-download"
-                                        style="flex: 1; max-width: none; width: auto;">
-                                        <i class="fas fa-magic"></i> Generate GIF
-                                    </button>
-                                    <label
-                                        style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin: 0; white-space: nowrap; flex-shrink: 0;">
-                                        <input type="checkbox" id="gif-optimize-size" name="gif-optimize-size"
-                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                        <span>Optimize Size</span>
-                                    </label>
+                                    <div style="display: flex; align-items: flex-start; gap: 1rem; width: 100%;">
+                                        <button type="submit" id="download-btn" class="btn-download"
+                                            style="flex: 1; max-width: none; height: 38px; margin: 0; padding: 0.6rem 1rem;">
+                                            <i class="fas fa-magic"></i> Generate GIF
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </form>
@@ -784,7 +818,7 @@
 
         <!-- Submagic Ad Banner -->
         <div class="ad-banner"
-            style="width: 100%; background-color: white; padding: 0.5rem 0; margin-top: -4rem; position: relative; z-index: 1; text-align: center;">
+            style="width: 100%; background-color: white; padding: 0.5rem 0; margin-top: -5rem; position: relative; z-index: 1; text-align: center;">
             <div class="container" style="max-width: 1200px; margin: 0 auto;">
                 <h1 style="font-size: 2.5em; font-weight: 800; margin: 0 0 0.5rem; line-height: 1.2; color: #000;">
                     Create viral shorts <span style="color: #ff4f01;">in seconds with AI</span>
@@ -978,18 +1012,18 @@
 
         <!-- How It Works Section -->
         <section id="get-started" class="content-section">
-            <h2>Create GIFs from YouTube, TikTok, and Facebook Videos Online for Free</h2>
+            <h2>Make GIFs from YouTube, TikTok, and Facebook Videos Online for Free</h2>
             <div class="features">
                 <div class="feature">
                     <i class="fas fa-bolt"></i>
                     <h3>Make GIFs from 1,000+ Sites — Right in Your Browser</h3>
                     <p>VideoClipper GIF Maker lets you paste a video link from YouTube, TikTok, Instagram, Facebook, Reddit,
-                        Twitter (X), Vimeo, Twitch, and more — then turn any part of it into a GIF. Just select the start and
+                        Twitter (X), Vimeo, Twitch, and more — then convert any part of it into a GIF. Just select the start and
                         end time, set your preferred width or speed, and generate your animated GIF instantly.</p>
                 </div>
                 <div class="feature">
                     <i class="far fa-lightbulb"></i>
-                    <h3>Fast & Simple Online GIF Creator</h3>
+                    <h3>Fast & Simple Online GIF converter</h3>
                     <p>Convert highlights, funny moments, or short clips into GIFs directly from your browser. No registration,
                         no software needed — just paste a link, adjust settings, and download your GIF in seconds.</p>
                 </div>
@@ -1088,7 +1122,7 @@
 
                 <div class="faq-item">
                     <button class="faq-question">
-                        How do I create a GIF from a video?
+                        How do I make a GIF from a video?
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
@@ -1155,10 +1189,10 @@
                 },
                 {
                   "@type": "Question",
-                  "name": "How do I create a GIF from a video?",
+                  "name": "How do I make a GIF from a video?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Paste a video link from YouTube, TikTok, Facebook, Instagram, or other supported platforms. Then choose the start and end times, adjust width, FPS, or speed, and click 'Create GIF' to generate your animation."
+                    "text": "Paste a video link from YouTube, TikTok, Facebook, Instagram, or other supported platforms. Then choose the start and end times, adjust width, FPS, or speed, and click 'Generate GIF' to generate your animation."
                   }
                 },
                 {

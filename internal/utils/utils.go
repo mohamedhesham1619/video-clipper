@@ -1,13 +1,17 @@
 package utils
 
 import (
+	"bufio"
 	"clipper/internal/config"
 	"clipper/internal/models"
 	"fmt"
+	"io"
 	"log/slog"
 	"math"
 	"math/rand/v2"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -94,9 +98,9 @@ func IsYouTubeURL(url string) bool {
 }
 
 // getVideoTitle retrieves the video title using yt-dlp.
-func GetVideoTitle(cfg *config.Config, videoRequest models.VideoRequest) (string, error) {
+func GetVideoTitle(cfg *config.Config, quality int, videoURL string) (string, error) {
 	args := []string{
-		"-f", fmt.Sprintf("bv*[height<=%[1]v]+ba/b[height<=%[1]v]/best", videoRequest.Quality),
+		"-f", fmt.Sprintf("bv*[height<=%[1]v]+ba/b[height<=%[1]v]/best", quality),
 		"--print", "%(title).220s-%(height)sp.mp4",
 		"--no-playlist",
 		"--no-download",
@@ -107,10 +111,10 @@ func GetVideoTitle(cfg *config.Config, videoRequest models.VideoRequest) (string
 		"--retries", "3",
 		"--retry-sleep", "3", // wait 3s between retries
 	}
-	if IsYouTubeURL(videoRequest.VideoURL) {
+	if IsYouTubeURL(videoURL) {
 		args = append(args, "--cookies", cfg.YouTube.CookiePath)
 	}
-	args = append(args, videoRequest.VideoURL)
+	args = append(args, videoURL)
 	infoCmd := exec.Command("yt-dlp", args...)
 
 	infoOutput, err := infoCmd.CombinedOutput()
@@ -120,7 +124,7 @@ func GetVideoTitle(cfg *config.Config, videoRequest models.VideoRequest) (string
 		return "", fmt.Errorf("failed to get video info: %w", err)
 	}
 	if len(infoOutput) == 0 {
-		slog.Error("yt-dlp returned empty output for video info", "videoURL", videoRequest.VideoURL)
+		slog.Error("yt-dlp returned empty output for video info", "videoURL", videoURL)
 		return "", fmt.Errorf("yt-dlp returned empty output for video info: %w", err)
 	}
 	slog.Debug("yt-dlp video title", "title", string(infoOutput))
@@ -131,7 +135,7 @@ func GetVideoTitle(cfg *config.Config, videoRequest models.VideoRequest) (string
 }
 
 // GetActualQuality extracts resolution from video title and returns closest match
-func GetActualQuality(videoTitle string) string {
+func GetActualQuality(videoTitle string) int {
 	resolutions := []int{480, 720, 1080, 1440}
 
 	// Regex to match resolution pattern at the end (e.g., -720p.mp4, _1080p.mp4)
@@ -139,13 +143,13 @@ func GetActualQuality(videoTitle string) string {
 	matches := re.FindStringSubmatch(videoTitle)
 
 	if len(matches) < 2 {
-		return "" // No resolution found
+		return 0 // No resolution found
 	}
 
 	// Parse the extracted resolution
 	foundRes, err := strconv.Atoi(matches[1])
 	if err != nil {
-		return ""
+		return 0
 	}
 
 	// Find closest resolution
@@ -160,7 +164,7 @@ func GetActualQuality(videoTitle string) string {
 		}
 	}
 
-	return strconv.Itoa(closest) + "p"
+	return closest
 }
 
 // ParseTimeRangeToMicroseconds parses a time range in format "hh:mm:ss" and returns the duration in microseconds.
@@ -218,4 +222,56 @@ func GetEgyptTime() string {
 		location = time.FixedZone("EET", 2*60*60) // fallback to UTC+2
 	}
 	return time.Now().In(location).Format("2006-01-02 3:04:05 PM")
+}
+
+// ParseAndSendProgress reads from ffmpeg's progress pipe, parses the progress, and sends it to the progress channel.
+func ParseAndSendProgress(pipe io.ReadCloser, progressChan chan models.ProgressEvent, totalTimeInMS int64) {
+	scanner := bufio.NewScanner(pipe)
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		if strings.Contains(line, "out_time_ms") {
+			outTime, err := strconv.ParseInt(strings.Split(line, "=")[1], 10, 64)
+
+			if err != nil {
+				slog.Error("error parsing out_time_ms from ffmpeg", "error", err)
+				continue
+			}
+
+			// Convert to float64 to avoid integer division truncation and get precise percentage
+			progress := (float64(outTime) / float64(totalTimeInMS)) * 100
+
+			progressChan <- models.ProgressEvent{
+				Event: models.EventTypeProgress,
+				Data: map[string]string{
+					"progress": fmt.Sprintf("%d", int(progress)),
+				},
+			}
+
+		}
+	}
+}
+
+// FindFileByID searches a directory for a file whose name (without extension) matches the given ID, and returns its full path if found.
+func FindFileByID(directory, id string) (string, error) {
+    entries, err := os.ReadDir(directory)
+    if err != nil {
+        return "", err
+    }
+
+    for _, entry := range entries {
+        if entry.IsDir() {
+            continue
+        }
+
+        name := entry.Name()
+        ext := filepath.Ext(name)
+        base := strings.TrimSuffix(name, ext)
+
+        if base == id {
+            return filepath.Join(directory, name), nil
+        }
+    }
+
+    return "", os.ErrNotExist
 }

@@ -546,7 +546,7 @@
     content: attr(data-desktop);
     font-size: 1rem;
     display: block;
-    color: #4a5568;
+    color: #333333
 }
 
 /* These rules are now combined with the credits-text rules above */
@@ -661,7 +661,7 @@
 input[type="url"],
 input[type="text"],
 select {
-    padding: 0.4rem 0.75rem;
+    padding: 0.4rem 0.1rem;
     margin: 0.25rem 0;
 }
 
@@ -2512,7 +2512,7 @@ header.main-header {
 }
 
 .quality-selector label {
-    color: #4a5568;
+    color: #333333;
     font-size: 0.9rem;
     position: absolute;
     top: 0;
@@ -3572,6 +3572,11 @@ grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     .btn-download::after {
         content: 'Download';
         font-size: 1rem;
+    }
+    
+    /* GIF page specific button text */
+    .gif-page .btn-download::after {
+        content: 'Generate GIF';
     }
     
     .btn-download i {

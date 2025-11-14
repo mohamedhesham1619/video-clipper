@@ -362,7 +362,7 @@ const contentSuggestions = {
                 ad_position: 'side',
                 transport: 'beacon'
             });">
-            <img src="//a.impactradius-go.com/display-ad/14885-1275476" border="0" alt="" width="300" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/1275476/14885" style="position:absolute;visibility:hidden;" border="0" />`
+            <img src="//a.impactradius-go.com/display-ad/14885-1275476" border="0" alt="Renderforest" width="300" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/1275476/14885" style="position:absolute;visibility:hidden;" border="0" />`
         },
         {
             html: `<a rel="noopener sponsored"
@@ -372,7 +372,7 @@ const contentSuggestions = {
                 ad_position: 'side',
                 transport: 'beacon'
             });">
-            <img src="//a.impactradius-go.com/display-ad/4662-3371584" border="0" alt="" width="300" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/3371584/4662" style="position:absolute;visibility:hidden;" border="0" />`
+            <img src="//a.impactradius-go.com/display-ad/4662-3371584" border="0" alt="Envato" width="300" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/3371584/4662" style="position:absolute;visibility:hidden;" border="0" />`
         },
         {
             html: `<a rel="noopener sponsored"
@@ -382,7 +382,7 @@ const contentSuggestions = {
                 ad_position: 'side',
                 transport: 'beacon'
             });">
-            <img src="//a.impactradius-go.com/display-ad/22474-3069242" border="0" alt="" width="160" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/3069242/22474" style="position:absolute;visibility:hidden;" border="0" />`
+            <img src="//a.impactradius-go.com/display-ad/22474-3069242" border="0" alt="CapCut AI" width="160" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/3069242/22474" style="position:absolute;visibility:hidden;" border="0" />`
         },
         {
             html: `<a href="https://partner.pcloud.com/r/146969" title="pCloud Premium" target="_blank" 

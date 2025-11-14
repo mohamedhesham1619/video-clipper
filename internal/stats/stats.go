@@ -13,9 +13,9 @@ import (
 	"cloud.google.com/go/firestore"
 )
 
-// IncrementClipCount increments the clip count in the Firestore database
-func IncrementClipCount(client *firestore.Client) error {
-	_, err := client.Collection("stats").Doc("clips").Update(context.Background(), []firestore.Update{
+// IncrementStat increments the stat for the given type (clips or gifs) in the Firestore database
+func IncrementStat(fireStoreClient *firestore.Client, statType string) error {
+	_, err := fireStoreClient.Collection("stats").Doc(statType).Update(context.Background(), []firestore.Update{
 		{
 			Path:  "count",
 			Value: firestore.Increment(1),
@@ -26,6 +26,7 @@ func IncrementClipCount(client *firestore.Client) error {
 
 // --- Failed downloads ---
 var failedDownloadsCount int64 = 0
+
 const alertThreshold int64 = 15
 
 // IncrementFailedDownloadsAndNotify increments the failed downloads count and sends an alert if the threshold is reached
@@ -35,7 +36,7 @@ func IncrementFailedDownloadsAndNotify(smtpConfig config.SMTPConfig) {
 		err := sendAlert(smtpConfig)
 		if err != nil {
 			slog.Error("Failed to send alert email", "error", err)
-		}else{
+		} else {
 			resetFailedDownloadsCount()
 		}
 	}

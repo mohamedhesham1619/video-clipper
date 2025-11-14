@@ -3,6 +3,7 @@ package models
 import "os/exec"
 
 type DownloadProcess struct {
+	ID            string
 	DownloadPath  string
 	ProgressChan  chan ProgressEvent
 	Watcher       chan struct{}
@@ -28,19 +29,19 @@ type ProgressEvent struct {
 	Data  map[string]string
 }
 
-type VideoRequest struct {
+type ClipRequest struct {
 	VideoURL  string `json:"videoUrl"`
 	ClipStart string `json:"clipStart"`
 	ClipEnd   string `json:"clipEnd"`
-	Quality   string `json:"quality"`
+	Quality   int    `json:"quality"`
 }
 
-type FeedbackRequest struct {
-	Message string `json:"message"`
-	Email   string `json:"email,omitempty"`
-}
-
-type FeedbackResponse struct {
-	Status  string `json:"status"`
-	Message string `json:"message"`
+type GIFRequest struct {
+	VideoURL   string  `json:"videoUrl"`
+	VideoStart string  `json:"videoStart"`
+	VideoEnd   string  `json:"videoEnd"`
+	Width      int     `json:"width"`
+	FPS        int     `json:"fps"`
+	Loops      int     `json:"loops"`
+	Speed      float64 `json:"speed"`
 }
