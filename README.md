@@ -33,13 +33,15 @@
 
 
 ## Features
-- **Precise Clipping** -  Allows extraction of specific video segments by selecting start and end times.
+- **Clip Downloader** -  Extract and download any part of an online video by selecting start and end times.
+
+- **GIF Maker** -  Select any part of an online video and download it as a GIF with adjustable width, FPS, speed, and loop count.
 
 - **Wide Platform Support** - Works with [1000+ video sites](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)
 
-- **Real-Time Progress** –  Displays live progress updates during the download process.  
+- **Live Progress Tracking** –  See real-time progress as your clip or GIF is being processed.  
 
-- **Quality Selection** – Provides video quality options from 480p up to 2K.  
+- **Video Quality Options** – Choose from 480p up to 2K.  
 
 
 ## Tech Stack
@@ -223,3 +225,4 @@ By comparing this duration against the requested clip length, the app calculates
 
 
 This setup ensures the **system automatically stays up-to-date with `yt-dlp`**, minimizing downtime caused by outdated versions.
+
