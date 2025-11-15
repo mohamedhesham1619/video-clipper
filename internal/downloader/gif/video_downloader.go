@@ -45,6 +45,8 @@ func startVideoDownload(downloadProcess *models.DownloadProcess, gifRequest *mod
 	// use cookies if the video is from youtube
 	if utils.IsYouTubeURL(gifRequest.VideoURL) {
 		args = append(args, "--cookies", cfg.YouTube.CookiePath)
+		args = append(args, "--extractor-args", "youtube:player_client=mweb")
+
 	}
 
 	// finally add the video url
