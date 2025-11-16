@@ -27,7 +27,6 @@
 - [Infrastructure & Scaling](#infrastructure--scaling)
 - [Key Design Decisions](#key-design-decisions)
   - [How rate limiting is implemented?](#how-rate-limiting-is-implemented)
-  - [Why `FFmpeg` is used?](#why-ffmpeg-is-used)
   - [How `yt-dlp` frequent updates are handled?](#how-yt-dlp-frequent-updates-are-handled)
 
 
@@ -80,7 +79,6 @@ sequenceDiagram
   Backend ->> In-Memory Store: Read from process's progress channel
 
   %% SSE Events
-  Backend -->> Client: SSE event: title (video’s title)
   Backend -->> Client: SSE event: progress (periodic percentage updates)
 
   %% Completion / Error
@@ -197,21 +195,6 @@ The credit system merges the reliability of the old IP and fingerprint checks wi
 
 ---
 
-### Why `FFmpeg` is used?
-
-
-While `yt-dlp` can handle the entire download and clip process, the **progress information it exposes is limited**. Its `--progress` flag provides meaningful updates for full downloads, but during clipping, the output isn’t sufficient to support real-time client updates.
-
-To address this, the app uses `yt-dlp` only for **extracting and downloading** the requested clip and then **pipes its output to `ffmpeg`**.
-
-`ffmpeg` then:
-- Produces the final output file.  
-- Exposes detailed progress data (e.g., current output duration).  
-
-By comparing this duration against the requested clip length, the app calculates and shares **accurate real-time progress percentages** with the client.
-
----
-
 ### How `yt-dlp` frequent updates are handled?
 
 `yt-dlp` updates often to adapt to changes on video platforms, and an outdated version can cause downloads to fail. To handle this:
@@ -225,4 +208,5 @@ By comparing this duration against the requested clip length, the app calculates
 
 
 This setup ensures the **system automatically stays up-to-date with `yt-dlp`**, minimizing downtime caused by outdated versions.
+
 
