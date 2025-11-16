@@ -897,50 +897,7 @@ const VideoClipper = (function () {
         }
     };
     
-    function handleTitleEvent(event) {
-        try {
-            let data;
-            try {
-                data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-            } catch (e) {
-                console.warn('Could not parse event data, using empty object');
-                data = {};
-            }
-            // Clean up the title from any HTML entities or special characters
-            const title = (data.title || '').replace(/&[^;]+;/g, '').trim();
 
-            // Create status message with title
-            if (state.statusText) {
-                state.statusText.setAttribute('data-status', 'extracting');
-                const statusHTML = `
-                    <div class="status-message">
-                        <div style="color: #000000;">Generating the required GIF from:</div>
-                        <div class="truncate-title" title="${title.replace(/"/g, '&quot;')}">${title}</div>
-                    </div>
-                `;
-
-                // Update the status with our custom HTML
-                state.statusText.innerHTML = statusHTML;
-                state.statusText.classList.add('visible');
-
-                // Ensure the status message has the gradient animation
-                const statusMessage = state.statusText.querySelector('.status-message > div:first-child');
-                if (statusMessage) {
-                    statusMessage.style.background = 'linear-gradient(90deg, #4f46e5, #8b5cf6, #4f46e5)';
-                    statusMessage.style.backgroundSize = '200% auto';
-                    statusMessage.style.backgroundClip = 'text';
-                    statusMessage.style.webkitBackgroundClip = 'text';
-                    statusMessage.style.webkitTextFillColor = 'transparent';
-                    statusMessage.style.animation = 'textGradient 3s linear infinite';
-                    statusMessage.style.display = 'inline-block';
-                    statusMessage.style.padding = '0.25rem 0';
-                }
-            }
-        } catch (e) {
-            console.error('Error in handleTitleEvent:', e);
-            // Don't show error to user for title parsing failures - not critical
-        }
-    }
 
     function handleProgressEvent(event) {
         try {
@@ -952,6 +909,34 @@ const VideoClipper = (function () {
                 state.progressContainer.style.display = 'block';
                 void state.progressContainer.offsetHeight;
                 state.progressContainer.classList.add('visible');
+            }
+
+            // Update status text when progress first starts (progress > 0 and status is still "Getting video information")
+            if (progress > 0 && state.statusText && state.statusText.getAttribute('data-status') === 'loading') {
+                state.statusText.setAttribute('data-status', 'extracting');
+                const statusHTML = `
+                    <div class="status-message">
+                        <div style="color: #10B981; margin-bottom: 0.5rem;">Getting video information ✓</div>
+                        <div style="color: #000000;">Generating the required GIF</div>
+                    </div>
+                `;
+
+                // Update the status with our custom HTML
+                state.statusText.innerHTML = statusHTML;
+                state.statusText.classList.add('visible');
+
+                // Apply gradient animation only to the active (second) line
+                const activeMessage = state.statusText.querySelector('.status-message > div:last-child');
+                if (activeMessage) {
+                    activeMessage.style.background = 'linear-gradient(90deg, #4f46e5, #8b5cf6, #4f46e5)';
+                    activeMessage.style.backgroundSize = '200% auto';
+                    activeMessage.style.backgroundClip = 'text';
+                    activeMessage.style.webkitBackgroundClip = 'text';
+                    activeMessage.style.webkitTextFillColor = 'transparent';
+                    activeMessage.style.animation = 'textGradient 3s linear infinite';
+                    activeMessage.style.display = 'inline-block';
+                    activeMessage.style.padding = '0.25rem 0';
+                }
             }
 
             // Update progress with a smooth transition
@@ -1250,7 +1235,6 @@ const VideoClipper = (function () {
         };
 
         // Set up event listeners
-        state.eventSource.addEventListener('title', handleTitleEvent);
         state.eventSource.addEventListener('progress', handleProgressEvent);
         state.eventSource.addEventListener('complete', (event) => {
             window.removeEventListener('error', errorHandler);

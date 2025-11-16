@@ -6,5 +6,6 @@ Dockerfile
 /build
 .env
 cookie.txt
+old-cookie.txt
 clipper.json
 clips/

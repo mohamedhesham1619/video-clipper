@@ -1,5 +1,6 @@
 build/
 .env
+old-cookie.txt
 cookie.txt
 ui/
 clipper.json

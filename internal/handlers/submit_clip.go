@@ -55,113 +55,73 @@ func SubmitClipHandler(cfg *config.Config) http.HandlerFunc {
 				http.Error(w, "Failed to process the video", http.StatusBadRequest) // Intentionally vague
 				return
 			}
-
 		}
 
 		// Create a download process struct and initialize it with the needed data
-		// The credits will be deducted in the progress handler to only deduct credits when the download starts (to prevent deducting credits for failed requests)
 		var downloadProcess models.DownloadProcess
+
+		userFingerPrint := r.Header.Get("X-Client-FP")
 
 		progressChan := make(chan models.ProgressEvent)
 		watcher := make(chan struct{})
 
-		fp := r.Header.Get("X-Client-FP")
-
+		downloadProcess.UserIP = userIP
+		downloadProcess.UserFP = userFingerPrint
 		downloadProcess.ProgressChan = progressChan
 		downloadProcess.Watcher = watcher
-		downloadProcess.UserIP = userIP
-		downloadProcess.UserFP = fp
+
+		// Calculate the needed credits based on quality and clip duration.
+		// The credits will be deducted in the progress handler to only deduct credits when the download starts (to prevent deducting credits for failed requests)
+		neededCredits := credits.CalculateClipCreditCost(clipDurationInSeconds, videoRequest.Quality)
+		downloadProcess.NeededCredits = neededCredits
 
 		// Add the download process to the shared data
 		processID := utils.GenerateID()
+		downloadProcess.ID = processID
 		data.addDownloadProcess(processID, &downloadProcess)
 
 		// Start a goroutine to handle the download process
 		go func() {
 
-			// Get the video title and send it to the progress channel
-			videoTitle, err := utils.GetVideoTitle(cfg, videoRequest.Quality, videoRequest.VideoURL)
-			if err != nil {
-				slog.Error("Error getting video title", "error", err, "request", videoRequest)
-
-				progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Could not get video info"}}
-
-				close(progressChan)
-
-				// Clean up any resources associated with this process
-				data.cleanupDownloadProcess(processID)
-
-				// Increment failed downloads count and send alert if threshold is reached
-				go stats.IncrementFailedDownloadsAndNotify(cfg.SMTP)
-
-				// The download could fail if yt-dlp is outdated, so we check for updates
-				go updater.CheckAndUpdateYtDlp()
-
-				return
-			}
-
-			// Getting the video title takes some time, so we check if the user cancelled the request while we were getting the video title
-			if downloadProcess.IsCancelled {
-				slog.Warn("Skipping download start as process was cancelled", "processID", processID)
-				close(progressChan)
-				return
-			}
-
-			// Get the actual quality from the retrieved video title
-			actualQuality := utils.GetActualQuality(videoTitle)
-			if actualQuality == 0 {
-				progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Could not get video info"}}
-				close(progressChan)
-				data.cleanupDownloadProcess(processID)
-				return
-			}
-
-			// Calculate the needed credits based on the actual quality and clip duration
-			// we don't use the quality from the request because it might be different from the actual quality retrieved from yt-dlp
-			neededCredits := credits.CalculateClipCreditCost(clipDurationInSeconds, actualQuality)
-			downloadProcess.NeededCredits = neededCredits
-
-			// Send the video title to the progress channel
-			// This is used to display the video title to the user
-			progressChan <- models.ProgressEvent{
-				Event: models.EventTypeTitle,
-				Data:  map[string]string{"title": videoTitle},
-			}
-
-			// StartVideoDownloadProcesses function start the download processes and doesn't wait for them to finish instead it returns the running commands
-			ytdlpCmd, ffmpegCmd, err := clip.StartClipDownloadProcesses(cfg, videoRequest, videoTitle, &downloadProcess)
+			// StartClipDownload function start the download process and doesn't wait for it to finish instead it returns the running command
+			ytdlpCmd, err := clip.StartClipDownload(cfg, videoRequest, &downloadProcess)
 
 			// If there was an error during the download, send an error message on the channel and clean up.
 			if err != nil {
-				slog.Error("Error downloading video", "error", err, "request", videoRequest)
-				progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": "Failed to download video"}}
-				close(progressChan)
-				data.cleanupDownloadProcess(processID)
-				go stats.IncrementFailedDownloadsAndNotify(cfg.SMTP)
-				go updater.CheckAndUpdateYtDlp()
+				handleError(err, "Failed to download video", progressChan, processID, cfg.SMTP)
 				return
 			}
 
-			// Save the running commands so they can be cancelled if the client disconnect
+			// Save the running command so it can be cancelled if the client disconnect
 			downloadProcess.YtDlpProcess = ytdlpCmd
-			downloadProcess.FFmpegProcess = ffmpegCmd
 
-			// Wait for both processes to finish
-			// If any process fails, send error message on the channel, increment failed downloads count and check for yt-dlp updates.
-			ffmpegErr := ffmpegCmd.Wait()
+			// Wait for the download process to finish
 			ytdlpErr := ytdlpCmd.Wait()
 
-			if ffmpegErr != nil {
-				handleProcessError("ffmpeg", ffmpegErr, progressChan, processID, cfg.SMTP)
-				return
-			}
 			if ytdlpErr != nil {
-				handleProcessError("yt-dlp", err, progressChan, processID, cfg.SMTP)
+				handleError(ytdlpErr, "Video processing failed", progressChan, processID, cfg.SMTP)
 				return
 			}
 
+			// Find the downloaded file 
+			filePath, err := utils.FindFileByID(cfg.App.DownloadPath, processID)
+			if err != nil {
+				handleError(err, "Failed to find file", progressChan, processID, cfg.SMTP)
+				return
+			}
+
+			// Remove the ID from the file name
+			filePath, err = utils.RemoveIDFromFileName(filePath, processID)
+			if err != nil {
+				handleError(err, "Failed to process downloaded file", progressChan, processID, cfg.SMTP)
+				return
+			}
+
+			// Set the download path in the download process struct
+			downloadProcess.DownloadPath = filePath
+
 			// If everything went well, send the download URL to the client
-			slog.Info("Download process finished successfully", "processId", processID, "videoTitle", videoTitle)
+			slog.Info("Download process finished successfully", "processId", processID)
 			downloadUrl := fmt.Sprintf("%s/api/download/%s", cfg.App.DownloadDomain, processID)
 
 			progressChan <- models.ProgressEvent{
@@ -204,6 +164,16 @@ func SubmitClipHandler(cfg *config.Config) http.HandlerFunc {
 		json.NewEncoder(w).Encode(map[string]string{"processId": processID})
 
 	}
+}
+
+// handleError handles download process errors consistently
+func handleError(err error, message string, progressChan chan models.ProgressEvent, processID string, smtpConfig config.SMTPConfig) {
+	slog.Error(message, "error", err, "processId", processID)
+	progressChan <- models.ProgressEvent{Event: models.EventTypeError, Data: map[string]string{"message": message}}
+	close(progressChan)
+	data.cleanupDownloadProcess(processID)
+	go stats.IncrementFailedDownloadsAndNotify(smtpConfig)
+	go updater.CheckAndUpdateYtDlp()
 }
 
 // handleProcessError handles process failures and cleans up resources

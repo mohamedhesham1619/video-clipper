@@ -1,16 +1,11 @@
 package utils
 
 import (
-	"bufio"
-	"clipper/internal/config"
-	"clipper/internal/models"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
-	"io"
-	"log/slog"
 	"math"
-	"math/rand/v2"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -19,10 +14,11 @@ import (
 	"unicode"
 )
 
+// GenerateID generates a random 8 characters ID.
 func GenerateID() string {
-
-	randNum := rand.Int32N(10000)
-	return fmt.Sprintf("%d%d", time.Now().UnixNano(), randNum)
+    b := make([]byte, 6)
+    rand.Read(b)
+    return base64.RawURLEncoding.EncodeToString(b)
 }
 
 // SanitizeOptions holds configuration for name sanitization
@@ -95,43 +91,6 @@ func SanitizeName(name string, opts *SanitizeOptions) string {
 // IsYouTubeURL returns true if the URL is a YouTube link.
 func IsYouTubeURL(url string) bool {
 	return strings.Contains(url, "youtube.com") || strings.Contains(url, "youtu.be")
-}
-
-// getVideoTitle retrieves the video title using yt-dlp.
-func GetVideoTitle(cfg *config.Config, quality int, videoURL string) (string, error) {
-	args := []string{
-		"-f", fmt.Sprintf("bv*[height<=%[1]v]+ba/b[height<=%[1]v]/best", quality),
-		"--print", "%(title).220s-%(height)sp.mp4",
-		"--no-playlist",
-		"--no-download",
-		"--no-warnings",
-		"--ignore-errors",        // Prevents crashes on format issues
-		"--no-abort-on-error",    // Continues trying other formats
-		"--socket-timeout", "20", // Prevents hanging
-		"--retries", "3",
-		"--retry-sleep", "3", // wait 3s between retries
-	}
-	if IsYouTubeURL(videoURL) {
-		args = append(args, "--cookies", cfg.YouTube.CookiePath)
-	}
-	args = append(args, videoURL)
-	infoCmd := exec.Command("yt-dlp", args...)
-
-	infoOutput, err := infoCmd.CombinedOutput()
-
-	if err != nil {
-		slog.Error("yt-dlp failed to get video info", "error", err, "output", string(infoOutput))
-		return "", fmt.Errorf("failed to get video info: %w", err)
-	}
-	if len(infoOutput) == 0 {
-		slog.Error("yt-dlp returned empty output for video info", "videoURL", videoURL)
-		return "", fmt.Errorf("yt-dlp returned empty output for video info: %w", err)
-	}
-	slog.Debug("yt-dlp video title", "title", string(infoOutput))
-
-	// Sanitize the video title to create a valid filename.
-	videoTitle := SanitizeName(strings.TrimSpace(string(infoOutput)), nil)
-	return videoTitle, nil
 }
 
 // GetActualQuality extracts resolution from video title and returns closest match
@@ -224,35 +183,8 @@ func GetEgyptTime() string {
 	return time.Now().In(location).Format("2006-01-02 3:04:05 PM")
 }
 
-// ParseAndSendProgress reads from ffmpeg's progress pipe, parses the progress, and sends it to the progress channel.
-func ParseAndSendProgress(pipe io.ReadCloser, progressChan chan models.ProgressEvent, totalTimeInMS int64) {
-	scanner := bufio.NewScanner(pipe)
-	for scanner.Scan() {
-		line := scanner.Text()
-
-		if strings.Contains(line, "out_time_ms") {
-			outTime, err := strconv.ParseInt(strings.Split(line, "=")[1], 10, 64)
-
-			if err != nil {
-				slog.Error("error parsing out_time_ms from ffmpeg", "error", err)
-				continue
-			}
-
-			// Convert to float64 to avoid integer division truncation and get precise percentage
-			progress := (float64(outTime) / float64(totalTimeInMS)) * 100
-
-			progressChan <- models.ProgressEvent{
-				Event: models.EventTypeProgress,
-				Data: map[string]string{
-					"progress": fmt.Sprintf("%d", int(progress)),
-				},
-			}
-
-		}
-	}
-}
-
-// FindFileByID searches a directory for a file whose name (without extension) matches the given ID, and returns its full path if found.
+// FindFileByID searches a directory for a file whose name starts with the given ID, and returns its full path if found.
+// This is used because downloaded files follow the pattern: <ID><title>.<ext>
 func FindFileByID(directory, id string) (string, error) {
     entries, err := os.ReadDir(directory)
     if err != nil {
@@ -265,13 +197,44 @@ func FindFileByID(directory, id string) (string, error) {
         }
 
         name := entry.Name()
-        ext := filepath.Ext(name)
-        base := strings.TrimSuffix(name, ext)
 
-        if base == id {
+        if strings.HasPrefix(name, id) {
             return filepath.Join(directory, name), nil
         }
     }
 
     return "", os.ErrNotExist
+}
+
+// RemoveIDFromFileName removes the ID from the file name.
+// It changes the file name from <ID><title>.<ext> to <title>.<ext> and returns the new file path.
+func RemoveIDFromFileName(filePath string, id string) (string, error) {
+	if id == "" {
+        return "", fmt.Errorf("id cannot be empty")
+    }
+
+    dir := filepath.Dir(filePath)
+    original := filepath.Base(filePath)
+
+    if !strings.HasPrefix(original, id) {
+        return "", fmt.Errorf("filename does not start with the expected id")
+    }
+
+    // Strip the ID
+    newName := original[len(id):]
+
+    // Ensure the new name is not empty
+    if newName == "" {
+        return "", fmt.Errorf("cannot rename, resulting filename is empty")
+    }
+
+    newPath := filepath.Join(dir, newName)
+
+    // Perform the rename
+    if err := os.Rename(filePath, newPath); err != nil {
+        return "", fmt.Errorf("error renaming file: %w", err)
+    }
+
+    return newPath, nil
+	
 }

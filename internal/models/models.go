@@ -18,7 +18,6 @@ type DownloadProcess struct {
 type EventName string
 
 const (
-	EventTypeTitle    EventName = "title"
 	EventTypeProgress EventName = "progress"
 	EventTypeComplete EventName = "complete"
 	EventTypeError    EventName = "error"

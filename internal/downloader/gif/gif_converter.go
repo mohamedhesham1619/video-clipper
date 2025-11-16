@@ -1,32 +1,36 @@
 package gif
 
 import (
+	"bufio"
 	"clipper/internal/models"
 	"clipper/internal/utils"
 	"fmt"
+	"io"
+	"log/slog"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
+	"strings"
 )
 
 // convertVideoToGIF converts a video to a GIF, sends progress events to the progress channel and removes the video file
-func convertVideoToGIF(title string, gifRequest *models.GIFRequest, downloadProcess *models.DownloadProcess) error {
+func convertVideoToGIF(downloadDirectory string, gifRequest *models.GIFRequest, downloadProcess *models.DownloadProcess) error {
 
-	// Find the video file path (we know the file name is the process id but we don't know the extension and the only way to know it is to wait for the download to finish and then see what file was downloaded)
-	videoPath, err:= utils.FindFileByID(downloadProcess.DownloadPath, downloadProcess.ID)
+	// Find the video file path
+	videoPath, err:= utils.FindFileByID(downloadDirectory, downloadProcess.ID)
 	if err != nil {
 		return fmt.Errorf("failed to find video file: %v", err)
 	}
 
-	// Set the video path in the download process struct
-	// It will be used by ffmpeg to generate the GIF
+	// Set the download path to the video path for now
+	// It will be changed later to the GIF path after it is generated
 	downloadProcess.DownloadPath = videoPath
 
 	// Prepare the GIF path
-	downloadDirectory := filepath.Dir(videoPath)
-	gifPath := filepath.Join(downloadDirectory, title + ".gif")
+	gifPath := prepareGIFPath(videoPath, downloadProcess.ID)
 
-	// Prepare the ffmpeg command and set it in the download process struct
+	// Prepare the ffmpeg command and set it in the download process struct so it can be cancelled if the client disconnects
 	ffmpegCmd := prepareFFmpegCommand(gifPath, gifRequest, downloadProcess)
 	downloadProcess.FFmpegProcess = ffmpegCmd
 
@@ -46,12 +50,15 @@ func convertVideoToGIF(title string, gifRequest *models.GIFRequest, downloadProc
 	}
 
 	// Read progress updates from ffmpeg stdout, parse them, and send them to the progress channel.
-	go utils.ParseAndSendProgress(ffmpegStdout, downloadProcess.ProgressChan, totalTimeInMS)
+	go parseAndSendProgress(ffmpegStdout, downloadProcess.ProgressChan, totalTimeInMS)
 
 	// Run the ffmpeg command
 	if err := ffmpegCmd.Start(); err != nil {
 		return fmt.Errorf("failed to start ffmpeg: %v", err)
 	}
+
+	// Set the ffmpeg process in the download process struct so it can be cancelled if the client disconnects
+	downloadProcess.FFmpegProcess = ffmpegCmd
 
 	// Wait for the ffmpeg command to finish
 	if err := ffmpegCmd.Wait(); err != nil {
@@ -68,6 +75,24 @@ func convertVideoToGIF(title string, gifRequest *models.GIFRequest, downloadProc
 	}
 
 	return nil
+}
+
+// prepareGIFPath prepares the GIF path by removing the process ID prefix from the video name and replacing the video extension with .gif extension
+func prepareGIFPath(videoPath string, processID string) string {
+	
+	// Get the download directory and base name
+	downloadDirectory := filepath.Dir(videoPath)
+	base := filepath.Base(videoPath)
+
+	// Remove the process ID prefix from the video name
+	videoName := strings.TrimPrefix(base, processID)
+
+	// Remove the extension from the video name
+	videoName = strings.TrimSuffix(videoName, filepath.Ext(videoName))
+
+	// Build the GIF path
+	gifPath := filepath.Join(downloadDirectory, videoName + ".gif")	
+	return gifPath
 }
 
 func prepareFFmpegCommand(gifPath string, gifRequest *models.GIFRequest, downloadProcess *models.DownloadProcess) *exec.Cmd {
@@ -100,4 +125,32 @@ func prepareFFmpegCommand(gifPath string, gifRequest *models.GIFRequest, downloa
 		// Output GIF file path
 		gifPath,
 	)
+}
+
+// parseAndSendProgress reads from ffmpeg's progress pipe, parses the progress, and sends it to the progress channel.
+func parseAndSendProgress(pipe io.ReadCloser, progressChan chan models.ProgressEvent, totalTimeInMS int64) {
+	scanner := bufio.NewScanner(pipe)
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		if strings.Contains(line, "out_time_ms") {
+			outTime, err := strconv.ParseInt(strings.Split(line, "=")[1], 10, 64)
+
+			if err != nil {
+				slog.Error("error parsing out_time_ms from ffmpeg", "error", err)
+				continue
+			}
+
+			// Convert to float64 to avoid integer division truncation and get precise percentage
+			progress := (float64(outTime) / float64(totalTimeInMS)) * 100
+
+			progressChan <- models.ProgressEvent{
+				Event: models.EventTypeProgress,
+				Data: map[string]string{
+					"progress": fmt.Sprintf("%d", int(progress)),
+				},
+			}
+
+		}
+	}
 }

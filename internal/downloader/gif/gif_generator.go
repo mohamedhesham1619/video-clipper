@@ -7,7 +7,6 @@ import (
 	"clipper/internal/utils"
 	"fmt"
 	"log/slog"
-	"regexp"
 )
 
 // GenerateGIF generates a GIF from a video
@@ -26,21 +25,7 @@ func GenerateGIF(gifRequest *models.GIFRequest, downloadProcess *models.Download
 	neededCredits := credits.CalculateGIFCreditCost(videoDurationInSeconds, gifRequest.Width, gifRequest.FPS, gifRequest.Speed)
 	downloadProcess.NeededCredits = neededCredits
 
-	// Create a channel to receive the video title
-	titleChannel := make(chan string)
-	defer close(titleChannel)
-
-	// Get the video title in a separate goroutine and send it to the title channel
-	go func() {
-		title, err := utils.GetVideoTitle(cfg, gifRequest.Width, gifRequest.VideoURL)
-		if err != nil {
-			titleChannel <- ""
-			return
-		}
-		titleChannel <- title
-	}()
-
-	// Start the video download and set the running yt-dlp process in the download process struct
+	// Start the video download and set the running yt-dlp process in the download process struct so it can be cancelled if the client disconnects
 	runningYtdlpCmd, err := startVideoDownload(downloadProcess, gifRequest, cfg)
 	downloadProcess.YtDlpProcess = runningYtdlpCmd
 
@@ -54,42 +39,13 @@ func GenerateGIF(gifRequest *models.GIFRequest, downloadProcess *models.Download
 		return fmt.Errorf("failed to start video download: %v", err)
 	}
 
-	// Wait for the video title to be received from the title channel
-	title := <-titleChannel
-
-	// If we failed to get the video title, send an error event to the progress channel and return an error
-	// else remove the "-<number>p.<ext>" suffix from the title and send it to the progress channel
-	if title == "" {
-		downloadProcess.ProgressChan <- models.ProgressEvent{
-			Event: models.EventTypeError,
-			Data:  map[string]string{"message": "Failed to get video info"},
-		}
-
-		// Kill the running yt-dlp process
-		runningYtdlpCmd.Process.Kill()
-
-		// clean up process resources
-		runningYtdlpCmd.Wait()
-
-		return fmt.Errorf("failed to get video title")
-	}else{
-		// Remove the "-<number>p.<ext>" suffix
-		re := regexp.MustCompile(`-\d+p\.\w+$`)
-		title = re.ReplaceAllString(title, "")
-
-		// Send the video title to the progress channel
-		downloadProcess.ProgressChan <- models.ProgressEvent{
-			Event: models.EventTypeTitle,
-			Data:  map[string]string{"title": title},
-		}
-	}
-
 	// Wait for the ytdlp download command to finish
 	if err := runningYtdlpCmd.Wait(); err != nil {
 		downloadProcess.ProgressChan <- models.ProgressEvent{
 			Event: models.EventTypeError,
 			Data:  map[string]string{"message": "Failed to download video"},
 		}
+
 		return fmt.Errorf("failed to download video: %v", err)
 	}
 
@@ -100,7 +56,7 @@ func GenerateGIF(gifRequest *models.GIFRequest, downloadProcess *models.Download
 	}
 
 	// Convert the video to GIF and send progress events to the progress channel
-	if err := convertVideoToGIF(title, gifRequest, downloadProcess); err != nil {
+	if err := convertVideoToGIF(cfg.App.DownloadPath, gifRequest, downloadProcess); err != nil {
 		downloadProcess.ProgressChan <- models.ProgressEvent{
 			Event: models.EventTypeError,
 			Data:  map[string]string{"message": "Failed to convert video to GIF"},
