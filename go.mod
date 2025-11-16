@@ -7,6 +7,7 @@ toolchain go1.23.11
 require (
 	cloud.google.com/go/firestore v1.18.0
 	github.com/joho/godotenv v1.5.1
+	github.com/ulule/limiter/v3 v3.11.2
 )
 
 require (
@@ -22,6 +23,7 @@ require (
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.6 // indirect
 	github.com/googleapis/gax-go/v2 v2.15.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.61.0 // indirect

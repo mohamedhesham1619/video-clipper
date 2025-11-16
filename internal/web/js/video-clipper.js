@@ -247,6 +247,75 @@ async function getClientFingerprint() {
     }
 }
 
+// Rate limit error handling utilities
+function calculateRetryTime(resetTimestamp) {
+    // Get current time in seconds
+    const now = Math.floor(Date.now() / 1000);
+    
+    // Calculate difference in seconds
+    const totalSeconds = Math.max(0, resetTimestamp - now);
+    
+    // Break down into hours, minutes, seconds
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    
+    return { hours, minutes, seconds, totalSeconds };
+}
+
+function formatRetryTime(retryTime) {
+    const { hours, minutes, seconds, totalSeconds } = retryTime;
+    
+    // Handle edge case: time has already passed or is very soon
+    if (totalSeconds <= 0) {
+        return 'shortly';
+    }
+    
+    // Format based on duration
+    if (hours > 0) {
+        // Show hours and minutes (e.g., "2h 30m")
+        return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
+    } else if (minutes > 0) {
+        // Show minutes and seconds (e.g., "45m 30s")
+        return seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
+    } else {
+        // Show only seconds (e.g., "30s")
+        return `${seconds}s`;
+    }
+}
+
+function formatRateLimitError(response) {
+    try {
+        // Extract X-RateLimit-Reset header
+        const resetHeader = response.headers.get('X-RateLimit-Reset');
+        
+        if (!resetHeader) {
+            // Fallback if header is missing
+            return "You've made too many requests. Please try again later.";
+        }
+        
+        // Parse reset timestamp
+        const resetTimestamp = parseInt(resetHeader, 10);
+        
+        if (isNaN(resetTimestamp)) {
+            // Fallback if header is invalid
+            return "You've made too many requests. Please try again later.";
+        }
+        
+        // Calculate and format retry time
+        const retryTime = calculateRetryTime(resetTimestamp);
+        const formattedTime = formatRetryTime(retryTime);
+        
+        // Return formatted message
+        return `You've made too many requests. Please try again in ${formattedTime}.`;
+        
+    } catch (error) {
+        console.error('Error formatting rate limit message:', error);
+        // Fallback for any unexpected errors
+        return "You've made too many requests. Please try again later.";
+    }
+}
+
 const VideoClipper = (function () {
     // Private state
     let state = {
@@ -471,8 +540,10 @@ const VideoClipper = (function () {
         
         // Hide both elements after 3 seconds
         setTimeout(() => {
-            // Remove visible class from both elements
-            if (state.statusText) state.statusText.classList.remove('visible');
+            // Remove visible class from both elements, but never hide error messages
+            if (state.statusText && !state.statusText.classList.contains('error')) {
+                state.statusText.classList.remove('visible');
+            }
             if (state.progressContainer) state.progressContainer.classList.remove('visible');
             
             // Show download button, credit cost, and quality selector after transition
@@ -589,12 +660,12 @@ if (downloadButton) downloadButton.classList.remove('hidden');
     let errorTimeout;
     let currentErrorId = 0;
     
-    function showError(message) {
+    function showError(message, customDuration = null) {
         // Generate a new error ID and get the current timestamp
         currentErrorId++;
         const errorId = currentErrorId;
         const errorTimestamp = Date.now();
-        const hideDelay = 10000; // 10s for all errors
+        const hideDelay = customDuration || 10000; // Use custom duration or default 10s
         
         
         // Clear any existing timeout to prevent premature hiding
@@ -603,8 +674,11 @@ if (downloadButton) downloadButton.classList.remove('hidden');
             errorTimeout = null;
         }
         
-        // Always hide loading state when showing an error
-        hideLoading(true);
+        // Don't call hideLoading here - we'll handle visibility manually to respect error duration
+        // Just stop any loading animations
+        if (state.progressLoading) {
+            state.progressLoading.style.display = 'none';
+        }
         
         // Only clear the process ID for actual errors, not during page unload
         if (isPageUnloading || !navigator.onLine || !document.hasFocus()) {
@@ -644,33 +718,34 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                     // Increment error ID to prevent auto-hide from interfering
                     currentErrorId++;
                     
-                    // Show action buttons immediately
-                    const actionButtons = document.querySelector('.action-buttons');
+                    // Show action buttons and UI elements
+                    const downloadButton = document.querySelector('.btn-download');
                     const qualitySelector = document.querySelector('.quality-selector');
-                    if (actionButtons) actionButtons.classList.remove('hidden');
+                    const creditCostDisplay = document.getElementById('credit-cost-display');
+                    
+                    if (downloadButton) downloadButton.classList.remove('hidden');
                     if (qualitySelector) qualitySelector.classList.remove('hidden');
+                    if (creditCostDisplay) creditCostDisplay.style.display = 'block';
                     
                     // Reset progress bar and UI immediately
                     resetProgressBar();
                     
-                    // Reset progress container immediately
-                    if (state.progressContainer) {
-                        state.progressContainer.classList.remove('visible');
-                        state.progressContainer.style.display = 'none';
-                    }
-                    
-                    // Ensure loading is hidden
-                    hideLoading(true);
-                    
                     // Reset error state flags
                     state.errorEventReceived = false;
                     
-                    // Fade out the error message
+                    // Fade out the error message and progress container
                     state.statusText.style.opacity = '0';
+                    if (state.progressContainer) {
+                        state.progressContainer.classList.remove('visible');
+                    }
+                    
                     setTimeout(() => {
                         if (state.statusText) {
                             state.statusText.style.visibility = 'hidden';
                             state.statusText.classList.remove('error');
+                        }
+                        if (state.progressContainer) {
+                            state.progressContainer.style.display = 'none';
                         }
                     }, 300); // Wait for opacity transition
                 });
@@ -737,34 +812,34 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                 
                 
                 if (state.statusText && state.statusText.classList.contains('error')) {
-                    // Show action buttons immediately
-                    const actionButtons = document.querySelector('.action-buttons');
+                    // Show action buttons and UI elements
+                    const downloadButton = document.querySelector('.btn-download');
                     const qualitySelector = document.querySelector('.quality-selector');
-                    if (actionButtons) actionButtons.classList.remove('hidden');
+                    const creditCostDisplay = document.getElementById('credit-cost-display');
+                    
+                    if (downloadButton) downloadButton.classList.remove('hidden');
                     if (qualitySelector) qualitySelector.classList.remove('hidden');
+                    if (creditCostDisplay) creditCostDisplay.style.display = 'block';
                     
                     // Reset progress bar and UI immediately
                     resetProgressBar();
                     
-                    // Reset progress container immediately
-                    if (state.progressContainer) {
-                        state.progressContainer.classList.remove('visible');
-                        state.progressContainer.style.display = 'none';
-                    }
-                    
-                    // Ensure loading is hidden
-                    hideLoading(true);
-                    
                     // Reset error state flags
                     state.errorEventReceived = false;
                     
-                    // Fade out the error message
+                    // Fade out the error message and progress container
                     state.statusText.style.opacity = '0';
+                    if (state.progressContainer) {
+                        state.progressContainer.classList.remove('visible');
+                    }
+                    
                     setTimeout(() => {
                         if (state.statusText && state.statusText.classList.contains('error') && errorId === currentErrorId) {
                             state.statusText.style.visibility = 'hidden';
                             state.statusText.classList.remove('error');
-                            
+                        }
+                        if (state.progressContainer) {
+                            state.progressContainer.style.display = 'none';
                         }
                     }, 300);
                 }
@@ -1407,6 +1482,13 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                 clearTimeout(timeoutId);
 
                 if (!response.ok) {
+                    // Check for rate limit error (429)
+                    if (response.status === 429) {
+                        const retryMessage = formatRateLimitError(response);
+                        throw new Error(retryMessage);
+                    }
+                    
+                    // Handle other errors as before
                     try {
                         const error = await response.json();
                         throw new Error(error.message || `Server error: ${response.status} ${response.statusText}`);
@@ -1431,7 +1513,9 @@ if (downloadButton) downloadButton.classList.remove('hidden');
                     timestamp: new Date().toISOString()
                 });
                 const errorMessage = error.message || 'Failed to process your request. Please try again.';
-                showError(errorMessage);
+                // Show rate limit errors for 30 seconds, other errors for 10 seconds
+                const duration = errorMessage.includes('too many requests') ? 30000 : null;
+                showError(errorMessage, duration);
                 // Don't call hideLoading here - showError will handle it
                 // Don't re-throw here as we've already handled the error
             }
@@ -1441,7 +1525,9 @@ if (downloadButton) downloadButton.classList.remove('hidden');
             if (error.message.includes('must be after') || 
                 error.message.includes('Please enter') ||
                 error.message.includes('playlist link')) {
-                showError(error.message);
+                // Show rate limit errors for 30 seconds, other errors for 10 seconds
+                const duration = error.message.includes('too many requests') ? 30000 : null;
+                showError(error.message, duration);
             } else {
                 showError('An unexpected error occurred. Please try again.');
             }

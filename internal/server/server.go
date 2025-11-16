@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
 )
 
 type Server struct {
@@ -16,9 +17,29 @@ type Server struct {
 func New(cfg *config.Config, creditsStore *credits.CreditsStore) *Server {
 	mux := http.NewServeMux()
 
+	// Rate limiters
+	ipLimiter := ipLimiterMiddleware(4, 1*time.Hour)
+	fpLimiter := fpLimiterMiddleware(4, 1*time.Hour)
+
 	// API routes
-	mux.Handle("/api/submit", validateFingerPrintMiddleware(validateClipRequestMiddleware(creditsStore, handlers.SubmitClipHandler(cfg))))
-	mux.Handle("/api/gif/submit", validateFingerPrintMiddleware(validateGIFRequestMiddleware(creditsStore, handlers.SubmitGIFHandler(cfg))))
+	mux.Handle("/api/submit",
+		validateFingerPrintMiddleware(
+			ipLimiter.Handler(
+				fpLimiter.Handler(
+					validateClipRequestMiddleware(creditsStore, handlers.SubmitClipHandler(cfg)),
+				),
+			),
+		),
+	)
+	mux.Handle("/api/gif/submit",
+		validateFingerPrintMiddleware(
+			ipLimiter.Handler(
+				fpLimiter.Handler(
+					validateGIFRequestMiddleware(creditsStore, handlers.SubmitGIFHandler(cfg)),
+				),
+			),
+		),
+	)
 	mux.HandleFunc("/api/progress/", handlers.ProgressHandler(creditsStore))
 	mux.HandleFunc("/api/cancel/", handlers.CancelHandler)
 	mux.HandleFunc("/api/feedback", handlers.FeedbackHandler(cfg))
