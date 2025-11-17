@@ -7,6 +7,7 @@ import (
 	"clipper/internal/utils"
 	"fmt"
 	"log/slog"
+	"path/filepath"
 )
 
 // GenerateGIF generates a GIF from a video
@@ -64,7 +65,7 @@ func GenerateGIF(gifRequest *models.GIFRequest, downloadProcess *models.Download
 		return fmt.Errorf("failed to convert video to GIF: %v", err)
 	}
 
-	slog.Info("GIF process finished successfully", "processID", downloadProcess.ID, "userIP", downloadProcess.UserIP)
+	slog.Info("GIF process finished successfully", "processID", downloadProcess.ID, "gif title", filepath.Base(downloadProcess.DownloadPath))
 
 	// Send the download url in completed event to the progress channel
 	downloadUrl := fmt.Sprintf("%s/api/download/%s", cfg.App.DownloadDomain, downloadProcess.ID)

@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -121,7 +122,7 @@ func SubmitClipHandler(cfg *config.Config) http.HandlerFunc {
 			downloadProcess.DownloadPath = filePath
 
 			// If everything went well, send the download URL to the client
-			slog.Info("Download process finished successfully", "processId", processID)
+			slog.Info("Download process finished successfully", "processId", processID, "video title", filepath.Base(filePath))
 			downloadUrl := fmt.Sprintf("%s/api/download/%s", cfg.App.DownloadDomain, processID)
 
 			progressChan <- models.ProgressEvent{
