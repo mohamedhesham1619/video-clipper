@@ -87,32 +87,48 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 }
 
 func parseAndSendProgress(clipDuration int, pipe io.ReadCloser, progressChan chan models.ProgressEvent) {
-	scanner := bufio.NewScanner(pipe)
+	reader := bufio.NewReader(pipe)
+	var line string
+	
 	// Regex to match ffmpeg time output: time=00:00:05.84
 	re := regexp.MustCompile(`time=(\d{2}):(\d{2}):(\d{2})`)
 
-	for scanner.Scan() {
-		line := scanner.Text()
+	buf := make([]byte, 1)
+	for {
+		n, err := reader.Read(buf)
+		if n > 0 {
+			char := buf[0]
+			
+			// If carriage return or newline, process the line
+			if char == '\r' || char == '\n' {
+				if len(line) > 0 {
+					match := re.FindStringSubmatch(line)
+					if len(match) == 4 {
+						hours, _ := strconv.Atoi(match[1])
+						minutes, _ := strconv.Atoi(match[2])
+						seconds, _ := strconv.Atoi(match[3])
 
-		match := re.FindStringSubmatch(line)
-		if len(match) == 4 {
-			// Parse HH:MM:SS to seconds (ignoring milliseconds)
-			hours, _ := strconv.Atoi(match[1])
-			minutes, _ := strconv.Atoi(match[2])
-			seconds, _ := strconv.Atoi(match[3])
+						processedTime := hours*3600 + minutes*60 + seconds
+						percentage := (processedTime * 100) / clipDuration
 
-			processedTime := hours*3600 + minutes*60 + seconds
-			percentage := (processedTime * 100) / clipDuration
+						if percentage >= 100 {
+							percentage = 100
+						}
 
-			// Cap at 100%
-			if percentage >= 100 {
-				percentage = 100
+						progressChan <- models.ProgressEvent{
+							Event: models.EventTypeProgress,
+							Data:  map[string]string{"progress": fmt.Sprintf("%d", percentage)},
+						}
+					}
+					line = "" // Reset line
+				}
+			} else {
+				line += string(char)
 			}
-
-			progressChan <- models.ProgressEvent{
-				Event: models.EventTypeProgress,
-				Data:  map[string]string{"progress": fmt.Sprintf("%d", percentage)},
-			}
+		}
+		
+		if err != nil {
+			break
 		}
 	}
 }
