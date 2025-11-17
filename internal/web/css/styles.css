@@ -2724,8 +2724,9 @@ header.main-header {
 /* Recommended Section - Consolidated */
 
 .recommended-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    /* grid-template-columns: repeat(4, minmax(0, 1fr)); */
     gap: 1.5rem;
     justify-content: center;
     margin: 1.5rem auto;

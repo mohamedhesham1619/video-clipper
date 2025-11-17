@@ -202,6 +202,12 @@ function initRotationElements() {
 function rotateContent() {
     const { leftPanel, rightPanel } = initRotationElements();
 
+    // If panels don't exist yet, skip this rotation
+    if (!leftPanel && !rightPanel) {
+        console.warn('Side panels not found in DOM yet');
+        return;
+    }
+
     // Initialize content arrays if they don't exist
     if (!window.contentRotation) {
         // Make sure we have at least 2 items for side content
@@ -354,15 +360,23 @@ function rotateContent() {
 // Content suggestions data
 const contentSuggestions = {
     sides: [
+        // {
+        //     html: `<a rel="noopener sponsored"
+        //    href="https://renderforest.pxf.io/c/6416428/1275476/14885?u=https%3A%2F%2Fwww.renderforest.com%2F" target="_blank" id="1275476"
+        //    onclick="gtag('event', 'ad_click', {
+        //         ad_name: 'Renderforest',
+        //         ad_position: 'side',
+        //         transport: 'beacon'
+        //     });">
+        //     <img src="//a.impactradius-go.com/display-ad/14885-1275476" border="0" alt="Renderforest" width="300" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/1275476/14885" style="position:absolute;visibility:hidden;" border="0" />`
+        // },
         {
-            html: `<a rel="noopener sponsored"
-           href="https://renderforest.pxf.io/c/6416428/1275476/14885?u=https%3A%2F%2Fwww.renderforest.com%2F" target="_blank" id="1275476"
-           onclick="gtag('event', 'ad_click', {
-                ad_name: 'Renderforest',
+            html: `<a href="https://www.mvvitrk.com/click?pid=5677&offer_id=1&l=1763130815" title="Movavi" target="_blank" 
+            onclick="gtag('event', 'ad_click', {
+                ad_name: 'Movavi',
                 ad_position: 'side',
                 transport: 'beacon'
-            });">
-            <img src="//a.impactradius-go.com/display-ad/14885-1275476" border="0" alt="Renderforest" width="300" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/1275476/14885" style="position:absolute;visibility:hidden;" border="0" />`
+            });"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/w_160,h_600,c_fill,f_auto,q_auto/v1763388520/movavi-160%D1%85600_ks8uk7.png" alt="Movavi"/></a>`
         },
         {
             html: `<a rel="noopener sponsored"
@@ -459,7 +473,7 @@ function createToolCard(tool) {
                 display: block;
                 width: 100%;
                 height: 100%;
-                object-fit: cover;
+                object-fit: contain;
                 object-position: center;
                 transition: transform 0.5s ease;
             ">
@@ -654,7 +668,6 @@ const mobile_recommended_tools = [
         "name": "Envato",
         "link": "https://1.envato.market/c/6416428/3371583/4662",
         "image": "https://app.impact.com/display-ad/4662-3371583?v=0"
-
     },
     {
         "name": "Pcloud",
@@ -662,5 +675,3 @@ const mobile_recommended_tools = [
         "image": "https://partner.pcloud.com/media/banners/lifetime/lifetime014300250.png"
     }
 ]
-
-
