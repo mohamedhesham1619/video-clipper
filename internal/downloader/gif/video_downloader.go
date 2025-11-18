@@ -32,7 +32,9 @@ func startVideoDownload(downloadProcess *models.DownloadProcess, gifRequest *mod
 	args := []string{
 		"-f", formatString,
 		"--download-sections", fmt.Sprintf("*%s-%s", gifRequest.VideoStart, gifRequest.VideoEnd),
-		"--sleep-requests", "1",
+		"--sleep-requests", "1-5",
+		"--user-agent", "random",
+		"--no-playlist",
 		"--no-warnings",
 		"--ignore-errors",
 		"--no-abort-on-error",

@@ -62,7 +62,9 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 	args := []string{
 		"-f", formatString,
 		"--download-sections", fmt.Sprintf("*%s-%s", videoRequest.ClipStart, videoRequest.ClipEnd),
-		"--sleep-requests", "1",
+		"--sleep-requests", "1-5",
+		"--user-agent", "random",
+		"--no-playlist",
 		"--no-warnings",
 		"--ignore-errors",
 		"--no-abort-on-error",
