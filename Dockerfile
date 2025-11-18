@@ -14,11 +14,14 @@ RUN go build -o build/clipper ./cmd/clipper
 # Final stage
 FROM alpine:latest
 
-# Install Python3, pip, ffmpeg, aria2, deno
-RUN apk add --no-cache python3 py3-pip ffmpeg aria2 deno
+# Install Python3, pip, ffmpeg, deno
+RUN apk add --no-cache python3 py3-pip ffmpeg deno
 
 # Install the latest yt-dlp from PyPI (pip)
 RUN pip install -U "yt-dlp[default]" --break-system-packages
+
+# Install POT plugin
+RUN pip install -U --break-system-packages bgutil-ytdlp-pot-provider
 
 WORKDIR /app
 

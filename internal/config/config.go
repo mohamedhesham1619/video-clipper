@@ -19,8 +19,8 @@ type SMTPConfig struct {
 }
 
 type AppConfig struct {
-	Environment  string
-	DownloadPath string
+	Environment    string
+	DownloadPath   string
 	DownloadDomain string
 }
 
@@ -31,11 +31,12 @@ type GoogleCloudConfig struct {
 }
 
 type YouTubeConfig struct {
-	CookiePath string
+	CookiePath      string
+	PoTokenProvider string
 }
 
 type RateLimitConfig struct {
-	MaxCredits float64
+	MaxCredits    float64
 	ResetDuration time.Duration
 }
 
@@ -65,8 +66,8 @@ func Load() (*Config, error) {
 			FeedbackMail: getEnv("FEEDBACK_EMAIL"),
 		},
 		App: AppConfig{
-			Environment:  getEnv("ENV"),
-			DownloadPath: getEnv("DOWNLOAD_PATH"),
+			Environment:    getEnv("ENV"),
+			DownloadPath:   getEnv("DOWNLOAD_PATH"),
 			DownloadDomain: getEnv("DOWNLOAD_DOMAIN"),
 		},
 		GoogleCloud: GoogleCloudConfig{
@@ -74,7 +75,12 @@ func Load() (*Config, error) {
 			CredentialsPath: getEnv("GOOGLE_APPLICATION_CREDENTIALS"),
 		},
 		YouTube: YouTubeConfig{
-			CookiePath: getEnv("YOUTUBE_COOKIE_PATH"),
+			CookiePath:      getEnv("YOUTUBE_COOKIE_PATH"),
+			PoTokenProvider: getEnv("POT_PROVIDER_URL"),
+		},
+		RateLimit: RateLimitConfig{
+			MaxCredits:    0,
+			ResetDuration: 0,
 		},
 	}
 
@@ -95,6 +101,10 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("DOWNLOAD_DOMAIN environment variable is required")
 	}
 
+	if cfg.YouTube.PoTokenProvider == "" {
+		return nil, fmt.Errorf("POT_PROVIDER_URL environment variable is required")
+	}
+
 	// Ensure download directory exists
 	if err := os.MkdirAll(cfg.App.DownloadPath, 0755); err != nil {
 		return nil, fmt.Errorf("failed to create download directory: %w", err)
@@ -103,7 +113,7 @@ func Load() (*Config, error) {
 	// Ensure Google Cloud credentials environment variable is set
 	if cfg.GoogleCloud.CredentialsPath == "" {
 		return nil, fmt.Errorf("GOOGLE_APPLICATION_CREDENTIALS environment variable is required")
-	}else{
+	} else {
 		// Ensure Google Cloud credentials file exists
 		if _, err := os.Stat(cfg.GoogleCloud.CredentialsPath); os.IsNotExist(err) {
 			return nil, fmt.Errorf("Google Cloud credentials file not found at %s", cfg.GoogleCloud.CredentialsPath)
@@ -113,7 +123,7 @@ func Load() (*Config, error) {
 	// Ensure YouTube cookie environment variable is set
 	if cfg.YouTube.CookiePath == "" {
 		return nil, fmt.Errorf("YOUTUBE_COOKIE environment variable is required")
-	}else{
+	} else {
 		// Ensure YouTube cookie file exists
 		if _, err := os.Stat(cfg.YouTube.CookiePath); os.IsNotExist(err) {
 			return nil, fmt.Errorf("YouTube cookie file not found at %s", cfg.YouTube.CookiePath)

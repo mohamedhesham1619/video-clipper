@@ -79,8 +79,7 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 
 	if utils.IsYouTubeURL(videoRequest.VideoURL) {
 		args = append(args, "--cookies", cfg.YouTube.CookiePath)
-		//args = append(args, "--extractor-args", "youtube:player_client=mweb")
-
+		args = append(args, "--extractor-args", fmt.Sprintf("youtubepot-bgutilhttp:base_url=%s", cfg.	YouTube.PoTokenProvider))
 	}
 	args = append(args, videoRequest.VideoURL)
 	return exec.Command("yt-dlp", args...)
@@ -89,7 +88,7 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 func parseAndSendProgress(clipDuration int, pipe io.ReadCloser, progressChan chan models.ProgressEvent) {
 	reader := bufio.NewReader(pipe)
 	var line string
-	
+
 	// Regex to match ffmpeg time output: time=00:00:05.84
 	re := regexp.MustCompile(`time=(\d{2}):(\d{2}):(\d{2})`)
 
@@ -98,7 +97,7 @@ func parseAndSendProgress(clipDuration int, pipe io.ReadCloser, progressChan cha
 		n, err := reader.Read(buf)
 		if n > 0 {
 			char := buf[0]
-			
+
 			// If carriage return or newline, process the line
 			if char == '\r' || char == '\n' {
 				if len(line) > 0 {
@@ -126,7 +125,7 @@ func parseAndSendProgress(clipDuration int, pipe io.ReadCloser, progressChan cha
 				line += string(char)
 			}
 		}
-		
+
 		if err != nil {
 			break
 		}
