@@ -5,6 +5,7 @@ import (
 	"clipper/internal/models"
 	"clipper/internal/utils"
 	"fmt"
+	"math/rand/v2"
 	"os/exec"
 	"path/filepath"
 )
@@ -28,11 +29,15 @@ func startVideoDownload(downloadProcess *models.DownloadProcess, gifRequest *mod
 	// This is especially important for titles with multi-byte characters.
 	outputPath := filepath.Join(cfg.App.DownloadPath, fmt.Sprintf("%s%%(title).60s.%%(ext)s", downloadProcess.ID))
 
+	// Generate random number between 1 and 5
+	randomSeconds := rand.IntN(5) + 1
+
 	// Prepare the ytdlp command args
 	args := []string{
 		"-f", formatString,
 		"--download-sections", fmt.Sprintf("*%s-%s", gifRequest.VideoStart, gifRequest.VideoEnd),
-		"--sleep-requests", "1-5",
+		"--sleep-requests", fmt.Sprintf("%d", randomSeconds),
+		"--sleep-interval", fmt.Sprintf("%d", randomSeconds),
 		"--user-agent", "random",
 		"--no-playlist",
 		"--no-warnings",
@@ -50,7 +55,6 @@ func startVideoDownload(downloadProcess *models.DownloadProcess, gifRequest *mod
 	if utils.IsYouTubeURL(gifRequest.VideoURL) {
 		args = append(args, "--cookies", cfg.YouTube.CookiePath)
 		args = append(args, "--extractor-args", fmt.Sprintf("youtubepot-bgutilhttp:base_url=%s", cfg.YouTube.PoTokenProvider))
-
 	}
 
 	// finally add the video url

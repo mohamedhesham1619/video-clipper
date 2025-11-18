@@ -7,6 +7,7 @@ import (
 	"clipper/internal/utils"
 	"fmt"
 	"io"
+	"math/rand/v2"
 	"os/exec"
 	"path/filepath"
 	"regexp"
@@ -59,10 +60,14 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 	// This is especially important for titles with multi-byte characters.
 	outputFile := filepath.Join(cfg.App.DownloadPath, fmt.Sprintf("%s%%(title).60s.%%(ext)s", processID))
 
+	// Generate random number between 1 and 5
+	randomSeconds := rand.IntN(5) + 1
+	
 	args := []string{
 		"-f", formatString,
 		"--download-sections", fmt.Sprintf("*%s-%s", videoRequest.ClipStart, videoRequest.ClipEnd),
-		"--sleep-requests", "1-5",
+		"--sleep-requests", fmt.Sprintf("%d", randomSeconds),
+		"--sleep-interval", fmt.Sprintf("%d", randomSeconds),
 		"--user-agent", "random",
 		"--no-playlist",
 		"--no-warnings",
@@ -81,7 +86,7 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 
 	if utils.IsYouTubeURL(videoRequest.VideoURL) {
 		args = append(args, "--cookies", cfg.YouTube.CookiePath)
-		args = append(args, "--extractor-args", fmt.Sprintf("youtubepot-bgutilhttp:base_url=%s", cfg.	YouTube.PoTokenProvider))
+		args = append(args, "--extractor-args", fmt.Sprintf("youtubepot-bgutilhttp:base_url=%s", cfg.YouTube.PoTokenProvider))
 	}
 	args = append(args, videoRequest.VideoURL)
 	return exec.Command("yt-dlp", args...)
