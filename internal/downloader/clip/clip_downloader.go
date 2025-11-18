@@ -79,7 +79,7 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 
 	if utils.IsYouTubeURL(videoRequest.VideoURL) {
 		args = append(args, "--cookies", cfg.YouTube.CookiePath)
-		args = append(args, "--extractor-args", "youtube:player_client=mweb")
+		//args = append(args, "--extractor-args", "youtube:player_client=mweb")
 
 	}
 	args = append(args, videoRequest.VideoURL)
