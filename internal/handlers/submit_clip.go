@@ -100,11 +100,11 @@ func SubmitClipHandler(cfg *config.Config) http.HandlerFunc {
 			ytdlpErr := ytdlpCmd.Wait()
 
 			if ytdlpErr != nil {
-				handleError(ytdlpErr, "Video processing failed", progressChan, processID, cfg.SMTP)
+				handleError(ytdlpErr, "Video download failed", progressChan, processID, cfg.SMTP)
 				return
 			}
 
-			// Find the downloaded file 
+			// Find the downloaded file
 			filePath, err := utils.FindFileByID(cfg.App.DownloadPath, processID)
 			if err != nil {
 				handleError(err, "Failed to find file", progressChan, processID, cfg.SMTP)

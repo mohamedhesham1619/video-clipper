@@ -7,11 +7,12 @@ import (
 	"clipper/internal/utils"
 	"fmt"
 	"io"
-	"math/rand/v2"
+	"log/slog"
 	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 // StartClipDownload starts the video download processes and returns the running commands.
@@ -21,10 +22,10 @@ func StartClipDownload(cfg *config.Config, videoRequest models.ClipRequest, down
 	ytdlpCmd = prepareYtDlpCommand(cfg, videoRequest, downloadProcess.ID)
 
 	// Create a pipe for yt-dlp's stderr.
-	// This pipe will be used to read progress updates.
+	// This pipe will be used to read progress updates and log errors.
 	ytdlpStderr, err := ytdlpCmd.StderrPipe()
 	if err != nil {
-		return nil, fmt.Errorf("error creating ytdlp stdout pipe: %v", err)
+		return nil, fmt.Errorf("error creating ytdlp stderr pipe: %v", err)
 	}
 
 	clipDurationInSeconds, err := utils.CalculateDurationSeconds(videoRequest.ClipStart, videoRequest.ClipEnd)
@@ -32,9 +33,10 @@ func StartClipDownload(cfg *config.Config, videoRequest models.ClipRequest, down
 		return nil, err
 	}
 
+	// Parse progress and log stderr in one goroutine
 	go parseAndSendProgress(clipDurationInSeconds, ytdlpStderr, downloadProcess.ProgressChan)
 
-	// Start both commands and do not wait for them to finish.
+	// Start the command
 	if err := ytdlpCmd.Start(); err != nil {
 		return nil, fmt.Errorf("failed to start yt-dlp: %w", err)
 	}
@@ -60,14 +62,9 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 	// This is especially important for titles with multi-byte characters.
 	outputFile := filepath.Join(cfg.App.DownloadPath, fmt.Sprintf("%s%%(title).60s.%%(ext)s", processID))
 
-	// Generate random number between 1 and 5
-	randomSeconds := rand.IntN(5) + 1
-	
 	args := []string{
 		"-f", formatString,
 		"--download-sections", fmt.Sprintf("*%s-%s", videoRequest.ClipStart, videoRequest.ClipEnd),
-		"--sleep-requests", fmt.Sprintf("%d", randomSeconds),
-		"--sleep-interval", fmt.Sprintf("%d", randomSeconds),
 		"--user-agent", "random",
 		"--no-playlist",
 		"--no-warnings",
@@ -93,48 +90,56 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 }
 
 func parseAndSendProgress(clipDuration int, pipe io.ReadCloser, progressChan chan models.ProgressEvent) {
+
+	// We need to read byte by byte because yt-dlp (and ffmpeg) often use \r to update progress inline.
 	reader := bufio.NewReader(pipe)
-	var line string
+	var line []byte
 
 	// Regex to match ffmpeg time output: time=00:00:05.84
 	re := regexp.MustCompile(`time=(\d{2}):(\d{2}):(\d{2})`)
 
-	buf := make([]byte, 1)
 	for {
-		n, err := reader.Read(buf)
-		if n > 0 {
-			char := buf[0]
-
-			// If carriage return or newline, process the line
-			if char == '\r' || char == '\n' {
-				if len(line) > 0 {
-					match := re.FindStringSubmatch(line)
-					if len(match) == 4 {
-						hours, _ := strconv.Atoi(match[1])
-						minutes, _ := strconv.Atoi(match[2])
-						seconds, _ := strconv.Atoi(match[3])
-
-						processedTime := hours*3600 + minutes*60 + seconds
-						percentage := (processedTime * 100) / clipDuration
-
-						if percentage >= 100 {
-							percentage = 100
-						}
-
-						progressChan <- models.ProgressEvent{
-							Event: models.EventTypeProgress,
-							Data:  map[string]string{"progress": fmt.Sprintf("%d", percentage)},
-						}
-					}
-					line = "" // Reset line
-				}
-			} else {
-				line += string(char)
+		// Read one byte at a time
+		b, err := reader.ReadByte()
+		if err != nil {
+			if err != io.EOF {
+				slog.Error("Error reading pipe", "error", err)
 			}
+			break
 		}
 
-		if err != nil {
-			break
+		// If we hit a delimiter, process the accumulated line
+		if b == '\r' || b == '\n' {
+			if len(line) > 0 {
+				lineStr := string(line)
+				if strings.Contains(lineStr, "ERROR") {
+					slog.Error("yt-dlp output", "line", lineStr)
+					line = nil // Reset line buffer
+					continue
+				}
+
+				match := re.FindStringSubmatch(lineStr)
+				if len(match) == 4 {
+					hours, _ := strconv.Atoi(match[1])
+					minutes, _ := strconv.Atoi(match[2])
+					seconds, _ := strconv.Atoi(match[3])
+
+					processedTime := hours*3600 + minutes*60 + seconds
+					percentage := (processedTime * 100) / clipDuration
+
+					if percentage >= 100 {
+						percentage = 100
+					}
+
+					progressChan <- models.ProgressEvent{
+						Event: models.EventTypeProgress,
+						Data:  map[string]string{"progress": fmt.Sprintf("%d", percentage)},
+					}
+				}
+				line = nil // Reset line buffer
+			}
+		} else {
+			line = append(line, b)
 		}
 	}
 }

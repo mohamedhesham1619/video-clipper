@@ -18,7 +18,7 @@ import (
 func convertVideoToGIF(downloadDirectory string, gifRequest *models.GIFRequest, downloadProcess *models.DownloadProcess) error {
 
 	// Find the video file path
-	videoPath, err:= utils.FindFileByID(downloadDirectory, downloadProcess.ID)
+	videoPath, err := utils.FindFileByID(downloadDirectory, downloadProcess.ID)
 	if err != nil {
 		return fmt.Errorf("failed to find video file: %v", err)
 	}
@@ -33,7 +33,6 @@ func convertVideoToGIF(downloadDirectory string, gifRequest *models.GIFRequest, 
 	// Prepare the ffmpeg command and set it in the download process struct so it can be cancelled if the client disconnects
 	ffmpegCmd := prepareFFmpegCommand(gifPath, gifRequest, downloadProcess)
 	downloadProcess.FFmpegProcess = ffmpegCmd
-
 
 	// Create a pipe for ffmpeg's stdout.
 	// It will be used to read progress updates.
@@ -51,6 +50,16 @@ func convertVideoToGIF(downloadDirectory string, gifRequest *models.GIFRequest, 
 
 	// Read progress updates from ffmpeg stdout, parse them, and send them to the progress channel.
 	go parseAndSendProgress(ffmpegStdout, downloadProcess.ProgressChan, totalTimeInMS)
+
+	// Create a pipe for ffmpeg's stderr.
+	// It will be used to log error messages.
+	ffmpegStderr, err := ffmpegCmd.StderrPipe()
+	if err != nil {
+		return fmt.Errorf("error creating ffmpeg stderr pipe: %v", err)
+	}
+
+	// Log stderr output for debugging purposes.
+	go utils.LogStderr(ffmpegStderr, downloadProcess.ID, "ffmpeg")
 
 	// Run the ffmpeg command
 	if err := ffmpegCmd.Start(); err != nil {
@@ -79,7 +88,7 @@ func convertVideoToGIF(downloadDirectory string, gifRequest *models.GIFRequest, 
 
 // prepareGIFPath prepares the GIF path by removing the process ID prefix from the video name and replacing the video extension with .gif extension
 func prepareGIFPath(videoPath string, processID string) string {
-	
+
 	// Get the download directory and base name
 	downloadDirectory := filepath.Dir(videoPath)
 	base := filepath.Base(videoPath)
@@ -91,12 +100,11 @@ func prepareGIFPath(videoPath string, processID string) string {
 	videoName = strings.TrimSuffix(videoName, filepath.Ext(videoName))
 
 	// Build the GIF path
-	gifPath := filepath.Join(downloadDirectory, videoName + ".gif")	
+	gifPath := filepath.Join(downloadDirectory, videoName+".gif")
 	return gifPath
 }
 
 func prepareFFmpegCommand(gifPath string, gifRequest *models.GIFRequest, downloadProcess *models.DownloadProcess) *exec.Cmd {
-
 
 	// Prepare the ffmpeg command
 	return exec.Command("ffmpeg",

@@ -5,7 +5,6 @@ import (
 	"clipper/internal/models"
 	"clipper/internal/utils"
 	"fmt"
-	"math/rand/v2"
 	"os/exec"
 	"path/filepath"
 )
@@ -29,15 +28,10 @@ func startVideoDownload(downloadProcess *models.DownloadProcess, gifRequest *mod
 	// This is especially important for titles with multi-byte characters.
 	outputPath := filepath.Join(cfg.App.DownloadPath, fmt.Sprintf("%s%%(title).60s.%%(ext)s", downloadProcess.ID))
 
-	// Generate random number between 1 and 5
-	randomSeconds := rand.IntN(5) + 1
-
 	// Prepare the ytdlp command args
 	args := []string{
 		"-f", formatString,
 		"--download-sections", fmt.Sprintf("*%s-%s", gifRequest.VideoStart, gifRequest.VideoEnd),
-		"--sleep-requests", fmt.Sprintf("%d", randomSeconds),
-		"--sleep-interval", fmt.Sprintf("%d", randomSeconds),
 		"--user-agent", "random",
 		"--no-playlist",
 		"--no-warnings",
@@ -62,6 +56,15 @@ func startVideoDownload(downloadProcess *models.DownloadProcess, gifRequest *mod
 
 	// Build the ytdlp command with the completed args
 	ytdlpCmd = exec.Command("yt-dlp", args...)
+
+	// Get the stderr pipe
+	stderrPipe, err := ytdlpCmd.StderrPipe()
+	if err != nil {
+		return nil, fmt.Errorf("failed to create stderr pipe: %w", err)
+	}
+
+	// Log stderr in a separate goroutine
+	go utils.LogStderr(stderrPipe, downloadProcess.ID, "ytdlp")
 
 	// Start the ytdlp command without waiting for it to finish
 	if err := ytdlpCmd.Start(); err != nil {

@@ -1,9 +1,12 @@
 package utils
 
 import (
+	"bufio"
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"io"
+	"log/slog"
 	"math"
 	"os"
 	"path/filepath"
@@ -16,9 +19,9 @@ import (
 
 // GenerateID generates a random 8 characters ID.
 func GenerateID() string {
-    b := make([]byte, 6)
-    rand.Read(b)
-    return base64.RawURLEncoding.EncodeToString(b)
+	b := make([]byte, 6)
+	rand.Read(b)
+	return base64.RawURLEncoding.EncodeToString(b)
 }
 
 // SanitizeOptions holds configuration for name sanitization
@@ -186,55 +189,71 @@ func GetEgyptTime() string {
 // FindFileByID searches a directory for a file whose name starts with the given ID, and returns its full path if found.
 // This is used because downloaded files follow the pattern: <ID><title>.<ext>
 func FindFileByID(directory, id string) (string, error) {
-    entries, err := os.ReadDir(directory)
-    if err != nil {
-        return "", err
-    }
+	entries, err := os.ReadDir(directory)
+	if err != nil {
+		return "", err
+	}
 
-    for _, entry := range entries {
-        if entry.IsDir() {
-            continue
-        }
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
 
-        name := entry.Name()
+		name := entry.Name()
 
-        if strings.HasPrefix(name, id) {
-            return filepath.Join(directory, name), nil
-        }
-    }
+		if strings.HasPrefix(name, id) {
+			return filepath.Join(directory, name), nil
+		}
+	}
 
-    return "", os.ErrNotExist
+	return "", os.ErrNotExist
 }
 
 // RemoveIDFromFileName removes the ID from the file name.
 // It changes the file name from <ID><title>.<ext> to <title>.<ext> and returns the new file path.
 func RemoveIDFromFileName(filePath string, id string) (string, error) {
 	if id == "" {
-        return "", fmt.Errorf("id cannot be empty")
-    }
+		return "", fmt.Errorf("id cannot be empty")
+	}
 
-    dir := filepath.Dir(filePath)
-    original := filepath.Base(filePath)
+	dir := filepath.Dir(filePath)
+	original := filepath.Base(filePath)
 
-    if !strings.HasPrefix(original, id) {
-        return "", fmt.Errorf("filename does not start with the expected id")
-    }
+	if !strings.HasPrefix(original, id) {
+		return "", fmt.Errorf("filename does not start with the expected id")
+	}
 
-    // Strip the ID
-    newName := original[len(id):]
+	// Strip the ID
+	newName := original[len(id):]
 
-    // Ensure the new name is not empty
-    if newName == "" {
-        return "", fmt.Errorf("cannot rename, resulting filename is empty")
-    }
+	// Ensure the new name is not empty
+	if newName == "" {
+		return "", fmt.Errorf("cannot rename, resulting filename is empty")
+	}
 
-    newPath := filepath.Join(dir, newName)
+	newPath := filepath.Join(dir, newName)
 
-    // Perform the rename
-    if err := os.Rename(filePath, newPath); err != nil {
-        return "", fmt.Errorf("error renaming file: %w", err)
-    }
+	// Perform the rename
+	if err := os.Rename(filePath, newPath); err != nil {
+		return "", fmt.Errorf("error renaming file: %w", err)
+	}
 
-    return newPath, nil
-	
+	return newPath, nil
+
+}
+
+// LogStderr reads from a stderr pipe and logs each line
+func LogStderr(pipe io.ReadCloser, processID string, command string) {
+
+	scanner := bufio.NewScanner(pipe)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line != "" {
+			slog.Error(line,
+				"processId", processID,
+				"command", command,
+				"source", "stderr",
+			)
+		}
+	}
 }
