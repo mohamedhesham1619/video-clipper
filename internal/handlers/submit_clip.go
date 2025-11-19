@@ -50,7 +50,8 @@ func SubmitClipHandler(cfg *config.Config) http.HandlerFunc {
 
 		// Check if the URL is blocked
 		// Since most of the requests are for YouTube, we skip the blocked check for YouTube URLs
-		if !utils.IsYouTubeURL(videoRequest.VideoURL) {
+		isYouTubeRequest := utils.IsYouTubeURL(videoRequest.VideoURL)
+		if !isYouTubeRequest {
 			if blocklist.IsBlocked(videoRequest.VideoURL) {
 				slog.Warn("Blocked download request", "request", videoRequest)
 				http.Error(w, "Failed to process the video", http.StatusBadRequest) // Intentionally vague
@@ -85,7 +86,7 @@ func SubmitClipHandler(cfg *config.Config) http.HandlerFunc {
 		go func() {
 
 			// StartClipDownload function start the download process and doesn't wait for it to finish instead it returns the running command
-			ytdlpCmd, err := clip.StartClipDownload(cfg, videoRequest, &downloadProcess)
+			ytdlpCmd, err := clip.StartClipDownload(cfg, videoRequest, &downloadProcess, false)
 
 			// If there was an error during the download, send an error message on the channel and clean up.
 			if err != nil {
@@ -99,12 +100,32 @@ func SubmitClipHandler(cfg *config.Config) http.HandlerFunc {
 			// Wait for the download process to finish
 			ytdlpErr := ytdlpCmd.Wait()
 
+			// if ytdlp failed
 			if ytdlpErr != nil {
-				handleError(ytdlpErr, "Video download failed", progressChan, processID, cfg.SMTP)
-				return
+				// if it was a YouTube request, try again with cookie
+				if isYouTubeRequest {
+					slog.Info("Failed to download youtube video without cookie, retrying with cookie", "processId", processID)
+					ytdlpCmd, err = clip.StartClipDownload(cfg, videoRequest, &downloadProcess, true)
+					if err != nil {
+						handleError(err, "Failed to download video", progressChan, processID, cfg.SMTP)
+						return
+					}
+					downloadProcess.YtDlpProcess = ytdlpCmd
+					ytdlpErr = ytdlpCmd.Wait()
+
+					// if it failed too, send error
+					if ytdlpErr != nil {
+						handleError(ytdlpErr, "Video download failed", progressChan, processID, cfg.SMTP)
+						return
+					}
+				} else {
+					// if it was not a YouTube request, send error
+					handleError(ytdlpErr, "Video download failed", progressChan, processID, cfg.SMTP)
+					return
+				}
 			}
 
-			// Find the downloaded file
+			// if ytdlp download completed successfully, find the downloaded file
 			filePath, err := utils.FindFileByID(cfg.App.DownloadPath, processID)
 			if err != nil {
 				handleError(err, "Failed to find file", progressChan, processID, cfg.SMTP)

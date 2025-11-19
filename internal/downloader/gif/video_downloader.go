@@ -10,7 +10,7 @@ import (
 )
 
 // startVideoDownload starts the video download and doesn't wait for the download to finish, instead it returns running ytdlp command.
-func startVideoDownload(downloadProcess *models.DownloadProcess, gifRequest *models.GIFRequest, cfg *config.Config) (ytdlpCmd *exec.Cmd, err error) {
+func startVideoDownload(downloadProcess *models.DownloadProcess, gifRequest *models.GIFRequest, cfg *config.Config, useYoutubeCookie bool) (ytdlpCmd *exec.Cmd, err error) {
 
 	// Robust ytdlp format selection:
 	// 1. Video-only ≥ target height
@@ -45,10 +45,16 @@ func startVideoDownload(downloadProcess *models.DownloadProcess, gifRequest *mod
 		"-o", outputPath,
 	}
 
-	// use cookies if the video is from youtube
+	// If it's a YouTube request
 	if utils.IsYouTubeURL(gifRequest.VideoURL) {
-		args = append(args, "--cookies", cfg.YouTube.CookiePath)
-		args = append(args, "--extractor-args", fmt.Sprintf("youtubepot-bgutilhttp:base_url=%s", cfg.YouTube.PoTokenProvider))
+		// If we should use the YouTube cookie
+		if useYoutubeCookie {
+			args = append(args, "--cookies", cfg.YouTube.CookiePath)
+			args = append(args, "--extractor-args", fmt.Sprintf("youtube:player-client=mweb;youtubepot-bgutilhttp:base_url=%s", cfg.YouTube.PoTokenProvider))
+		} else {
+			// If we should only use the Po token provider
+			args = append(args, "--extractor-args", fmt.Sprintf("youtubepot-bgutilhttp:base_url=%s", cfg.YouTube.PoTokenProvider))
+		}
 	}
 
 	// finally add the video url

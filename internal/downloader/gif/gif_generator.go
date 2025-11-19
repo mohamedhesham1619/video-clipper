@@ -26,8 +26,11 @@ func GenerateGIF(gifRequest *models.GIFRequest, downloadProcess *models.Download
 	neededCredits := credits.CalculateGIFCreditCost(videoDurationInSeconds, gifRequest.Width, gifRequest.FPS, gifRequest.Speed)
 	downloadProcess.NeededCredits = neededCredits
 
+	// Check if this is a YouTube request
+	isYouTubeRequest := utils.IsYouTubeURL(gifRequest.VideoURL)
+
 	// Start the video download and set the running yt-dlp process in the download process struct so it can be cancelled if the client disconnects
-	runningYtdlpCmd, err := startVideoDownload(downloadProcess, gifRequest, cfg)
+	runningYtdlpCmd, err := startVideoDownload(downloadProcess, gifRequest, cfg, false)
 	downloadProcess.YtDlpProcess = runningYtdlpCmd
 
 	// If the yt-dlp command failed to start, send an error event to the progress channel and return an error
@@ -41,13 +44,40 @@ func GenerateGIF(gifRequest *models.GIFRequest, downloadProcess *models.Download
 	}
 
 	// Wait for the ytdlp download command to finish
-	if err := runningYtdlpCmd.Wait(); err != nil {
-		downloadProcess.ProgressChan <- models.ProgressEvent{
-			Event: models.EventTypeError,
-			Data:  map[string]string{"message": "Failed to download video"},
-		}
+	ytdlpErr := runningYtdlpCmd.Wait()
 
-		return fmt.Errorf("failed to download video: %v", err)
+	// if ytdlp failed
+	if ytdlpErr != nil {
+		// if it was a YouTube request, try again with cookie
+		if isYouTubeRequest {
+			slog.Info("YouTube download failed without cookies, retrying with cookies", "processID", downloadProcess.ID, "error", ytdlpErr)
+			runningYtdlpCmd, err = startVideoDownload(downloadProcess, gifRequest, cfg, true)
+			if err != nil {
+				downloadProcess.ProgressChan <- models.ProgressEvent{
+					Event: models.EventTypeError,
+					Data:  map[string]string{"message": "Failed to start video download"},
+				}
+				return fmt.Errorf("failed to start video download retry: %v", err)
+			}
+			downloadProcess.YtDlpProcess = runningYtdlpCmd
+			ytdlpErr = runningYtdlpCmd.Wait()
+
+			// if it failed too, send error
+			if ytdlpErr != nil {
+				downloadProcess.ProgressChan <- models.ProgressEvent{
+					Event: models.EventTypeError,
+					Data:  map[string]string{"message": "Failed to download video"},
+				}
+				return fmt.Errorf("failed to download video: %v", ytdlpErr)
+			}
+		} else {
+			// if it was not a YouTube request, send error
+			downloadProcess.ProgressChan <- models.ProgressEvent{
+				Event: models.EventTypeError,
+				Data:  map[string]string{"message": "Failed to download video"},
+			}
+			return fmt.Errorf("failed to download video: %v", ytdlpErr)
+		}
 	}
 
 	// Before converting the video to GIF, check if the process was cancelled while we were downloading the video, if so, stop the process and return

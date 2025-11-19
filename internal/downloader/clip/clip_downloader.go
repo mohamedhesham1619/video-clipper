@@ -16,10 +16,10 @@ import (
 )
 
 // StartClipDownload starts the video download processes and returns the running commands.
-func StartClipDownload(cfg *config.Config, videoRequest models.ClipRequest, downloadProcess *models.DownloadProcess) (ytdlpCmd *exec.Cmd, err error) {
+func StartClipDownload(cfg *config.Config, videoRequest models.ClipRequest, downloadProcess *models.DownloadProcess, useYoutubeCookie bool) (ytdlpCmd *exec.Cmd, err error) {
 
 	// Create the yt-dlp commands.
-	ytdlpCmd = prepareYtDlpCommand(cfg, videoRequest, downloadProcess.ID)
+	ytdlpCmd = prepareYtDlpCommand(cfg, videoRequest, downloadProcess.ID, useYoutubeCookie)
 
 	// Create a pipe for yt-dlp's stderr.
 	// This pipe will be used to read progress updates and log errors.
@@ -44,7 +44,7 @@ func StartClipDownload(cfg *config.Config, videoRequest models.ClipRequest, down
 	return ytdlpCmd, nil
 }
 
-func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, processID string) *exec.Cmd {
+func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, processID string, useYoutubeCookie bool) *exec.Cmd {
 
 	var formatString string
 
@@ -81,10 +81,18 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 		"-o", outputFile,
 	}
 
+	// If it's a YouTube request
 	if utils.IsYouTubeURL(videoRequest.VideoURL) {
-		args = append(args, "--cookies", cfg.YouTube.CookiePath)
-		args = append(args, "--extractor-args", fmt.Sprintf("youtubepot-bgutilhttp:base_url=%s", cfg.YouTube.PoTokenProvider))
+		// If we should use the YouTube cookie
+		if useYoutubeCookie {
+			args = append(args, "--cookies", cfg.YouTube.CookiePath)
+			args = append(args, "--extractor-args", fmt.Sprintf("youtube:player-client=mweb;youtubepot-bgutilhttp:base_url=%s", cfg.YouTube.PoTokenProvider))
+		} else {
+			// If we should only use the Po token provider
+			args = append(args, "--extractor-args", fmt.Sprintf("youtubepot-bgutilhttp:base_url=%s", cfg.YouTube.PoTokenProvider))
+		}
 	}
+	
 	args = append(args, videoRequest.VideoURL)
 	return exec.Command("yt-dlp", args...)
 }
