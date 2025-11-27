@@ -378,15 +378,27 @@ const contentSuggestions = {
                 transport: 'beacon'
             });"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/w_160,h_600,c_fill,f_auto,q_auto/v1763388520/movavi-160%D1%85600_ks8uk7.png" alt="Movavi"/></a>`
         },
+        // {
+        //     html: `<a rel="noopener sponsored"
+        //    href="https://1.envato.market/c/6416428/3371584/4662" target="_blank" id="3371584"
+        //    onclick="gtag('event', 'ad_click', {
+        //         ad_name: 'Envato',
+        //         ad_position: 'side',
+        //         transport: 'beacon'
+        //     });">
+        //     <img src="//a.impactradius-go.com/display-ad/4662-3371584" border="0" alt="Envato" width="300" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/3371584/4662" style="position:absolute;visibility:hidden;" border="0" />`
+        // },
         {
-            html: `<a rel="noopener sponsored"
-           href="https://1.envato.market/c/6416428/3371584/4662" target="_blank" id="3371584"
+            html: `
+                <a rel="noopener sponsored"
+           href="https://1.envato.market/c/6416428/3404903/4662" target="_blank" id="3404903"
            onclick="gtag('event', 'ad_click', {
                 ad_name: 'Envato',
                 ad_position: 'side',
                 transport: 'beacon'
             });">
-            <img src="//a.impactradius-go.com/display-ad/4662-3371584" border="0" alt="Envato" width="300" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/3371584/4662" style="position:absolute;visibility:hidden;" border="0" />`
+        <img src="//a.impactradius-go.com/display-ad/4662-3404903" border="0" alt="Envato" width="161" height="601"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/3404903/4662" style="position:absolute;visibility:hidden;" border="0" />
+            `
         },
         {
             html: `<a rel="noopener sponsored"
@@ -421,7 +433,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Set up interval for side ads rotation (40 seconds)
             setInterval(rotateContent, 40000);
         };
-        
+
         if ('requestIdleCallback' in window) {
             requestIdleCallback(startRotation, { timeout: 2000 });
         } else {
@@ -436,10 +448,10 @@ function createToolCard(tool) {
     const isMobileView = window.innerWidth <= 768;
     const card = document.createElement('div');
     card.className = 'recommended-card';
-    
+
     const cardWidth = 300; // Same width for both mobile and desktop
     const cardHeight = isMobileView ? 215 : 250; // 215px height for mobile, 250px for desktop
-    
+
     card.style.cssText = `
         width: ${cardWidth}px !important;
         height: ${cardHeight}px !important;
@@ -604,7 +616,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 swiperInstance = initSwiper();
                 lastIsMobile = nowIsMobile;
             };
-            
+
             if ('requestIdleCallback' in window) {
                 requestIdleCallback(reRender, { timeout: 500 });
             } else {
@@ -621,7 +633,7 @@ document.addEventListener('DOMContentLoaded', function () {
             swiperInstance = null;
         }
     }, 300);
-    
+
     window.addEventListener('resize', handleResize, { passive: true });
 });
 
