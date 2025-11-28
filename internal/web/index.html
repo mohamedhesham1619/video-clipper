@@ -1050,16 +1050,13 @@
     <!-- Black Friday Countdown Timer -->
     <script>
         (function() {
-            // Set the end time to 49 hours 32 minutes from now
-            const now = new Date();
-            const endTime = new Date(now.getTime() + (49 * 60 * 60 * 1000) + (32 * 60 * 1000));
+            var deadline = '2025/11/30 09:00:00 UTC';
             
             function updateCountdown() {
                 const countdownElement = document.getElementById('submagic-countdown');
                 if (!countdownElement) return;
                 
-                const now = new Date();
-                const timeLeft = endTime - now;
+                const timeLeft = Date.parse(deadline) - Date.parse(new Date());
                 
                 if (timeLeft <= 0) {
                     countdownElement.textContent = 'Offer expired';
