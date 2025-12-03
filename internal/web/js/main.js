@@ -378,27 +378,15 @@ const contentSuggestions = {
                 transport: 'beacon'
             });"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/w_160,h_600,c_fill,f_auto,q_auto/v1763388520/movavi-160%D1%85600_ks8uk7.png" alt="Movavi"/></a>`
         },
-        // {
-        //     html: `<a rel="noopener sponsored"
-        //    href="https://1.envato.market/c/6416428/3371584/4662" target="_blank" id="3371584"
-        //    onclick="gtag('event', 'ad_click', {
-        //         ad_name: 'Envato',
-        //         ad_position: 'side',
-        //         transport: 'beacon'
-        //     });">
-        //     <img src="//a.impactradius-go.com/display-ad/4662-3371584" border="0" alt="Envato" width="300" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/3371584/4662" style="position:absolute;visibility:hidden;" border="0" />`
-        // },
         {
-            html: `
-                <a rel="noopener sponsored"
-           href="https://1.envato.market/c/6416428/3404903/4662" target="_blank" id="3404903"
+            html: `<a rel="noopener sponsored"
+           href="https://1.envato.market/c/6416428/3371584/4662" target="_blank" id="3371584"
            onclick="gtag('event', 'ad_click', {
                 ad_name: 'Envato',
                 ad_position: 'side',
                 transport: 'beacon'
             });">
-        <img src="//a.impactradius-go.com/display-ad/4662-3404903" border="0" alt="Envato" width="161" height="601"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/3404903/4662" style="position:absolute;visibility:hidden;" border="0" />
-            `
+            <img src="//a.impactradius-go.com/display-ad/4662-3371584" border="0" alt="Envato" width="300" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/3371584/4662" style="position:absolute;visibility:hidden;" border="0" />`
         },
         {
             html: `<a rel="noopener sponsored"
