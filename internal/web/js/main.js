@@ -360,23 +360,15 @@ function rotateContent() {
 // Content suggestions data
 const contentSuggestions = {
     sides: [
-        // {
-        //     html: `<a rel="noopener sponsored"
-        //    href="https://renderforest.pxf.io/c/6416428/1275476/14885?u=https%3A%2F%2Fwww.renderforest.com%2F" target="_blank" id="1275476"
-        //    onclick="gtag('event', 'ad_click', {
-        //         ad_name: 'Renderforest',
-        //         ad_position: 'side',
-        //         transport: 'beacon'
-        //     });">
-        //     <img src="//a.impactradius-go.com/display-ad/14885-1275476" border="0" alt="Renderforest" width="300" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/1275476/14885" style="position:absolute;visibility:hidden;" border="0" />`
-        // },
         {
-            html: `<a href="https://www.mvvitrk.com/click?pid=5677&offer_id=1&l=1763130815" title="Movavi" target="_blank" 
-            onclick="gtag('event', 'ad_click', {
-                ad_name: 'Movavi',
+            html: `<a rel="noopener sponsored"
+           href="https://renderforest.pxf.io/c/6416428/1960717/14885" target="_blank" id="1960717"
+           onclick="gtag('event', 'ad_click', {
+                ad_name: 'Renderforest',
                 ad_position: 'side',
                 transport: 'beacon'
-            });"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/w_160,h_600,c_fill,f_auto,q_auto/v1763388520/movavi-160%D1%85600_ks8uk7.png" alt="Movavi"/></a>`
+            });">
+            <img src="//a.impactradius-go.com/display-ad/14885-1960717" border="0" alt="Renderforest" width="160" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/1960717/14885" style="position:absolute;visibility:hidden;" border="0" />`
         },
         {
             html: `<a rel="noopener sponsored"
