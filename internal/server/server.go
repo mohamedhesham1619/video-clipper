@@ -18,8 +18,8 @@ func New(cfg *config.Config, creditsStore *credits.CreditsStore) *Server {
 	mux := http.NewServeMux()
 
 	// Rate limiters
-	ipLimiter := ipLimiterMiddleware(3, 1*time.Hour)
-	fpLimiter := fpLimiterMiddleware(3, 1*time.Hour)
+	ipLimiter := ipLimiterMiddleware(5, 1*time.Hour)
+	fpLimiter := fpLimiterMiddleware(5, 1*time.Hour)
 
 	// API routes
 	mux.Handle("/api/submit",

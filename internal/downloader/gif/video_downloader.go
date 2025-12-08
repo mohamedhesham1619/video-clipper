@@ -2,9 +2,11 @@ package gif
 
 import (
 	"clipper/internal/config"
+	"clipper/internal/cookie"
 	"clipper/internal/models"
 	"clipper/internal/utils"
 	"fmt"
+	"log/slog"
 	"os/exec"
 	"path/filepath"
 )
@@ -49,7 +51,9 @@ func startVideoDownload(downloadProcess *models.DownloadProcess, gifRequest *mod
 	if utils.IsYouTubeURL(gifRequest.VideoURL) {
 		// If we should use the YouTube cookie
 		if useYoutubeCookie {
-			args = append(args, "--cookies", cfg.YouTube.CookiePath)
+			cookie := cookie.YouTube()
+			slog.Info("Using YouTube cookie", "cookie", filepath.Base(cookie), "process ID", downloadProcess.ID)
+			args = append(args, "--cookies", cookie)
 			args = append(args, "--extractor-args", fmt.Sprintf("youtube:player-client=mweb;youtubepot-bgutilhttp:base_url=%s", cfg.YouTube.PoTokenProvider))
 		} else {
 			// If we should only use the Po token provider

@@ -1,7 +1,6 @@
 build/
 .env
-old-cookie.txt
-cookie.txt
+*.txt
 ui/
 clipper.json
 firestore_key.json

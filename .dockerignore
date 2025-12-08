@@ -5,7 +5,6 @@ Dockerfile
 .dockerignore
 /build
 .env
-cookie.txt
-old-cookie.txt
+*.txt
 clipper.json
 clips/
