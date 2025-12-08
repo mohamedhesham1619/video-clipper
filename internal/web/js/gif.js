@@ -1497,8 +1497,19 @@ const VideoClipper = (function () {
             }
 
             // Validate videoUrl (playlist detection)
-            if ((videoUrl.includes('youtube') || videoUrl.includes('youtu.be')) && videoUrl.includes('list=')) {
+            const videoUrlLower = videoUrl.toLowerCase();
+            if ((videoUrlLower.includes('youtube') || videoUrlLower.includes('youtu.be')) && videoUrlLower.includes('list=')) {
                 throw new Error('It looks like you used a playlist link. Please copy the video link from the Share button instead.');
+            }
+            
+            // Check if it's a Google search URL (but not Google Drive)
+            if ((videoUrlLower.includes('google.com/search') || videoUrlLower.includes('google.') && videoUrlLower.includes('/search')) && !videoUrlLower.includes('drive.google.com')) {
+                throw new Error('It looks like you used a Google search link. Please copy the actual video URL instead.');
+            }
+            
+            // Check if it's a Bing search URL
+            if (videoUrlLower.includes('bing.com/') && (videoUrlLower.includes('/search') || videoUrlLower.includes('?q='))) {
+                throw new Error('It looks like you used a Bing search link. Please copy the actual video URL instead.');
             }
 
             // Validate videoStart and videoEnd (time format)
@@ -1630,6 +1641,8 @@ const VideoClipper = (function () {
             if (error.message.includes('must be after') || 
                 error.message.includes('Please enter') ||
                 error.message.includes('playlist link') ||
+                error.message.includes('Google search link') ||
+                error.message.includes('Bing search link') ||
                 error.message.includes('Invalid') ||
                 error.message.includes('GIFs are limited')) {
                 // Show rate limit errors for 30 seconds, other errors for 10 seconds
@@ -2006,11 +2019,29 @@ const VideoClipper = (function () {
         // Add input event listener for live URL validation
         videoUrlInput.addEventListener('input', function() {
             const url = this.value.trim().toLowerCase();
+            
+            // Check for playlist URLs
             if ((url.includes('youtube') || url.includes('youtu.be')) && url.includes('list=')) {
                 urlErrorElement.textContent = 'It looks like you used a playlist link. Please copy the video link from the Share button instead.';
                 urlErrorElement.style.display = 'block';
+                urlErrorElement.style.color = 'red';
                 this.setCustomValidity('Please use a video link, not a playlist link');
-            } else {
+            } 
+            // Check for Google search URLs (but not Google Drive)
+            else if ((url.includes('google.com/search') || (url.includes('google.') && url.includes('/search'))) && !url.includes('drive.google.com')) {
+                urlErrorElement.textContent = 'It looks like you used a Google search link. Please copy the actual video URL instead.';
+                urlErrorElement.style.display = 'block';
+                urlErrorElement.style.color = 'red';
+                this.setCustomValidity('Please use the actual video URL, not a search link');
+            }
+            // Check for Bing search URLs
+            else if (url.includes('bing.com/') && (url.includes('/search') || url.includes('?q='))) {
+                urlErrorElement.textContent = 'It looks like you used a Bing search link. Please copy the actual video URL instead.';
+                urlErrorElement.style.display = 'block';
+                urlErrorElement.style.color = 'red';
+                this.setCustomValidity('Please use the actual video URL, not a search link');
+            }
+            else {
                 urlErrorElement.style.display = 'none';
                 this.setCustomValidity('');
             }
