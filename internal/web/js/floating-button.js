@@ -35,11 +35,13 @@ class FloatingButton {
     const modalForm = document.getElementById('modal-contact-form');
 
     if (contactFloat && contactModal) {
-      // Open modal
+      // Open modal - use requestAnimationFrame for better INP
       contactFloat.addEventListener('click', (e) => {
         e.preventDefault();
-        contactModal.classList.add('show');
-        document.body.style.overflow = 'hidden';
+        requestAnimationFrame(() => {
+          contactModal.classList.add('show');
+          document.body.style.overflow = 'hidden';
+        });
       });
 
       // Close modal
@@ -47,19 +49,19 @@ class FloatingButton {
         closeModal.addEventListener('click', () => this.closeModal(contactModal));
       }
 
-      // Close when clicking outside
+      // Close when clicking outside - use passive for better performance
       contactModal.addEventListener('click', (e) => {
         if (e.target === contactModal) {
           this.closeModal(contactModal);
         }
-      });
+      }, { passive: true });
 
-      // Close with Escape key
+      // Close with Escape key - use passive
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && contactModal.classList.contains('show')) {
           this.closeModal(contactModal);
         }
-      });
+      }, { passive: true });
 
       // Form submission
       if (modalForm) {
@@ -69,8 +71,11 @@ class FloatingButton {
   }
 
   closeModal(modal) {
-    modal.classList.remove('show');
-    document.body.style.overflow = '';
+    // Use requestAnimationFrame for better INP
+    requestAnimationFrame(() => {
+      modal.classList.remove('show');
+      document.body.style.overflow = '';
+    });
   }
 
   async handleFormSubmit(e, form, modal) {

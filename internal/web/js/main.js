@@ -64,7 +64,7 @@ function updateHeaderPaths() {
 
 }
 
-// Mobile menu toggle
+// Mobile menu toggle with INP optimization
 function setupMobileMenu() {
     domCache.mobileMenu.toggle = document.querySelector('.mobile-menu-toggle');
     domCache.mobileMenu.nav = document.querySelector('.nav-links');
@@ -75,15 +75,20 @@ function setupMobileMenu() {
     const handleClick = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        domCache.mobileMenu.nav.classList.toggle('active');
-        domCache.mobileMenu.toggle.classList.toggle('active');
-        document.body.classList.toggle('menu-open');
+        // Use requestAnimationFrame to yield to main thread and improve INP
+        requestAnimationFrame(() => {
+            domCache.mobileMenu.nav.classList.toggle('active');
+            domCache.mobileMenu.toggle.classList.toggle('active');
+            document.body.classList.toggle('menu-open');
+        });
     };
 
     const closeMenu = () => {
-        domCache.mobileMenu.nav.classList.remove('active');
-        domCache.mobileMenu.toggle.classList.remove('active');
-        document.body.classList.remove('menu-open');
+        requestAnimationFrame(() => {
+            domCache.mobileMenu.nav.classList.remove('active');
+            domCache.mobileMenu.toggle.classList.remove('active');
+            document.body.classList.remove('menu-open');
+        });
     };
 
     // Add event listeners
@@ -95,14 +100,14 @@ function setupMobileMenu() {
         link.addEventListener('click', closeMenu);
     });
 
-    // Close when clicking outside
+    // Close when clicking outside - use passive for better scroll performance
     document.addEventListener('click', (e) => {
         if (domCache.mobileMenu.nav.classList.contains('active') &&
             !domCache.mobileMenu.toggle.contains(e.target) &&
             !domCache.mobileMenu.nav.contains(e.target)) {
             closeMenu();
         }
-    });
+    }, { passive: true });
 
     // Cleanup function
     return () => {
@@ -154,7 +159,7 @@ function handleScroll() {
     // This is throttled to improve performance
 }
 
-// Smooth scrolling for anchor links
+// Smooth scrolling for anchor links with INP optimization
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
@@ -162,18 +167,21 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         const targetId = this.getAttribute('href');
         if (targetId === '#') return;
 
-        const targetElement = document.querySelector(targetId);
-        if (targetElement) {
-            // Calculate the offset based on the header height
-            const headerOffset = 80;
-            const elementPosition = targetElement.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        // Use requestAnimationFrame to yield to main thread and improve INP
+        requestAnimationFrame(() => {
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                // Calculate the offset based on the header height
+                const headerOffset = 80;
+                const elementPosition = targetElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            });
-        }
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
     });
 });
 
@@ -493,24 +501,30 @@ function createToolCard(tool) {
         </a>
     `;
 
-    // Add hover effects
-    card.addEventListener('mouseenter', () => {
-        card.style.transform = 'translateY(-5px)';
-        card.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.15)';
-        const img = card.querySelector('img');
-        const overlay = card.querySelector('.card-overlay');
-        if (img) img.style.transform = 'scale(1.05)';
-        if (overlay) overlay.style.transform = 'translateY(0)';
-    });
+    // Add hover effects only on desktop to improve mobile INP
+    if (window.innerWidth > 768) {
+        card.addEventListener('mouseenter', () => {
+            requestAnimationFrame(() => {
+                card.style.transform = 'translateY(-5px)';
+                card.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.15)';
+                const img = card.querySelector('img');
+                const overlay = card.querySelector('.card-overlay');
+                if (img) img.style.transform = 'scale(1.05)';
+                if (overlay) overlay.style.transform = 'translateY(0)';
+            });
+        });
 
-    card.addEventListener('mouseleave', () => {
-        card.style.transform = 'translateY(0)';
-        card.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-        const img = card.querySelector('img');
-        const overlay = card.querySelector('.card-overlay');
-        if (img) img.style.transform = 'scale(1)';
-        if (overlay) overlay.style.transform = 'translateY(100%)';
-    });
+        card.addEventListener('mouseleave', () => {
+            requestAnimationFrame(() => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+                const img = card.querySelector('img');
+                const overlay = card.querySelector('.card-overlay');
+                if (img) img.style.transform = 'scale(1)';
+                if (overlay) overlay.style.transform = 'translateY(100%)';
+            });
+        });
+    }
 
     return card;
 }

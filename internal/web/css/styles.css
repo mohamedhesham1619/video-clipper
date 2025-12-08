@@ -3848,3 +3848,78 @@ grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         display: block !important;
     }
 }
+
+
+/* ============================================
+   INP (Interaction to Next Paint) Optimizations
+   ============================================ */
+
+/* Improve touch responsiveness on mobile */
+@media screen and (max-width: 768px) {
+    /* Optimize touch targets for faster response */
+    button,
+    .btn-download,
+    .faq-question,
+    .mobile-menu-toggle,
+    .nav-link,
+    .paste-button,
+    a[href] {
+        touch-action: manipulation;
+    }
+    
+    /* Use content-visibility for off-screen sections to reduce rendering work */
+    .content-section,
+    .recommended-section,
+    .tutorials,
+    #faq {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 500px;
+    }
+    
+    /* Reduce paint complexity on interactive elements */
+    .faq-item {
+        contain: layout style;
+    }
+    
+    /* Optimize FAQ answer transitions */
+    .faq-answer {
+        will-change: max-height;
+        contain: content;
+    }
+    
+    /* Prevent layout shifts during interactions */
+    .nav-links {
+        contain: layout;
+    }
+}
+
+/* Global touch optimization for all interactive elements */
+button,
+[role="button"],
+input[type="submit"],
+.btn-download,
+.faq-question {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Optimize transitions for smoother interactions */
+.faq-answer {
+    transition: max-height 0.25s ease-out;
+}
+
+/* Reduce animation complexity on mobile for better INP */
+@media screen and (max-width: 768px) {
+    /* Disable hover effects that can cause jank */
+    .recommended-card:hover,
+    .tutorial-feature:hover {
+        transform: none !important;
+    }
+    
+    /* Simplify transitions on mobile */
+    .faq-answer,
+    .nav-links,
+    .mobile-menu-toggle span {
+        transition-duration: 0.2s;
+    }
+}

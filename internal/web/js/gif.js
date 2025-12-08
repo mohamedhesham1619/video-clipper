@@ -101,19 +101,21 @@ function initFingerprint() {
                             resetTimeElement.addEventListener('mouseenter', showHint);
                             resetTimeElement.addEventListener('mouseleave', hideHint);
                         } else {
-                            // Mobile: show on click
+                            // Mobile: show on click - use requestAnimationFrame for better INP
                             resetTimeElement.addEventListener('click', (e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 
-                                if (mobileHint) {
-                                    const isVisible = mobileHint.style.display === 'block';
-                                    if (isVisible) {
-                                        hideHint();
-                                    } else {
-                                        showHint();
+                                requestAnimationFrame(() => {
+                                    if (mobileHint) {
+                                        const isVisible = mobileHint.style.display === 'block';
+                                        if (isVisible) {
+                                            hideHint();
+                                        } else {
+                                            showHint();
+                                        }
                                     }
-                                }
+                                });
                             });
                         }
                         
@@ -2492,6 +2494,18 @@ const VideoClipper = (function () {
         document.body.appendChild(overlay);
         document.body.appendChild(popup);
         
+        // Close popup function - use requestAnimationFrame for better INP
+        function closePopup() {
+            requestAnimationFrame(() => {
+                if (document.body.contains(popup)) {
+                    document.body.removeChild(popup);
+                }
+                if (document.body.contains(overlay)) {
+                    document.body.removeChild(overlay);
+                }
+            });
+        }
+        
         // Add event listeners
         document.getElementById('support-yes').addEventListener('click', (e) => {
             // Let the default anchor click behavior handle the navigation
@@ -2500,16 +2514,6 @@ const VideoClipper = (function () {
         
         document.getElementById('support-no').addEventListener('click', closePopup);
         // Removed overlay click to close
-        
-        // Close popup function
-        function closePopup() {
-            if (document.body.contains(popup)) {
-                document.body.removeChild(popup);
-            }
-            if (document.body.contains(overlay)) {
-                document.body.removeChild(overlay);
-            }
-        }
         
         // Close with Escape key
         document.addEventListener('keydown', function handleEscape(e) {

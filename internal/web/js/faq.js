@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
         answer.style.maxHeight = '0';
     });
 
-    // Add click event to each FAQ question
+    // Add click event to each FAQ question with INP optimization
     faqItems.forEach(item => {
         const question = item.querySelector('.faq-question');
         const answer = item.querySelector('.faq-answer');
@@ -16,28 +16,32 @@ document.addEventListener('DOMContentLoaded', function() {
         question.addEventListener('click', function() {
             const isActive = item.classList.contains('active');
             
-            // Close all other items
-            faqItems.forEach(otherItem => {
-                if (otherItem !== item) {
-                    otherItem.classList.remove('active');
-                    otherItem.querySelector('.faq-answer').style.maxHeight = '0';
-                    otherItem.querySelector('.faq-question i').classList.remove('fa-chevron-up');
-                    otherItem.querySelector('.faq-question i').classList.add('fa-chevron-down');
+            // Use requestAnimationFrame to yield to main thread and improve INP
+            requestAnimationFrame(() => {
+                // Close all other items
+                faqItems.forEach(otherItem => {
+                    if (otherItem !== item) {
+                        otherItem.classList.remove('active');
+                        otherItem.querySelector('.faq-answer').style.maxHeight = '0';
+                        const otherIcon = otherItem.querySelector('.faq-question i');
+                        otherIcon.classList.remove('fa-chevron-up');
+                        otherIcon.classList.add('fa-chevron-down');
+                    }
+                });
+                
+                // Toggle the clicked item
+                if (!isActive) {
+                    item.classList.add('active');
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                } else {
+                    item.classList.remove('active');
+                    answer.style.maxHeight = '0';
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
                 }
             });
-            
-            // Toggle the clicked item
-            if (!isActive) {
-                item.classList.add('active');
-                answer.style.maxHeight = answer.scrollHeight + 'px';
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-up');
-            } else {
-                item.classList.remove('active');
-                answer.style.maxHeight = '0';
-                icon.classList.remove('fa-chevron-up');
-                icon.classList.add('fa-chevron-down');
-            }
         });
     });
     
