@@ -391,12 +391,12 @@ const contentSuggestions = {
             <img src="//a.impactradius-go.com/display-ad/22474-3069242" border="0" alt="CapCut AI" width="160" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/3069242/22474" style="position:absolute;visibility:hidden;" border="0" />`
         },
         {
-            html: `<a href="https://partner.pcloud.com/r/152307" title="pCloud Premium" target="_blank" 
+            html: `<a href="https://partner.pcloud.com/r/146969" title="pCloud Premium" target="_blank" 
             onclick="gtag('event', 'ad_click', {
                 ad_name: 'pCloud Premium',
                 ad_position: 'side',
                 transport: 'beacon'
-            });"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/f_auto,q_auto/v1763816930/2025-Black-Friday-Partners-160x600-V4-EN_ch1pzo.jpg" alt="pCloud Premium"/></a>`
+            });"><img src="https://partner.pcloud.com/media/banners/lifetime/lifetime008160600.jpg" alt="pCloud Premium"/></a>`
         }
     ]
 };

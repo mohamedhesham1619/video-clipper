@@ -537,7 +537,7 @@
 /* Time label styling */
 .time-group .time-label {
     display: block;
-    margin: 0.5rem 0 0.1rem 0;  /* Increased top margin to 0.5rem */
+    margin: 0.15rem 0 0 0 !important;  /* Reduced spacing between label and input */
     position: relative;
     font-size: 0;
 }
@@ -546,7 +546,9 @@
     content: attr(data-desktop);
     font-size: 1rem;
     display: block;
-    color: #333333
+    color: #333333;
+    line-height: 1;
+    margin-bottom: 0.1rem;
 }
 
 /* These rules are now combined with the credits-text rules above */
@@ -662,7 +664,7 @@ input[type="url"],
 input[type="text"],
 select {
     padding: 0.4rem 0.1rem;
-    margin: 0.25rem 0;
+    margin: 0 0 0.25rem 0;  /* Only bottom margin, no top margin for tighter label spacing */
 }
 
 
@@ -691,6 +693,7 @@ select {
     position: relative;
     display: flex;
     align-items: center;
+    margin-bottom: 0.5rem;  /* Space between video URL and time fields */
 }
 
 .input-with-paste input {
@@ -2357,6 +2360,8 @@ header.main-header {
     text-align: left;
     width: 100%;
     padding-left: 4px;
+    margin-bottom: 0.1rem !important;  /* Reduced spacing between label and input */
+    line-height: 1.2;
 }
 
 .form-group input[type="url"] {
@@ -3328,7 +3333,7 @@ grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         width: 300px;
         background: transparent;
         padding: 0;
-        border-radius: 0;
+        border-radius: 12px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -3339,6 +3344,8 @@ grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         position: relative;
         overflow: hidden;
         /* Prevent content from overflowing */
+        z-index: 2;
+        /* Above ad-banner which has z-index: 1 */
     }
 
     /* Ad content container */
