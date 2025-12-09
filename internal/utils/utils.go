@@ -242,13 +242,14 @@ func RemoveIDFromFileName(filePath string, id string) (string, error) {
 
 }
 
-// LogStderr reads from a stderr pipe and logs each line
+// LogStderr reads from a stderr pipe and logs only actual errors
+// yt-dlp prefixes errors with "ERROR:", ffmpeg errors typically contain specific error keywords
 func LogStderr(pipe io.ReadCloser, processID string, command string) {
 
 	scanner := bufio.NewScanner(pipe)
 	for scanner.Scan() {
 		line := scanner.Text()
-		if line != "" {
+		if line != "" && isStderrError(line) {
 			slog.Error(line,
 				"processId", processID,
 				"command", command,
@@ -256,4 +257,35 @@ func LogStderr(pipe io.ReadCloser, processID string, command string) {
 			)
 		}
 	}
+}
+
+// isStderrError checks if a stderr line is an actual error vs informational output
+func isStderrError(line string) bool {
+	normalized := strings.ToLower(line)
+
+	// yt-dlp errors start with "ERROR:"
+	if strings.Contains(normalized, "error") {
+		return true
+	}
+
+	// ffmpeg error patterns (lowercase for comparison)
+	ffmpegErrors := []string{
+		"invalid ",
+		"no such file",
+		"permission denied",
+		"cannot ",
+		"could not ",
+		"failed to",
+		"unrecognized option",
+		"option not found",
+		"does not exist",
+	}
+
+	for _, pattern := range ffmpegErrors {
+		if strings.Contains(normalized, pattern) {
+			return true
+		}
+	}
+
+	return false
 }
