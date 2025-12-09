@@ -60,17 +60,34 @@ func New(cfg *config.Config, creditsStore *credits.CreditsStore) *Server {
 	mux.HandleFunc("/cut-youtube-video-online", handlers.YouTubeGuideHandler)
 	mux.HandleFunc("/trim-videos-online", handlers.GeneralGuideHandler)
 
-	// SEO/static root files
+	// SEO/static root files - wrap with CORS headers for Clarity recordings
 	fs := http.FileServer(http.Dir("internal/web/"))
-	mux.Handle("/css/", fs)
-	mux.Handle("/js/", fs)
-	mux.Handle("/images/", fs)
-	mux.Handle("/components/", fs)
+	corsFS := addCORSHeaders(fs)
+	mux.Handle("/css/", corsFS)
+	mux.Handle("/js/", corsFS)
+	mux.Handle("/images/", corsFS)
+	mux.Handle("/components/", corsFS)
 	mux.HandleFunc("/robots.txt", handlers.RobotsTxtHandler)
 	mux.HandleFunc("/sitemap.xml", handlers.SitemapXMLHandler)
 	mux.Handle("/favicon.ico", http.FileServer(http.Dir("internal/web/images")))
 
 	return &Server{mux: mux}
+}
+
+// addCORSHeaders wraps a handler to add CORS headers for Microsoft Clarity session recordings
+func addCORSHeaders(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Allow Clarity and other analytics tools to fetch static assets
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		h.ServeHTTP(w, r)
+	})
 }
 
 func (s *Server) Start() error {
