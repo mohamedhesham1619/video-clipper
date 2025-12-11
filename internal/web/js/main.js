@@ -380,13 +380,19 @@ const contentSuggestions = {
         },
         {
             html: `<a rel="noopener sponsored"
-           href="https://1.envato.market/c/6416428/3371584/4662" target="_blank" id="3371584"
+           href="https://www.mvvitrk.com/click?pid=5677&offer_id=1&l=1765367902" target="_blank"
            onclick="gtag('event', 'ad_click', {
-                ad_name: 'Envato',
+                ad_name: 'Movavi',
                 ad_position: 'side',
                 transport: 'beacon'
             });">
-            <img src="//a.impactradius-go.com/display-ad/4662-3371584" border="0" alt="Envato" width="300" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/3371584/4662" style="position:absolute;visibility:hidden;" border="0" />`
+            <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/c_fill,w_160,h_600,g_auto/f_auto,q_auto/v1765453811/160%D1%85600_c1gh2g.png" 
+                 border="0" 
+                 alt="movavi" 
+                 width="160" 
+                 height="600" 
+                 style="width: 160px; height: 600px; object-fit: cover;" />
+            </a>`
         },
         {
             html: `<a rel="noopener sponsored"
@@ -418,8 +424,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Defer initial rotation using requestIdleCallback
         const startRotation = () => {
             rotateContent();
-            // Set up interval for side ads rotation (40 seconds)
-            setInterval(rotateContent, 40000);
+            // Set up interval for side ads rotation (45 seconds)
+            setInterval(rotateContent, 45000);
         };
 
         if ('requestIdleCallback' in window) {
@@ -647,8 +653,8 @@ const recommended_tools = [
     {
         "name": "Envato",
         "header": "Top-Quality Assets for Designers & Video Editors",
-        "link": "https://1.envato.market/c/6416428/3323986/4662",
-        "image": "https://app.impact.com/display-ad/4662-3323986?v=0"
+        "link": "https://1.envato.market/c/6416428/3371582/4662",
+        "image": "https://app.impact.com/display-ad/4662-3371583?v=0"
 
     },
     {
