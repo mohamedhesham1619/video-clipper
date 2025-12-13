@@ -110,8 +110,8 @@ func validateGIFRequestMiddleware(creditsStore *credits.CreditsStore, next http.
 		}
 
 		// Validate gif length
-		lengthInSeconds, err:= utils.CalculateDurationSeconds(gifRequest.VideoStart, gifRequest.VideoEnd)
-		if err != nil || lengthInSeconds < 1 || lengthInSeconds > 30{
+		lengthInSeconds, err := utils.CalculateDurationSeconds(gifRequest.VideoStart, gifRequest.VideoEnd)
+		if err != nil || lengthInSeconds < 1 || lengthInSeconds > 60 {
 			http.Error(w, "Invalid GIF length", http.StatusBadRequest)
 			return
 		}

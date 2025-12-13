@@ -1436,11 +1436,11 @@ const VideoClipper = (function () {
                     durationDisplayCache.lastDuration = durationStr;
                     durationSpan.textContent = durationStr;
                     
-                    // Show warning if duration exceeds 30 seconds
-                    if (duration > 30 && durationDisplayCache.durationWarning) {
+                    // Show warning if duration exceeds 60 seconds
+                    if (duration > 60 && durationDisplayCache.durationWarning) {
                         const warningText = durationDisplayCache.durationWarning.querySelector('.warning-text');
                         if (warningText) {
-                            warningText.innerHTML = 'GIFs are limited to 30 seconds. For longer clips, please use the regular <a href="/" style="color: #3b82f6; text-decoration: underline;">Video Clipper</a> instead.';
+                            warningText.innerHTML = 'GIFs are limited to 60 seconds. For longer clips, please use the regular <a href="/" style="color: #3b82f6; text-decoration: underline;">Video Clipper</a> instead.';
                         }
                         durationDisplayCache.durationWarning.style.display = 'flex';
                         durationDisplayCache.durationWarning.style.alignItems = 'center';
@@ -1533,8 +1533,8 @@ const VideoClipper = (function () {
 
             // Validate duration limit for GIFs
             const duration = endSeconds - startSeconds;
-            if (duration > 30) {
-                throw new Error('GIFs are limited to 30 seconds. For longer clips, please use the regular <a href="/" style="color: #3b82f6; text-decoration: underline;">Video Clipper</a> instead.');
+            if (duration > 60) {
+                throw new Error('GIFs are limited to 60 seconds. For longer clips, please use the regular <a href="/" style="color: #3b82f6; text-decoration: underline;">Video Clipper</a> instead.');
             }
 
             // Validate numeric parameters
