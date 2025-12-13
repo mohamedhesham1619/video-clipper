@@ -55,6 +55,7 @@ func New(cfg *config.Config, creditsStore *credits.CreditsStore) *Server {
 	mux.HandleFunc("/privacy", handlers.PrivacyPageHandler)
 	mux.HandleFunc("/supported-sites", handlers.SupportedSitesPageHandler)
 	mux.HandleFunc("/faq", handlers.FAQPageHandler)
+	mux.HandleFunc("/support", handlers.SupportPageHandler)
 
 	// Guide pages
 	mux.HandleFunc("/cut-youtube-video-online", handlers.YouTubeGuideHandler)

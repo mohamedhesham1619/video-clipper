@@ -69,12 +69,13 @@
     <!-- Load main stylesheet -->
     <link rel="stylesheet" href="css/styles.css">
     <!-- Load Font Awesome - crossorigin for Clarity session recordings -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        crossorigin="anonymous">
     <!-- Preconnect to CDN -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <!-- Load Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" crossorigin="anonymous">
-    
+
     <!-- Load Swiper JS with defer -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
     <script>
@@ -399,6 +400,9 @@
                     <li><a href="/supported-sites" class="nav-link">Supported Sites</a></li>
                     <li><a href="/faq" class="nav-link">FAQ</a></li>
                     <li><a href="/contact" class="nav-link">Contact</a></li>
+                    <li class="support-link"><a href="/support" class="nav-link"
+                            style="background: linear-gradient(135deg, #f97316, #fb923c); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">☕
+                            Support Us</a></li>
                     <li class="nav-divider">|</li>
                     <li><a href="/terms" class="nav-link">Terms</a></li>
                     <li><a href="/privacy" class="nav-link">Privacy</a></li>
@@ -435,7 +439,8 @@
                             </div>
                             <div class="time-inputs">
                                 <div class="form-group time-group">
-                                    <label for="start-time" class="time-label" data-desktop="Start Time (hh:mm:ss)" data-mobile="Start Time"></label>
+                                    <label for="start-time" class="time-label" data-desktop="Start Time (hh:mm:ss)"
+                                        data-mobile="Start Time"></label>
                                     <div class="input-with-icon left-icon">
                                         <i class="far fa-clock"></i>
                                         <input type="text" id="start-time" name="start-time" value="00:00:00"
@@ -447,7 +452,8 @@
                                     </div>
                                 </div>
                                 <div class="form-group time-group">
-                                    <label for="end-time" class="time-label" data-desktop="End Time (hh:mm:ss)" data-mobile="End Time"></label>
+                                    <label for="end-time" class="time-label" data-desktop="End Time (hh:mm:ss)"
+                                        data-mobile="End Time"></label>
                                     <div class="input-with-icon left-icon">
                                         <i class="far fa-clock"></i>
                                         <input type="text" id="end-time" name="end-time" value="00:01:00"
@@ -455,19 +461,26 @@
                                     </div>
                                     <div class="time-format-hint">Format: hh:mm:ss</div>
                                     <div class="duration-display credits-display">
-                                        <span class="credits-text" data-desktop="Credits Available: " data-mobile="Credits:"></span>
+                                        <span class="credits-text" data-desktop="Credits Available: "
+                                            data-mobile="Credits:"></span>
                                         <span class="credits-value-container">
-                                            <span id="credits-available" style="font-weight: 600; color: #2d3748;">-</span>
-                                            <span id="credits-reset-time" class="reset-time-icon" style="margin-left: 4px; cursor: pointer; display: none; position: relative;" role="button" tabindex="0" aria-label="Reset time">
+                                            <span id="credits-available"
+                                                style="font-weight: 600; color: #2d3748;">-</span>
+                                            <span id="credits-reset-time" class="reset-time-icon"
+                                                style="margin-left: 4px; cursor: pointer; display: none; position: relative;"
+                                                role="button" tabindex="0" aria-label="Reset time">
                                                 <span style="color: #eab308; font-size: 1.1em;">⏳</span>
-                                                <div id="mobile-hint" style="display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #374151; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; white-space: nowrap; margin-bottom: 5px; z-index: 1000;"></div>
+                                                <div id="mobile-hint"
+                                                    style="display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #374151; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; white-space: nowrap; margin-bottom: 5px; z-index: 1000;">
+                                                </div>
                                             </span>
                                         </span>
                                     </div>
                                 </div>
                             </div>
                             <div class="action-buttons" style="position: relative; margin-top: 4px;">
-                                <div id="credit-cost-display" style="position: absolute; top: -10px; left: 0; font-size: 1.1rem; font-weight: 600; display: none; text-align: left; padding: 4px 0; line-height: 1.3;">
+                                <div id="credit-cost-display"
+                                    style="position: absolute; top: -10px; left: 0; font-size: 1.1rem; font-weight: 600; display: none; text-align: left; padding: 4px 0; line-height: 1.3;">
                                     <span id="credit-cost-text"></span>
                                 </div>
                                 <div class="action-group">
@@ -493,35 +506,31 @@
         </section>
 
         <!-- Submagic Ad Banner -->
-        <div class="ad-banner" style="width: 100%; background-color: white; padding: 0.5rem 0; margin-top: -5rem; position: relative; z-index: 1; text-align: center;">
+        <div class="ad-banner"
+            style="width: 100%; background-color: white; padding: 0.5rem 0; margin-top: -5rem; position: relative; z-index: 1; text-align: center;">
             <div class="container" style="max-width: 1200px; margin: 0 auto;">
                 <p style="font-size: 2.5em; font-weight: 800; margin: 0 0 0.5rem; line-height: 1.2; color: #000;">
                     Create viral shorts <span style="color: #ff4f01;">in seconds with AI</span>
                 </p>
-                <p style="color: #6b7280; font-size: 1.25em; margin: 0.5rem 0 1.5rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+                <p
+                    style="color: #6b7280; font-size: 1.25em; margin: 0.5rem 0 1.5rem; max-width: 800px; margin-left: auto; margin-right: auto;">
                     The new way to edit videos. From raw footage to viral shorts in 3 clicks.
                 </p>
-                <a href="https://submagic.co/?via=mh19"
-                   class="primary-button"
-                   rel="noopener sponsored"
-                   target="_blank"
-                   style="display: inline-block; background-color: #ff4f01; color: white; text-decoration: none; font-weight: 700; 
+                <a href="https://submagic.co/?via=mh19" class="primary-button" rel="noopener sponsored" target="_blank"
+                    style="display: inline-block; background-color: #ff4f01; color: white; text-decoration: none; font-weight: 700; 
                           padding: 0.75rem 1.5rem; border-radius: 12px; font-size: 1.25em; margin-bottom: 1rem; transition: transform 0.2s;"
-                   onmouseover="this.style.transform='scale(1.03)'"
-                   onmouseout="this.style.transform='scale(1)'"
-                   onclick="gtag('event', 'ad_click', {
+                    onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'"
+                    onclick="gtag('event', 'ad_click', {
                        ad_name: 'submagic',
                        ad_position: 'bottom',
                        transport: 'beacon'
                    });">
                     Create Free Shorts
                 </a>
-                
+
                 <div style="display: flex; align-items: center; justify-content: center; gap: 0.5em; margin: 0.5rem 0;">
-                    <img src="https://cdn.prod.website-files.com/6469e2294ac68c3d5caea327/64b52db3d97c954b4a00e35e_rating-stars%20(3).png" 
-                         alt="5 star rating" 
-                         style="height: 20px; width: auto;" 
-                         loading="lazy">
+                    <img src="https://cdn.prod.website-files.com/6469e2294ac68c3d5caea327/64b52db3d97c954b4a00e35e_rating-stars%20(3).png"
+                        alt="5 star rating" style="height: 20px; width: auto;" loading="lazy">
                     <span style="color: #6b7280; font-size: 0.9em;">4.9 out of 5</span>
                 </div>
                 <p style="color: #6b7280; font-size: 0.9em; margin: 0.2rem 0 0;">
@@ -536,18 +545,22 @@
                     padding: 1rem 0 !important;
                     position: static !important;
                 }
+
                 .ad-banner p:first-of-type {
                     font-size: 1.8em !important;
                     padding: 0 1rem;
                 }
+
                 .ad-banner p {
                     font-size: 1.1em !important;
                     padding: 0 1rem;
                 }
+
                 .ad-banner .primary-button {
                     font-size: 1.1em !important;
                     padding: 0.6rem 1.2rem !important;
                 }
+
                 /* Ensure content above has enough space */
                 .video-clipper {
                     margin-bottom: 1rem !important;
@@ -970,10 +983,11 @@
         <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;" itemscope
             itemtype="https://schema.org/WPFooter">
             <!-- Main Footer Content -->
-                        <div
+            <div
                 style="display: flex; justify-content: space-between; align-items: center; gap: 30px; flex-wrap: nowrap; width: 100%; overflow: hidden;">
                 <!-- Left Side: Logo, Title, and Description in one line -->
-                <div style="display: flex; align-items: center; gap: 15px; white-space: nowrap; flex-shrink: 1; min-width: 0;">
+                <div
+                    style="display: flex; align-items: center; gap: 15px; white-space: nowrap; flex-shrink: 1; min-width: 0;">
                     <img src="/images/icon-48.png" alt="VideoClipper Logo"
                         style="width: 30px; height: 30px; object-fit: contain; flex-shrink: 0;">
                     <h3 style="margin: 0; font-size: 1.3rem; font-weight: 600; color: #2c3e50; flex-shrink: 0;">
@@ -987,14 +1001,22 @@
                 <!-- Right Side: Quick Links -->
                 <nav style="display: flex; gap: 20px; align-items: center; flex-shrink: 0;">
                     <a href="/"
-                        style="color: #1a56db; text-decoration: none; transition: color 0.2s; font-weight: 600; white-space: nowrap;" class="active">Video&nbsp;Clipper</a>
-                    <a href="/gif" style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">GIF Maker</a>
+                        style="color: #1a56db; text-decoration: none; transition: color 0.2s; font-weight: 600; white-space: nowrap;"
+                        class="active">Video&nbsp;Clipper</a>
+                    <a href="/gif"
+                        style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">GIF
+                        Maker</a>
                     <a href="/supported-sites"
-                        style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">Supported Sites</a>
-                    <a href="/faq" style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">FAQ</a>
+                        style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">Supported
+                        Sites</a>
+                    <a href="/faq"
+                        style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">FAQ</a>
                     <a href="/contact"
                         style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">Contact</a>
-                    <a href="/terms" style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">Terms</a>
+                    <a href="/support" class="support-link"
+                        style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">Support</a>
+                    <a href="/terms"
+                        style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">Terms</a>
                     <a href="/privacy"
                         style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">Privacy</a>
                 </nav>
@@ -1028,27 +1050,27 @@
 
     <!-- Black Friday Countdown Timer -->
     <script>
-        (function() {
+        (function () {
             var deadline = '2025/11/30 09:00:00 UTC';
-            
+
             function updateCountdown() {
                 const countdownElement = document.getElementById('submagic-countdown');
                 if (!countdownElement) return;
-                
+
                 const timeLeft = Date.parse(deadline) - Date.parse(new Date());
-                
+
                 if (timeLeft <= 0) {
                     countdownElement.textContent = 'Offer expired';
                     return;
                 }
-                
+
                 const hours = Math.floor(timeLeft / (1000 * 60 * 60));
                 const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-                
+
                 countdownElement.textContent = `${hours}h ${minutes}m ${seconds}s`;
             }
-            
+
             // Update immediately and then every second
             updateCountdown();
             setInterval(updateCountdown, 1000);

@@ -85,6 +85,18 @@ func FAQPageHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, filepath.Join("internal/web/pages", "faq.html"))
 }
 
+func SupportPageHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/support/" {
+		http.Redirect(w, r, "/support", http.StatusMovedPermanently)
+		return
+	}
+	if r.URL.Path != "/support" {
+		http.NotFound(w, r)
+		return
+	}
+	http.ServeFile(w, r, filepath.Join("internal/web/pages", "support.html"))
+}
+
 func RobotsTxtHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/robots.txt" {
 		http.NotFound(w, r)

@@ -1,29 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us - VideoClipper</title>
     <!-- Favicon and Site Icon for Search Engines -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    
+
     <!-- Modern Favicon -->
     <link rel="icon" type="image/png" sizes="16x16" href="/images/icon-16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/images/icon-32.png">
     <link rel="icon" type="image/png" sizes="48x48" href="/images/icon-48.png">
     <link rel="icon" type="image/png" sizes="96x96" href="/images/icon-96.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/images/icon-512.png">
-    
+
     <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/images/icon-180.png">
-    
+
     <!-- Microsoft Tile -->
     <meta name="msapplication-TileImage" content="/images/icon-144.png">
     <meta name="msapplication-TileColor" content="#ffffff">
     <link rel="stylesheet" href="/css/styles.css">
     <!-- Load Font Awesome with media="print" to make it non-render-blocking -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    </noscript>
     <style>
         .contact-container {
             display: grid;
@@ -31,20 +35,20 @@
             gap: 3rem;
             margin-top: 2rem;
         }
-        
+
         .contact-info {
             background-color: white;
             padding: 2rem;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
         }
-        
+
         .contact-method {
             display: flex;
             align-items: flex-start;
             margin-bottom: 1.5rem;
         }
-        
+
         .contact-icon {
             background-color: var(--light-gray);
             width: 50px;
@@ -57,35 +61,36 @@
             color: var(--primary-color);
             font-size: 1.2rem;
         }
-        
+
         .contact-details h3 {
             margin-bottom: 0.3rem;
             color: var(--text-color);
         }
-        
-        .contact-details p, .contact-details a {
+
+        .contact-details p,
+        .contact-details a {
             color: var(--secondary-color);
             margin: 0;
         }
-        
+
         .contact-form {
             background-color: white;
             padding: 2rem;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
         }
-        
+
         .form-group {
             margin-bottom: 1.5rem;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
             color: var(--text-color);
         }
-        
+
         .form-control {
             width: 100%;
             padding: 0.8rem 1rem;
@@ -94,18 +99,18 @@
             font-size: 1rem;
             transition: var(--transition);
         }
-        
+
         .form-control:focus {
             border-color: var(--primary-color);
             outline: none;
             box-shadow: 0 0 0 2px rgba(74, 107, 255, 0.2);
         }
-        
+
         textarea.form-control {
-            min-height: 150px;
+            min-height: 100px;
             resize: vertical;
         }
-        
+
         .btn-submit {
             background-color: var(--primary-color);
             color: white;
@@ -116,18 +121,18 @@
             font-weight: 600;
             transition: var(--transition);
         }
-        
+
         .btn-submit:hover {
             background-color: #3a56d4;
             transform: translateY(-2px);
         }
-        
+
         .social-links-contact {
             display: flex;
             gap: 1rem;
             margin-top: 1.5rem;
         }
-        
+
         .social-links-contact a {
             display: flex;
             align-items: center;
@@ -139,26 +144,26 @@
             color: var(--text-color);
             transition: var(--transition);
         }
-        
+
         .social-links-contact a:hover {
             background-color: var(--primary-color);
             color: white;
             transform: translateY(-3px);
         }
-        
+
         .map-container {
             margin-top: 2rem;
             border-radius: var(--border-radius);
             overflow: hidden;
             box-shadow: var(--box-shadow);
         }
-        
+
         .map-container iframe {
             width: 100%;
             height: 300px;
             border: none;
         }
-        
+
         @media (max-width: 768px) {
             .contact-container {
                 grid-template-columns: 1fr;
@@ -166,12 +171,16 @@
         }
     </style>
 </head>
+
 <body>
-    <header class="main-header" role="banner" style="padding: 0 !important; min-height: 85px; display: flex; align-items: center;">
+    <header class="main-header" role="banner"
+        style="padding: 0 !important; min-height: 85px; display: flex; align-items: center;">
         <div class="container" style="padding: 0.5rem 5% !important; display: flex; align-items: center; height: 100%;">
             <div class="logo" style="display: flex; align-items: center;">
-                <a href="/" class="logo-link" aria-label="VideoClipper Home" style="display: flex; align-items: center;">
-                    <img src="/images/icon-96.png" alt="VideoClipper Logo" class="logo-img" style="width: 60px; height: 60px; object-fit: contain;">
+                <a href="/" class="logo-link" aria-label="VideoClipper Home"
+                    style="display: flex; align-items: center;">
+                    <img src="/images/icon-96.png" alt="VideoClipper Logo" class="logo-img"
+                        style="width: 60px; height: 60px; object-fit: contain;">
                     <span style="font-size: 1.6rem; margin-left: 1px;">VideoClipper</span>
                 </a>
             </div>
@@ -187,6 +196,9 @@
                     <li><a href="/supported-sites" class="nav-link">Supported Sites</a></li>
                     <li><a href="/faq" class="nav-link">FAQ</a></li>
                     <li><a href="/contact" class="nav-link active">Contact</a></li>
+                    <li class="support-link"><a href="/support" class="nav-link"
+                            style="background: linear-gradient(135deg, #f97316, #fb923c); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">☕
+                            Support Us</a></li>
                     <li class="nav-divider">|</li>
                     <li><a href="/terms" class="nav-link">Terms</a></li>
                     <li><a href="/privacy" class="nav-link">Privacy</a></li>
@@ -198,72 +210,103 @@
     <main style="padding: 6rem 0 4rem;">
         <div class="container">
             <div class="contact-form-container">
-                <h1>Contact Us</h1>
-                <p class="subtitle">Have a question, suggestion, or need help?<br>Feel free to reach out to us using the form below.</p>
-                
+                <h1 style="color: var(--primary-color); margin-bottom: 1rem; text-align: center;">Contact Us</h1>
+                <p class="subtitle">
+                    Have a question about VideoClipper's video trimmer or GIF maker? 
+                    Need help with a download, or want to suggest a new feature?
+                     We'd love to hear from you.
+                </p>
+
                 <form id="contactForm" class="minimal-contact-form">
                     <div class="form-group">
                         <label for="email">Email (optional)</label>
                         <input type="email" id="email" name="email" class="form-control" placeholder="your@email.com">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="message">Your Message <span class="required">*</span></label>
-                        <textarea id="message" name="message" class="form-control" rows="5" placeholder="How can we help you?" required></textarea>
+                        <textarea id="message" name="message" class="form-control" rows="3"
+                            placeholder="How can we help you?" required></textarea>
                     </div>
-                    
+
                     <button type="submit" class="btn-send-message">
                         Send Message
                     </button>
                 </form>
+
+                <!-- Response time info -->
+                <div style="margin-top: 1.5rem; text-align: center;">
+                    <p style="color: var(--secondary-color); font-size: 0.9rem; line-height: 1.6;">
+                        <i class="fas fa-clock" style="margin-right: 6px; color: var(--primary-color);"></i>
+                        We typically respond to messages within 24-48 hours. For urgent issues, please include as much
+                        detail as possible
+                        about the problem you're experiencing, including the video URL and any error messages you've
+                        encountered.
+                    </p>
+                </div>
             </div>
+
+            <!-- FAQ teaser for SEO -->
+            <section class="contact-faq-teaser"
+                style="max-width: 800px; margin: 2rem auto; padding: 2rem; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                <h2 style="color: var(--text-color); margin-bottom: 1rem;">Looking for Quick Answers?</h2>
+                <p style="color: var(--secondary-color); line-height: 1.7; margin-bottom: 1.5rem;">
+                    Before reaching out, you might find the answer you're looking for in our Frequently Asked Questions.
+                    We've compiled answers to common questions about video clipping, GIF creation, supported platforms,
+                    and troubleshooting tips.
+                </p>
+                <a href="/faq"
+                    style="display: inline-block; background: var(--primary-color); color: white; padding: 0.75rem 1.5rem; border-radius: 6px; text-decoration: none; font-weight: 500; transition: background 0.2s;">
+                    Visit Our FAQ Page
+                </a>
+            </section>
         </div>
     </main>
-    
+
     <style>
         .contact-form-container {
             max-width: 600px;
-            margin: 2rem auto;
-            padding: 2rem;
+            margin: 1rem auto;
+            padding: 1.5rem;
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        
+
         .contact-form-container h1 {
             color: var(--primary-color);
             margin-bottom: 1rem;
             text-align: center;
         }
-        
+
         .subtitle {
             text-align: center;
             color: var(--text-color);
             margin-bottom: 2rem;
             line-height: 1.6;
         }
-        
+
         .minimal-contact-form {
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
         }
-        
+
         .form-group {
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
         }
-        
+
         .form-group label {
             font-weight: 500;
             color: var(--text-color);
         }
-        
+
         .required {
             color: #e53e3e;
         }
-        
+
         .form-control {
             padding: 0.75rem 1rem;
             border: 1px solid #e2e8f0;
@@ -271,18 +314,18 @@
             font-size: 1rem;
             transition: border-color 0.2s;
         }
-        
+
         .form-control:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 1px var(--primary-color);
         }
-        
+
         textarea.form-control {
-            min-height: 150px;
+            min-height: 100px;
             resize: vertical;
         }
-        
+
         .btn-send-message {
             background-color: var(--primary-color);
             color: white;
@@ -295,7 +338,7 @@
             transition: background-color 0.2s;
             margin-top: 0.5rem;
         }
-        
+
         .btn-send-message:hover {
             background-color: #3a56d4;
         }
@@ -303,35 +346,52 @@
 
     <!-- Footer -->
     <!-- Footer -->
-    <footer class="main-footer" role="contentinfo" style="background-color: #f5f5f5; padding: 30px 0; margin-top: 50px; border-top: 1px solid #e9ecef;">
-        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;" itemscope itemtype="https://schema.org/WPFooter">
+    <footer class="main-footer" role="contentinfo"
+        style="background-color: #f5f5f5; padding: 30px 0; margin-top: 50px; border-top: 1px solid #e9ecef;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;" itemscope
+            itemtype="https://schema.org/WPFooter">
             <!-- Main Footer Content -->
-            <div style="display: flex; justify-content: space-between; align-items: center; gap: 30px; flex-wrap: nowrap; width: 100%;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; gap: 30px; flex-wrap: nowrap; width: 100%;">
                 <!-- Left Side: Logo, Title, and Description in one line -->
-                <div style="display: flex; align-items: center; gap: 15px; white-space: nowrap; flex-shrink: 1; min-width: 0;">
-                    <img src="/images/icon-48.png" alt="VideoClipper Logo" style="width: 30px; height: 30px; object-fit: contain; flex-shrink: 0;">
+                <div
+                    style="display: flex; align-items: center; gap: 15px; white-space: nowrap; flex-shrink: 1; min-width: 0;">
+                    <img src="/images/icon-48.png" alt="VideoClipper Logo"
+                        style="width: 30px; height: 30px; object-fit: contain; flex-shrink: 0;">
                     <h3 style="margin: 0; font-size: 1.3rem; font-weight: 600; color: #2c3e50; flex-shrink: 0;">
                         VideoClipper
                     </h3>
-                    <span style="color: #6c757d; font-size: 0.95rem; margin-left: 5px; text-overflow: ellipsis; overflow: hidden;">
+                    <span
+                        style="color: #6c757d; font-size: 0.95rem; margin-left: 5px; text-overflow: ellipsis; overflow: hidden;">
                         Free Online GIF Maker & Video Trimmer
                     </span>
                 </div>
 
                 <!-- Right Side: Quick Links -->
                 <nav style="display: flex; gap: 20px; align-items: center; flex-shrink: 0;">
-                    <a href="/" style="color: #495057; text-decoration: none; transition: color 0.2s; white-space: nowrap;">Video Clipper</a>
-                    <a href="/gif" style="color: #495057; text-decoration: none; transition: color 0.2s; white-space: nowrap;">GIF&nbsp;Maker</a>
-                    <a href="/supported-sites" style="color: #495057; text-decoration: none; transition: color 0.2s; white-space: nowrap;">Supported&nbsp;Sites</a>
-                    <a href="/faq" style="color: #495057; text-decoration: none; transition: color 0.2s; white-space: nowrap;">FAQ</a>
-                    <a href="/contact" style="color: #3b82f6; text-decoration: none; transition: color 0.2s; font-weight: bold; white-space: nowrap;">Contact</a>
-                    <a href="/terms" style="color: #495057; text-decoration: none; transition: color 0.2s; white-space: nowrap;">Terms</a>
-                    <a href="/privacy" style="color: #495057; text-decoration: none; transition: color 0.2s; white-space: nowrap;">Privacy</a>
+                    <a href="/"
+                        style="color: #495057; text-decoration: none; transition: color 0.2s; white-space: nowrap;">Video
+                        Clipper</a>
+                    <a href="/gif"
+                        style="color: #495057; text-decoration: none; transition: color 0.2s; white-space: nowrap;">GIF&nbsp;Maker</a>
+                    <a href="/supported-sites"
+                        style="color: #495057; text-decoration: none; transition: color 0.2s; white-space: nowrap;">Supported&nbsp;Sites</a>
+                    <a href="/faq"
+                        style="color: #495057; text-decoration: none; transition: color 0.2s; white-space: nowrap;">FAQ</a>
+                    <a href="/contact"
+                        style="color: #3b82f6; text-decoration: none; transition: color 0.2s; font-weight: bold; white-space: nowrap;">Contact</a>
+                    <a href="/support" class="support-link"
+                        style="color: #495057; text-decoration: none; transition: color 0.2s; white-space: nowrap;">Support</a>
+                    <a href="/terms"
+                        style="color: #495057; text-decoration: none; transition: color 0.2s; white-space: nowrap;">Terms</a>
+                    <a href="/privacy"
+                        style="color: #495057; text-decoration: none; transition: color 0.2s; white-space: nowrap;">Privacy</a>
                 </nav>
             </div>
 
             <!-- Footer Bottom -->
-            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e9ecef; color: #6c757d; font-size: 0.9rem;">
+            <div
+                style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e9ecef; color: #6c757d; font-size: 0.9rem;">
                 <p style="margin-bottom: 5px;">&copy; 2025 VideoClipper.online</p>
                 <p style="margin: 5px 0;">
                     Developed and maintained by Mohamed Hesham.
@@ -344,4 +404,5 @@
     <script src="/js/contact.js"></script>
     <script src="/js/floating-button.js"></script>
 </body>
+
 </html>

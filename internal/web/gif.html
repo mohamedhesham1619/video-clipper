@@ -74,7 +74,8 @@
     <!-- Load main stylesheet -->
     <link rel="stylesheet" href="css/styles.css">
     <!-- Load Font Awesome - crossorigin for Clarity session recordings -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        crossorigin="anonymous">
     <!-- Preconnect to CDN -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <!-- Load Swiper CSS -->
@@ -92,7 +93,7 @@
                 width: 100%;
                 overflow-x: hidden;
             }
-            
+
             .container {
                 width: 100% !important;
                 max-width: 100% !important;
@@ -100,13 +101,13 @@
                 margin: 0 auto !important;
                 box-sizing: border-box;
             }
-            
+
             .main-content {
                 width: 100% !important;
                 padding: 0 !important;
                 margin: 0 auto !important;
             }
-            
+
             .clip-card {
                 width: 100% !important;
                 margin: 0 auto !important;
@@ -114,7 +115,7 @@
                 box-sizing: border-box;
             }
         }
-        
+
         /* Responsive fixes */
         @media screen and (max-width: 767px) {
             .main-header .container {
@@ -626,6 +627,9 @@
                     <li><a href="/supported-sites" class="nav-link">Supported Sites</a></li>
                     <li><a href="/faq" class="nav-link">FAQ</a></li>
                     <li><a href="/contact" class="nav-link">Contact</a></li>
+                    <li class="support-link"><a href="/support" class="nav-link"
+                            style="background: linear-gradient(135deg, #f97316, #fb923c); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">☕
+                            Support Us</a></li>
                     <li class="nav-divider">|</li>
                     <li><a href="/terms" class="nav-link">Terms</a></li>
                     <li><a href="/privacy" class="nav-link">Privacy</a></li>
@@ -646,7 +650,8 @@
                             <i class="fas fa-video"></i>
                         </div>
                         <h1 style="white-space: nowrap; text-align: center;">Free Online Video to GIF Converter</h1>
-                        <p class="subtitle" style="text-align: center;">Make GIFs from online videos — fully adjustable to fit your needs.</p>
+                        <p class="subtitle" style="text-align: center;">Make GIFs from online videos — fully adjustable
+                            to fit your needs.</p>
                         <form id="clip-form" class="clip-form">
                             <div class="form-group">
                                 <label for="video-url">Video URL</label>
@@ -700,7 +705,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="duration-warning" class="duration-warning" style="display: none; background-color: #fef2f2; border-left: 3px solid #ef4444; color: #b91c1c; padding: 8px 16px; margin: 1px 0 12px 0; border-radius: 6px; font-size: 0.9em; line-height: 1.4; width: 100%; box-sizing: border-box;">
+                            <div id="duration-warning" class="duration-warning"
+                                style="display: none; background-color: #fef2f2; border-left: 3px solid #ef4444; color: #b91c1c; padding: 8px 16px; margin: 1px 0 12px 0; border-radius: 6px; font-size: 0.9em; line-height: 1.4; width: 100%; box-sizing: border-box;">
                                 <i class="fas fa-exclamation-triangle" style="margin-right: 8px; min-width: 16px;"></i>
                                 <span class="warning-text" style="flex: 1;"></span>
                             </div>
@@ -713,7 +719,8 @@
                                             <i class="far fa-circle-question"></i>
                                             <span class="tooltiptext">
                                                 How wide your GIF will be<br><span
-                                                    style="color: #d1d5db; font-size: 0.9em;">Wider GIFs are clearer but larger</span>
+                                                    style="color: #d1d5db; font-size: 0.9em;">Wider GIFs are clearer but
+                                                    larger</span>
                                             </span>
                                         </div>
                                     </div>
@@ -749,7 +756,9 @@
                                         <div class="tooltip">
                                             <i class="far fa-circle-question"></i>
                                             <span class="tooltiptext">
-                                                How many <strong>additional times</strong> the GIF repeats after the first play.<br><span style="color: #d1d5db; font-size: 0.9em;">Infinite makes it play forever.</span>
+                                                How many <strong>additional times</strong> the GIF repeats after the
+                                                first play.<br><span style="color: #d1d5db; font-size: 0.9em;">Infinite
+                                                    makes it play forever.</span>
                                             </span>
                                         </div>
                                     </div>
@@ -767,7 +776,10 @@
                                         <div class="tooltip">
                                             <i class="far fa-circle-question"></i>
                                             <span class="tooltiptext">
-                                                How fast the GIF plays<br><span style="color: #d1d5db; font-size: 0.9em;">below 1× makes the GIF slower and longer than the original video <br> above 1× makes it faster and shorter than the original video.</span>
+                                                How fast the GIF plays<br><span
+                                                    style="color: #d1d5db; font-size: 0.9em;">below 1× makes the GIF
+                                                    slower and longer than the original video <br> above 1× makes it
+                                                    faster and shorter than the original video.</span>
                                             </span>
                                         </div>
                                     </div>
@@ -782,7 +794,8 @@
                             </div>
 
                             <div class="form-group">
-                                <div id="credit-cost-display" style="position: relative; margin-bottom: 10px; font-size: 1.1rem; font-weight: 600; display: none; text-align: left; padding: 4px 0; line-height: 1.3;">
+                                <div id="credit-cost-display"
+                                    style="position: relative; margin-bottom: 10px; font-size: 1.1rem; font-weight: 600; display: none; text-align: left; padding: 4px 0; line-height: 1.3;">
                                     <span id="credit-cost-text"></span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: nowrap;">
@@ -1002,20 +1015,24 @@
                 <div class="feature">
                     <i class="fas fa-bolt"></i>
                     <h3>Make GIFs from 1,000+ Sites — Right in Your Browser</h3>
-                    <p>VideoClipper GIF Maker lets you paste a video link from YouTube, TikTok, Instagram, Facebook, Reddit,
-                        Twitter (X), Vimeo, Twitch, and more — then convert any part of it into a GIF. Just select the start and
+                    <p>VideoClipper GIF Maker lets you paste a video link from YouTube, TikTok, Instagram, Facebook,
+                        Reddit,
+                        Twitter (X), Vimeo, Twitch, and more — then convert any part of it into a GIF. Just select the
+                        start and
                         end time, set your preferred width or speed, and generate your animated GIF instantly.</p>
                 </div>
                 <div class="feature">
                     <i class="far fa-lightbulb"></i>
                     <h3>Fast & Simple Online GIF converter</h3>
-                    <p>Convert highlights, funny moments, or short clips into GIFs directly from your browser. No registration,
+                    <p>Convert highlights, funny moments, or short clips into GIFs directly from your browser. No
+                        registration,
                         no software needed — just paste a link, adjust settings, and download your GIF in seconds.</p>
                 </div>
                 <div class="feature">
                     <i class="fas fa-images"></i>
                     <h3>Customizable Output — Smooth and High Quality</h3>
-                    <p>Control your GIF’s width, FPS, loop count, and speed to get the perfect result. Enjoy smooth animation
+                    <p>Control your GIF’s width, FPS, loop count, and speed to get the perfect result. Enjoy smooth
+                        animation
                         and sharp image quality optimized for sharing anywhere.</p>
                 </div>
             </div>
@@ -1101,7 +1118,8 @@
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>VideoClipper GIF Maker is a free online tool that lets you convert any part of an online video into an animated GIF — no installation or login required.</p>
+                        <p>VideoClipper GIF Maker is a free online tool that lets you convert any part of an online
+                            video into an animated GIF — no installation or login required.</p>
                     </div>
                 </div>
 
@@ -1111,7 +1129,9 @@
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>Simply paste a video link from YouTube, TikTok, Facebook, Instagram, or other supported platforms. Then select the start and end time, adjust width, FPS, or speed if you like, and click “Generate GIF.”</p>
+                        <p>Simply paste a video link from YouTube, TikTok, Facebook, Instagram, or other supported
+                            platforms. Then select the start and end time, adjust width, FPS, or speed if you like, and
+                            click “Generate GIF.”</p>
                     </div>
                 </div>
 
@@ -1135,7 +1155,8 @@
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>Yes. You can customize the GIF width, frame rate (FPS), playback speed, and loop count before creating your GIF.</p>
+                        <p>Yes. You can customize the GIF width, frame rate (FPS), playback speed, and loop count before
+                            creating your GIF.</p>
                     </div>
                 </div>
 
@@ -1145,7 +1166,8 @@
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer">
-                        <p>Yes. VideoClipper runs directly in your browser and never asks for your login information or personal data. All processing is secure and temporary.</p>
+                        <p>Yes. VideoClipper runs directly in your browser and never asks for your login information or
+                            personal data. All processing is secure and temporary.</p>
                     </div>
                 </div>
 
@@ -1207,8 +1229,8 @@
               ]
             }
             </script>
-            
-            <script type="application/ld+json">
+
+        <script type="application/ld+json">
             {
               "@context": "https://schema.org",
               "@type": "HowTo",
@@ -1244,7 +1266,7 @@
               ]
             }
             </script>
-            
+
     </main>
 
     <script>
@@ -1342,6 +1364,8 @@
                         style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">FAQ</a>
                     <a href="/contact"
                         style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">Contact</a>
+                    <a href="/support" class="support-link"
+                        style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">Support</a>
                     <a href="/terms"
                         style="color: #374151; text-decoration: none; transition: color 0.2s; font-weight: 500;">Terms</a>
                     <a href="/privacy"
