@@ -54,7 +54,7 @@ func startVideoDownload(downloadProcess *models.DownloadProcess, gifRequest *mod
 			cookie := cookie.YouTube()
 			slog.Info("Using YouTube cookie", "cookie", filepath.Base(cookie), "process ID", downloadProcess.ID)
 			args = append(args, "--cookies", cookie)
-			args = append(args, "--extractor-args", fmt.Sprintf("youtube:player-client=mweb;youtubepot-bgutilhttp:base_url=%s", cfg.YouTube.PoTokenProvider))
+			args = append(args, "--extractor-args", fmt.Sprintf("youtubepot-bgutilhttp:base_url=%s", cfg.YouTube.PoTokenProvider))
 		} else {
 			// If we should only use the Po token provider
 			args = append(args, "--extractor-args", fmt.Sprintf("youtubepot-bgutilhttp:base_url=%s", cfg.YouTube.PoTokenProvider))
