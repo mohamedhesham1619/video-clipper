@@ -641,8 +641,8 @@ const recommended_tools = [
     {
         "name": "CapCut",
         "header": "Create Stunning Videos—Fast, Fun & Free",
-        "link": "https://capcutaffiliateprogram.pxf.io/c/6416428/3069221/22474?u=https%3A%2F%2Fwww.capcut.com%2F",
-        "image": "https://app.impact.com/display-ad/22474-3069221?v=0"
+        "link": "https://capcutaffiliateprogram.pxf.io/c/6416428/3734641/22474",
+        "image": "https://app.impact.com/display-ad/22474-3734641?v=0"
     },
     {
         "name": "Renderforest",
