@@ -380,12 +380,23 @@
     <header class="main-header" role="banner"
         style="padding: 0 !important; min-height: 85px; display: flex; align-items: center;">
         <div class="container" style="padding: 0.5rem 5% !important; display: flex; align-items: center; height: 100%;">
-            <div class="logo" style="display: flex; align-items: center;">
+            <div class="logo" style="display: flex; align-items: center; gap: 12px;">
                 <a href="/" class="logo-link" aria-label="VideoClipper Home"
                     style="display: flex; align-items: center;">
                     <img src="/images/icon-96.png" alt="VideoClipper Logo" class="logo-img"
                         style="width: 60px; height: 60px; object-fit: contain;">
                     <span style="font-size: 1.6rem; margin-left: 1px;">VideoClipper</span>
+                </a>
+                <a href="https://github.com/mohamedhesham1619/video-downloader" target="_blank"
+                    rel="noopener noreferrer" class="cli-badge desktop-only"
+                    style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 8px 14px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3); white-space: nowrap;"
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.4)'"
+                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(59, 130, 246, 0.3)'"
+                    onclick="gtag('event', 'desktop_tool_click');"
+                    title="Download our free offline CLI tool for bulk, unlimited downloads">
+                    <span class="pulse-dot"
+                        style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse-glow 2s ease-in-out infinite;"></span>
+                    <span>New: Desktop Tool</span>
                 </a>
             </div>
             <nav class="main-nav">
