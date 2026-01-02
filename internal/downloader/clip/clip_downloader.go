@@ -51,7 +51,10 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 
 	if utils.IsYouTubeURL(videoRequest.VideoURL) {
 		// Youtube often seperate the audio and video streams, so we need to prefer seperate streams to get the required video quality.
-		formatString = fmt.Sprintf("bestvideo[height<=%[1]v]+bestaudio/best[height<=%[1]v]/best", videoRequest.Quality)
+
+		// Prefer HLS streams first (much faster, not throttled), then fall back to regular streams
+		formatString = fmt.Sprintf("bestvideo[height<=%[1]v][protocol^=m3u8]+bestaudio[protocol^=m3u8]/best[height<=%[1]v][protocol^=m3u8]/bestvideo[height<=%[1]v]+bestaudio/best[height<=%[1]v]/best", videoRequest.Quality)
+
 	} else {
 		// For other sites, we can prefer the merged stream.
 		formatString = fmt.Sprintf("best[height<=%[1]v]/bv*[height<=%[1]v]+ba/best/bv+ba/worst", videoRequest.Quality)
