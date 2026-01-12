@@ -380,19 +380,13 @@ const contentSuggestions = {
         },
         {
             html: `<a rel="noopener sponsored"
-           href="https://www.mvvitrk.com/click?pid=5677&offer_id=1&l=1765367902" target="_blank"
+           href="https://1.envato.market/c/6416428/847697/4662" target="_blank" id="847697"
            onclick="gtag('event', 'ad_click', {
-                ad_name: 'Movavi',
+                ad_name: 'Envato',
                 ad_position: 'side',
                 transport: 'beacon'
             });">
-            <img src="https://res.cloudinary.com/ddozq3vu5/image/upload/c_fill,w_160,h_600,g_auto/f_auto,q_auto/v1765453811/160%D1%85600_c1gh2g.png" 
-                 border="0" 
-                 alt="movavi" 
-                 width="160" 
-                 height="600" 
-                 style="width: 160px; height: 600px; object-fit: cover;" />
-            </a>`
+            <img src="//a.impactradius-go.com/display-ad/4662-847697" border="0" alt="Envato" width="160" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/847697/4662" style="position:absolute;visibility:hidden;" border="0" />`
         },
         {
             html: `<a rel="noopener sponsored"
