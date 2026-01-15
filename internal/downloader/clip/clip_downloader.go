@@ -17,10 +17,10 @@ import (
 )
 
 // StartClipDownload starts the video download processes and returns the running commands.
-func StartClipDownload(cfg *config.Config, videoRequest models.ClipRequest, downloadProcess *models.DownloadProcess, useYoutubeCookie bool) (ytdlpCmd *exec.Cmd, err error) {
+func StartClipDownload(cfg *config.Config, videoRequest models.ClipRequest, downloadProcess *models.DownloadProcess, useYoutubeCookie bool, preferHLS bool) (ytdlpCmd *exec.Cmd, err error) {
 
 	// Create the yt-dlp commands.
-	ytdlpCmd = prepareYtDlpCommand(cfg, videoRequest, downloadProcess.ID, useYoutubeCookie)
+	ytdlpCmd = prepareYtDlpCommand(cfg, videoRequest, downloadProcess.ID, useYoutubeCookie, preferHLS)
 
 	// Create a pipe for yt-dlp's stderr.
 	// This pipe will be used to read progress updates and log errors.
@@ -45,15 +45,20 @@ func StartClipDownload(cfg *config.Config, videoRequest models.ClipRequest, down
 	return ytdlpCmd, nil
 }
 
-func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, processID string, useYoutubeCookie bool) *exec.Cmd {
+func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, processID string, useYoutubeCookie bool, preferHLS bool) *exec.Cmd {
 
 	var formatString string
 
 	if utils.IsYouTubeURL(videoRequest.VideoURL) {
 		// Youtube often seperate the audio and video streams, so we need to prefer seperate streams to get the required video quality.
 
-		// Prefer HLS streams first (much faster, not throttled), then fall back to regular streams
-		formatString = fmt.Sprintf("bestvideo[height<=%[1]v][protocol^=m3u8]+bestaudio[protocol^=m3u8]/best[height<=%[1]v][protocol^=m3u8]/bestvideo[height<=%[1]v]+bestaudio/best[height<=%[1]v]/best", videoRequest.Quality)
+		if preferHLS {
+			// Prefer HLS streams first (much faster, not throttled), then fall back to regular streams
+			formatString = fmt.Sprintf("bestvideo[height<=%[1]v][protocol^=m3u8]+bestaudio[protocol^=m3u8]/best[height<=%[1]v][protocol^=m3u8]/bestvideo[height<=%[1]v]+bestaudio/best[height<=%[1]v]/best", videoRequest.Quality)
+		} else {
+			// Use regular streams without HLS preference
+			formatString = fmt.Sprintf("bestvideo[height<=%[1]v]+bestaudio/best[height<=%[1]v]/best", videoRequest.Quality)
+		}
 
 	} else {
 		// For other sites, we can prefer the merged stream.

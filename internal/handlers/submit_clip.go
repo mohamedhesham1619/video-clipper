@@ -86,7 +86,8 @@ func SubmitClipHandler(cfg *config.Config) http.HandlerFunc {
 		go func() {
 
 			// StartClipDownload function start the download process and doesn't wait for it to finish instead it returns the running command
-			ytdlpCmd, err := clip.StartClipDownload(cfg, videoRequest, &downloadProcess, false)
+			// First attempt: without cookie, with HLS preference
+			ytdlpCmd, err := clip.StartClipDownload(cfg, videoRequest, &downloadProcess, false, true)
 
 			// If there was an error during the download, send an error message on the channel and clean up.
 			if err != nil {
@@ -104,8 +105,9 @@ func SubmitClipHandler(cfg *config.Config) http.HandlerFunc {
 			if ytdlpErr != nil {
 				// if it was a YouTube request, try again with cookie
 				if isYouTubeRequest {
-					slog.Info("Failed to download youtube video without cookie, retrying with cookie", "processId", processID)
-					ytdlpCmd, err = clip.StartClipDownload(cfg, videoRequest, &downloadProcess, true)
+					// Second attempt: with cookie and HLS preference
+					slog.Info("Failed to download youtube video without cookie, retrying with cookie and HLS", "processId", processID)
+					ytdlpCmd, err = clip.StartClipDownload(cfg, videoRequest, &downloadProcess, true, true)
 					if err != nil {
 						handleError(err, "Failed to download video", progressChan, processID, cfg.SMTP)
 						return
@@ -113,10 +115,23 @@ func SubmitClipHandler(cfg *config.Config) http.HandlerFunc {
 					downloadProcess.YtDlpProcess = ytdlpCmd
 					ytdlpErr = ytdlpCmd.Wait()
 
-					// if it failed too, send error
+					// if it failed too, try third time without HLS preference
 					if ytdlpErr != nil {
-						handleError(ytdlpErr, "Video download failed", progressChan, processID, cfg.SMTP)
-						return
+						// Third attempt: with cookie but without HLS preference
+						slog.Info("Failed to download youtube video with HLS, retrying without HLS preference", "processId", processID)
+						ytdlpCmd, err = clip.StartClipDownload(cfg, videoRequest, &downloadProcess, true, false)
+						if err != nil {
+							handleError(err, "Failed to download video", progressChan, processID, cfg.SMTP)
+							return
+						}
+						downloadProcess.YtDlpProcess = ytdlpCmd
+						ytdlpErr = ytdlpCmd.Wait()
+
+						// if all three attempts failed, send error
+						if ytdlpErr != nil {
+							handleError(ytdlpErr, "Video download failed", progressChan, processID, cfg.SMTP)
+							return
+						}
 					}
 				} else {
 					// if it was not a YouTube request, send error
