@@ -291,7 +291,7 @@ function formatRateLimitError(response) {
         
         if (!resetHeader) {
             // Fallback if header is missing
-            return "You've made too many requests. Please try again later.";
+            return "You've made too many requests. Please try again later.<br>For unlimited usage, try our <a href='https://github.com/mohamedhesham1619/video-downloader' target='_blank' rel='noopener noreferrer'>desktop version</a>.";
         }
         
         // Parse reset timestamp
@@ -299,7 +299,7 @@ function formatRateLimitError(response) {
         
         if (isNaN(resetTimestamp)) {
             // Fallback if header is invalid
-            return "You've made too many requests. Please try again later.";
+            return "You've made too many requests. Please try again later.<br>For unlimited usage, try our <a href='https://github.com/mohamedhesham1619/video-downloader' target='_blank' rel='noopener noreferrer'>desktop version</a>.";
         }
         
         // Calculate and format retry time
@@ -307,12 +307,12 @@ function formatRateLimitError(response) {
         const formattedTime = formatRetryTime(retryTime);
         
         // Return formatted message
-        return `You've made too many requests. Please try again in ${formattedTime}.`;
+        return `You've made too many requests. Please try again in ${formattedTime}.<br>For unlimited usage, try our <a href='https://github.com/mohamedhesham1619/video-downloader' target='_blank' rel='noopener noreferrer'>desktop version</a>.`;
         
     } catch (error) {
         console.error('Error formatting rate limit message:', error);
         // Fallback for any unexpected errors
-        return "You've made too many requests. Please try again later.";
+        return "You've made too many requests. Please try again later.<br>For unlimited usage, try our <a href='https://github.com/mohamedhesham1619/video-downloader' target='_blank' rel='noopener noreferrer'>desktop version</a>.";
     }
 }
 
@@ -1441,7 +1441,7 @@ if (downloadButton) downloadButton.classList.remove('hidden');
             // Final credit check before submission using the last calculated cost
             const roundedCost = parseFloat(lastCalculatedCost.toFixed(2));
             if (availableCredits < roundedCost) {
-                const errorMessage = `Not enough credits. This clip requires ${roundedCost} credits, but you only have ${availableCredits}.`;
+                const errorMessage = `Not enough credits. You can download this clip using our <a href='https://github.com/mohamedhesham1619/video-downloader' target='_blank' rel='noopener noreferrer'>desktop tool</a>.`;
                 showError(errorMessage);
                 return; // Exit early instead of throwing to prevent duplicate error handling
             }
