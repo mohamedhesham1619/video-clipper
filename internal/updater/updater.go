@@ -39,7 +39,7 @@ func getCurrentYtDlpVersion() (string, error) {
 }
 
 func updateYtDlp() error {
-	cmd := exec.Command("pip", "install", "-U", "yt-dlp[default]", "--break-system-packages")
+	cmd := exec.Command("pip", "install", "--pre", "-U", "yt-dlp[default]", "--break-system-packages")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("failed to update ytdlp: %v", err)
@@ -52,26 +52,30 @@ func updateYtDlp() error {
 func CheckAndUpdateYtDlp() {
 	slog.Info("Checking for ytdlp updates...")
 
-	current, err := getCurrentYtDlpVersion()
-	if err != nil {
-		slog.Error("Failed to get current ytdlp version", "error", err)
-		return
+	if err := updateYtDlp(); err != nil {
+		slog.Error("Failed to update ytdlp", "error", err)
 	}
 
-	latest, err := getLatestYtDlpVersion()
-	if err != nil {
-		slog.Error("Failed to get latest ytdlp version", "error", err)
-		return
-	}
+	// current, err := getCurrentYtDlpVersion()
+	// if err != nil {
+	// 	slog.Error("Failed to get current ytdlp version", "error", err)
+	// 	return
+	// }
 
-	if latest != current {
-		slog.Info("ytdlp update available! Updating...", "current", current, "latest", latest)
-		if err := updateYtDlp(); err != nil {
-			slog.Error("Failed to update ytdlp", "error", err)
-		}
-	} else {
-		slog.Info("ytdlp is up to date")
-	}
+	// latest, err := getLatestYtDlpVersion()
+	// if err != nil {
+	// 	slog.Error("Failed to get latest ytdlp version", "error", err)
+	// 	return
+	// }
+
+	// if latest != current {
+	// 	slog.Info("ytdlp update available! Updating...", "current", current, "latest", latest)
+	// 	if err := updateYtDlp(); err != nil {
+	// 		slog.Error("Failed to update ytdlp", "error", err)
+	// 	}
+	// } else {
+	// 	slog.Info("ytdlp is up to date")
+	// }
 }
 
 // StartYtDlpDailyUpdater starts a goroutine that checks for yt-dlp updates daily

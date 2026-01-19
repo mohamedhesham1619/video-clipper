@@ -18,7 +18,7 @@ FROM alpine:latest
 RUN apk add --no-cache python3 py3-pip ffmpeg deno
 
 # Install the latest yt-dlp from PyPI (pip)
-RUN pip install -U "yt-dlp[default]" --break-system-packages
+RUN pip install --pre -U "yt-dlp[default]" --break-system-packages
 
 # Install POT plugin
 RUN pip install -U --break-system-packages bgutil-ytdlp-pot-provider
