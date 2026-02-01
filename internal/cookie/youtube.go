@@ -6,7 +6,6 @@ var (
 	youtubeCookiePaths = []string{
 		"/app/cookie_1.txt",
 		"/app/cookie_2.txt",
-		"/app/cookie_3.txt",
 	}
 	youtubeCookieIndex int
 	youtubeCookieMu    sync.Mutex
