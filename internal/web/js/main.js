@@ -370,13 +370,13 @@ const contentSuggestions = {
     sides: [
         {
             html: `<a rel="noopener sponsored"
-           href="https://renderforest.pxf.io/c/6416428/1960717/14885" target="_blank" id="1960717"
+           href="https://renderforest.pxf.io/c/6416428/3793681/14885" target="_blank" id="3793681"
            onclick="gtag('event', 'ad_click', {
                 ad_name: 'Renderforest',
                 ad_position: 'side',
                 transport: 'beacon'
             });">
-            <img src="//a.impactradius-go.com/display-ad/14885-1960717" border="0" alt="Renderforest" width="160" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/1960717/14885" style="position:absolute;visibility:hidden;" border="0" />`
+            <img src="//a.impactradius-go.com/display-ad/14885-3793681" border="0" alt="Renderforest" width="1200" height="2400"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/3793681/14885" style="position:absolute;visibility:hidden;" border="0" />`
         },
         {
             html: `<a rel="noopener sponsored"
