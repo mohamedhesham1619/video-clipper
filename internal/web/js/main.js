@@ -368,16 +368,7 @@ function rotateContent() {
 // Content suggestions data
 const contentSuggestions = {
     sides: [
-        {
-            html: `<a rel="noopener sponsored"
-           href="https://renderforest.pxf.io/c/6416428/3793681/14885" target="_blank" id="3793681"
-           onclick="gtag('event', 'ad_click', {
-                ad_name: 'Renderforest',
-                ad_position: 'side',
-                transport: 'beacon'
-            });">
-            <img src="//a.impactradius-go.com/display-ad/14885-3793681" border="0" alt="Renderforest" width="1200" height="2400"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/3793681/14885" style="position:absolute;visibility:hidden;" border="0" />`
-        },
+        
         {
             html: `<a rel="noopener sponsored"
            href="https://1.envato.market/c/6416428/847697/4662" target="_blank" id="847697"
@@ -389,22 +380,12 @@ const contentSuggestions = {
             <img src="//a.impactradius-go.com/display-ad/4662-847697" border="0" alt="Envato" width="160" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/847697/4662" style="position:absolute;visibility:hidden;" border="0" />`
         },
         {
-            html: `<a rel="noopener sponsored"
-           href="https://capcutaffiliateprogram.pxf.io/c/6416428/3069242/22474?u=https%3A%2F%2Fwww.capcut.com%2F" target="_blank" id="3069242"
-           onclick="gtag('event', 'ad_click', {
-                ad_name: 'CapCut',
-                ad_position: 'side',
-                transport: 'beacon'
-            });">
-            <img src="//a.impactradius-go.com/display-ad/22474-3069242" border="0" alt="CapCut AI" width="160" height="600"/></a><img height="0" width="0" src="https://imp.pxf.io/i/6416428/3069242/22474" style="position:absolute;visibility:hidden;" border="0" />`
-        },
-        {
-            html: `<a href="https://partner.pcloud.com/r/146969" title="pCloud Premium" target="_blank" 
+            html: `<a href="https://veed.sjv.io/qWA6Dj" title="Veed" target="_blank" 
             onclick="gtag('event', 'ad_click', {
-                ad_name: 'pCloud Premium',
+                ad_name: 'Veed',
                 ad_position: 'side',
                 transport: 'beacon'
-            });"><img src="https://partner.pcloud.com/media/banners/lifetime/lifetime008160600.jpg" alt="pCloud Premium"/></a>`
+            });"><img src="https://res.cloudinary.com/ddozq3vu5/image/upload/w_160,h_600,c_pad,b_auto,f_auto,q_auto/v1776375124/Gemini_Generated_Image_x0r6v1x0r6v1x0r6_k89cxp.png" alt="Veed" width="160" height="600" style="object-fit: contain;" /></a>`
         }
     ]
 };
