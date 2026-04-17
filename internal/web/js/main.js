@@ -380,7 +380,7 @@ const contentSuggestions = {
             <img src="//a.impactradius-go.com/display-ad/4662-847697" border="0" alt="Envato" width="160" height="600"/></a><img height="0" width="0" src="https://1.envato.market/i/6416428/847697/4662" style="position:absolute;visibility:hidden;" border="0" />`
         },
         {
-            html: `<a href="https://veed.sjv.io/qWA6Dj" title="Veed" target="_blank" 
+            html: `<a href="https://veed.sjv.io/WO4eNM" title="Veed" target="_blank" 
             onclick="gtag('event', 'ad_click', {
                 ad_name: 'Veed',
                 ad_position: 'side',
