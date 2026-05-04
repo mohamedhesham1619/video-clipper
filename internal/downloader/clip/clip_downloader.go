@@ -75,6 +75,7 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 		"-f", formatString,
 		"--download-sections", fmt.Sprintf("*%s-%s", videoRequest.ClipStart, videoRequest.ClipEnd),
 		"--user-agent", "random",
+		"--source-address", "::",
 		"--no-playlist",
 		"--no-warnings",
 		"--ignore-errors",

@@ -35,6 +35,7 @@ func startVideoDownload(downloadProcess *models.DownloadProcess, gifRequest *mod
 		"-f", formatString,
 		"--download-sections", fmt.Sprintf("*%s-%s", gifRequest.VideoStart, gifRequest.VideoEnd),
 		"--user-agent", "random",
+		"--source-address", "::",
 		"--no-playlist",
 		"--no-warnings",
 		"--ignore-errors",
