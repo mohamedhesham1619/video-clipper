@@ -145,6 +145,7 @@ func parseAndSendProgress(clipDuration int, pipe io.ReadCloser, progressChan cha
 	// We need to read byte by byte because yt-dlp (and ffmpeg) often use \r to update progress inline.
 	reader := bufio.NewReader(pipe)
 	var line []byte
+	var stderrLines []string
 
 	// Regex to match ffmpeg time output: time=00:00:05.84
 	re := regexp.MustCompile(`time=(\d{2}):(\d{2}):(\d{2})`)
@@ -163,7 +164,7 @@ func parseAndSendProgress(clipDuration int, pipe io.ReadCloser, progressChan cha
 		if b == '\r' || b == '\n' {
 			if len(line) > 0 {
 				lineStr := string(line)
-				logYtDlpOutput(lineStr, logContext)
+				appendYtDlpOutputLine(&stderrLines, lineStr)
 
 				match := re.FindStringSubmatch(lineStr)
 				if len(match) == 4 {
@@ -189,16 +190,32 @@ func parseAndSendProgress(clipDuration int, pipe io.ReadCloser, progressChan cha
 			line = append(line, b)
 		}
 	}
+
+	if len(line) > 0 {
+		appendYtDlpOutputLine(&stderrLines, string(line))
+	}
+
+	logYtDlpOutputBlock(stderrLines, logContext)
 }
 
-func logYtDlpOutput(line string, logContext ytdlpLogContext) {
+func appendYtDlpOutputLine(stderrLines *[]string, line string) {
 	trimmedLine := strings.TrimSpace(line)
 	if trimmedLine == "" {
 		return
 	}
 
+	*stderrLines = append(*stderrLines, trimmedLine)
+}
+
+func logYtDlpOutputBlock(lines []string, logContext ytdlpLogContext) {
+	if len(lines) == 0 {
+		return
+	}
+
+	stderr := strings.Join(lines, "\n")
 	args := []any{
-		"line", trimmedLine,
+		"stderr", stderr,
+		"lines", len(lines),
 		"processId", logContext.ProcessID,
 		"attempt", logContext.Attempt,
 		"useYoutubeCookie", logContext.UseYoutubeCookie,
@@ -208,18 +225,18 @@ func logYtDlpOutput(line string, logContext ytdlpLogContext) {
 		"url", logContext.VideoURL,
 	}
 
-	normalized := strings.ToLower(trimmedLine)
+	normalized := strings.ToLower(stderr)
 	switch {
 	case strings.Contains(normalized, "error") ||
 		strings.Contains(normalized, "traceback") ||
 		strings.Contains(normalized, "failed"):
-		slog.Error("yt-dlp stderr", args...)
+		slog.Error("yt-dlp stderr block", args...)
 	case strings.Contains(normalized, "warning") ||
 		strings.Contains(normalized, "unable to") ||
 		strings.Contains(normalized, "retrying"):
-		slog.Warn("yt-dlp stderr", args...)
+		slog.Warn("yt-dlp stderr block", args...)
 	default:
-		slog.Info("yt-dlp stderr", args...)
+		slog.Info("yt-dlp stderr block", args...)
 	}
 }
 
