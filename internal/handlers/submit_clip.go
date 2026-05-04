@@ -87,7 +87,7 @@ func SubmitClipHandler(cfg *config.Config) http.HandlerFunc {
 
 			// StartClipDownload function start the download process and doesn't wait for it to finish instead it returns the running command
 			// First attempt: without cookie, with HLS preference
-			ytdlpCmd, err := clip.StartClipDownload(cfg, videoRequest, &downloadProcess, false, true)
+			ytdlpCmd, err := clip.StartClipDownload(cfg, videoRequest, &downloadProcess, false, true, "no-cookie-hls")
 
 			// If there was an error during the download, send an error message on the channel and clean up.
 			if err != nil {
@@ -106,8 +106,8 @@ func SubmitClipHandler(cfg *config.Config) http.HandlerFunc {
 				// if it was a YouTube request, try again with cookie
 				if isYouTubeRequest {
 					// Second attempt: with cookie and HLS preference
-					slog.Info("Failed to download youtube video without cookie, retrying with cookie and HLS", "processId", processID)
-					ytdlpCmd, err = clip.StartClipDownload(cfg, videoRequest, &downloadProcess, true, true)
+					slog.Info("Failed to download youtube video without cookie, retrying with cookie and HLS", "processId", processID, "error", ytdlpErr)
+					ytdlpCmd, err = clip.StartClipDownload(cfg, videoRequest, &downloadProcess, true, true, "cookie-hls")
 					if err != nil {
 						handleError(err, "Failed to download video", progressChan, processID, cfg.SMTP)
 						return
@@ -118,8 +118,8 @@ func SubmitClipHandler(cfg *config.Config) http.HandlerFunc {
 					// if it failed too, try third time without HLS preference
 					if ytdlpErr != nil {
 						// Third attempt: with cookie but without HLS preference
-						slog.Info("Failed to download youtube video with HLS, retrying without HLS preference", "processId", processID)
-						ytdlpCmd, err = clip.StartClipDownload(cfg, videoRequest, &downloadProcess, true, false)
+						slog.Info("Failed to download youtube video with HLS, retrying without HLS preference", "processId", processID, "error", ytdlpErr)
+						ytdlpCmd, err = clip.StartClipDownload(cfg, videoRequest, &downloadProcess, true, false, "cookie-no-hls")
 						if err != nil {
 							handleError(err, "Failed to download video", progressChan, processID, cfg.SMTP)
 							return

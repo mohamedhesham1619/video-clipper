@@ -16,11 +16,21 @@ import (
 	"strings"
 )
 
+type ytdlpLogContext struct {
+	ProcessID        string
+	Attempt          string
+	UseYoutubeCookie bool
+	PreferHLS        bool
+	CookieFile       string
+	VideoURL         string
+	Quality          int
+}
+
 // StartClipDownload starts the video download processes and returns the running commands.
-func StartClipDownload(cfg *config.Config, videoRequest models.ClipRequest, downloadProcess *models.DownloadProcess, useYoutubeCookie bool, preferHLS bool) (ytdlpCmd *exec.Cmd, err error) {
+func StartClipDownload(cfg *config.Config, videoRequest models.ClipRequest, downloadProcess *models.DownloadProcess, useYoutubeCookie bool, preferHLS bool, attempt string) (ytdlpCmd *exec.Cmd, err error) {
 
 	// Create the yt-dlp commands.
-	ytdlpCmd = prepareYtDlpCommand(cfg, videoRequest, downloadProcess.ID, useYoutubeCookie, preferHLS)
+	ytdlpCmd, logContext := prepareYtDlpCommand(cfg, videoRequest, downloadProcess.ID, useYoutubeCookie, preferHLS, attempt)
 
 	// Create a pipe for yt-dlp's stderr.
 	// This pipe will be used to read progress updates and log errors.
@@ -34,8 +44,19 @@ func StartClipDownload(cfg *config.Config, videoRequest models.ClipRequest, down
 		return nil, err
 	}
 
-	// Parse progress and log stderr in one goroutine
-	go parseAndSendProgress(clipDurationInSeconds, ytdlpStderr, downloadProcess.ProgressChan)
+	// Parse progress and log stderr in one goroutine.
+	go parseAndSendProgress(clipDurationInSeconds, ytdlpStderr, downloadProcess.ProgressChan, logContext)
+
+	slog.Info("Starting yt-dlp",
+		"processId", logContext.ProcessID,
+		"attempt", logContext.Attempt,
+		"useYoutubeCookie", logContext.UseYoutubeCookie,
+		"preferHLS", logContext.PreferHLS,
+		"cookie", logContext.CookieFile,
+		"quality", logContext.Quality,
+		"url", logContext.VideoURL,
+		"args", sanitizeYtDlpArgs(ytdlpCmd.Args[1:]),
+	)
 
 	// Start the command
 	if err := ytdlpCmd.Start(); err != nil {
@@ -45,9 +66,10 @@ func StartClipDownload(cfg *config.Config, videoRequest models.ClipRequest, down
 	return ytdlpCmd, nil
 }
 
-func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, processID string, useYoutubeCookie bool, preferHLS bool) *exec.Cmd {
+func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, processID string, useYoutubeCookie bool, preferHLS bool, attempt string) (*exec.Cmd, ytdlpLogContext) {
 
 	var formatString string
+	var cookieFile string
 
 	if utils.IsYouTubeURL(videoRequest.VideoURL) {
 		// Youtube often seperate the audio and video streams, so we need to prefer seperate streams to get the required video quality.
@@ -77,7 +99,7 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 		"--user-agent", "random",
 		"--source-address", "::",
 		"--no-playlist",
-		"--no-warnings",
+		"--verbose",
 		"--ignore-errors",
 		"--no-abort-on-error",
 		"--audio-quality", "0",
@@ -95,9 +117,10 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 	if utils.IsYouTubeURL(videoRequest.VideoURL) {
 		// If we should use the YouTube cookie
 		if useYoutubeCookie {
-			cookie := cookie.YouTube()
-			slog.Info("Using YouTube cookie", "cookie", filepath.Base(cookie), "process ID", processID)
-			args = append(args, "--cookies", cookie)
+			youtubeCookiePath := cookie.YouTube()
+			cookieFile = filepath.Base(youtubeCookiePath)
+			slog.Info("Using YouTube cookie", "cookie", cookieFile, "processId", processID, "attempt", attempt)
+			args = append(args, "--cookies", youtubeCookiePath)
 			args = append(args, "--extractor-args", fmt.Sprintf("youtubepot-bgutilhttp:base_url=%s", cfg.YouTube.PoTokenProvider))
 		} else {
 			// If we should only use the Po token provider
@@ -106,10 +129,18 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 	}
 
 	args = append(args, videoRequest.VideoURL)
-	return exec.Command("yt-dlp", args...)
+	return exec.Command("yt-dlp", args...), ytdlpLogContext{
+		ProcessID:        processID,
+		Attempt:          attempt,
+		UseYoutubeCookie: useYoutubeCookie,
+		PreferHLS:        preferHLS,
+		CookieFile:       cookieFile,
+		VideoURL:         videoRequest.VideoURL,
+		Quality:          videoRequest.Quality,
+	}
 }
 
-func parseAndSendProgress(clipDuration int, pipe io.ReadCloser, progressChan chan models.ProgressEvent) {
+func parseAndSendProgress(clipDuration int, pipe io.ReadCloser, progressChan chan models.ProgressEvent, logContext ytdlpLogContext) {
 
 	// We need to read byte by byte because yt-dlp (and ffmpeg) often use \r to update progress inline.
 	reader := bufio.NewReader(pipe)
@@ -132,11 +163,7 @@ func parseAndSendProgress(clipDuration int, pipe io.ReadCloser, progressChan cha
 		if b == '\r' || b == '\n' {
 			if len(line) > 0 {
 				lineStr := string(line)
-				if strings.Contains(lineStr, "ERROR") {
-					slog.Error("yt-dlp output", "line", lineStr)
-					line = nil // Reset line buffer
-					continue
-				}
+				logYtDlpOutput(lineStr, logContext)
 
 				match := re.FindStringSubmatch(lineStr)
 				if len(match) == 4 {
@@ -162,4 +189,52 @@ func parseAndSendProgress(clipDuration int, pipe io.ReadCloser, progressChan cha
 			line = append(line, b)
 		}
 	}
+}
+
+func logYtDlpOutput(line string, logContext ytdlpLogContext) {
+	trimmedLine := strings.TrimSpace(line)
+	if trimmedLine == "" {
+		return
+	}
+
+	args := []any{
+		"line", trimmedLine,
+		"processId", logContext.ProcessID,
+		"attempt", logContext.Attempt,
+		"useYoutubeCookie", logContext.UseYoutubeCookie,
+		"preferHLS", logContext.PreferHLS,
+		"cookie", logContext.CookieFile,
+		"quality", logContext.Quality,
+		"url", logContext.VideoURL,
+	}
+
+	normalized := strings.ToLower(trimmedLine)
+	switch {
+	case strings.Contains(normalized, "error") ||
+		strings.Contains(normalized, "traceback") ||
+		strings.Contains(normalized, "failed"):
+		slog.Error("yt-dlp stderr", args...)
+	case strings.Contains(normalized, "warning") ||
+		strings.Contains(normalized, "unable to") ||
+		strings.Contains(normalized, "retrying"):
+		slog.Warn("yt-dlp stderr", args...)
+	default:
+		slog.Info("yt-dlp stderr", args...)
+	}
+}
+
+func sanitizeYtDlpArgs(args []string) []string {
+	sanitized := append([]string(nil), args...)
+
+	for i := 0; i < len(sanitized); i++ {
+		switch sanitized[i] {
+		case "--cookies":
+			if i+1 < len(sanitized) {
+				sanitized[i+1] = filepath.Base(sanitized[i+1])
+				i++
+			}
+		}
+	}
+
+	return sanitized
 }
