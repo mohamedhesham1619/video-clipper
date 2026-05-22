@@ -75,7 +75,6 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 		"-f", formatString,
 		"--download-sections", fmt.Sprintf("*%s-%s", videoRequest.ClipStart, videoRequest.ClipEnd),
 		"--user-agent", "random",
-		"--source-address", "::",
 		"--no-playlist",
 		"--no-warnings",
 		"--ignore-errors",
@@ -93,6 +92,8 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 
 	// If it's a YouTube request
 	if utils.IsYouTubeURL(videoRequest.VideoURL) {
+		// Use IPv6 (::) for YouTube downloads
+		args = append(args, "--source-address", "::")
 		// If we should use the YouTube cookie
 		if useYoutubeCookie {
 			cookie := cookie.YouTube()

@@ -35,7 +35,6 @@ func startVideoDownload(downloadProcess *models.DownloadProcess, gifRequest *mod
 		"-f", formatString,
 		"--download-sections", fmt.Sprintf("*%s-%s", gifRequest.VideoStart, gifRequest.VideoEnd),
 		"--user-agent", "random",
-		"--source-address", "::",
 		"--no-playlist",
 		"--no-warnings",
 		"--ignore-errors",
@@ -50,6 +49,8 @@ func startVideoDownload(downloadProcess *models.DownloadProcess, gifRequest *mod
 
 	// If it's a YouTube request
 	if utils.IsYouTubeURL(gifRequest.VideoURL) {
+		// Use IPv6 (::) for YouTube downloads
+		args = append(args, "--source-address", "::")
 		// If we should use the YouTube cookie
 		if useYoutubeCookie {
 			cookie := cookie.YouTube()
