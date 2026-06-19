@@ -992,6 +992,52 @@ header.main-header {
     padding: 0 !important;
 }
 
+/* Site-wide discontinuation notice */
+.site-notice {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    box-sizing: border-box;
+    background: #fef3c7;
+    color: #92400e;
+    text-align: center;
+    padding: 0.65rem 1.25rem;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    border-bottom: 1px solid #fcd34d;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.site-notice p {
+    margin: 0 auto;
+    max-width: 720px;
+}
+
+.notice-line2::before {
+    content: ' ';
+}
+
+@media (max-width: 768px) {
+    .site-notice {
+        background-color: #fef3c7 !important;
+        background: #fef3c7 !important;
+        padding: 0.6rem 1rem;
+    }
+
+    .site-notice p {
+        text-align: center;
+    }
+
+    .notice-line2 {
+        display: block;
+        margin-top: 0.1rem;
+    }
+
+    .notice-line2::before {
+        content: none;
+    }
+}
+
 .logo a {
     display: flex;
     align-items: center;
