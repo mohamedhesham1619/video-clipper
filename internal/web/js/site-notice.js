@@ -1,5 +1,4 @@
 (function () {
-    var NOTICE_TEXT = 'VideoClipper online will be discontinued soon. Thank you for using the service.';
 
     function getContentEl() {
         return (
@@ -10,6 +9,9 @@
     }
 
     function init() {
+        // Don't show the banner on the new server/domain
+        if (window.location.hostname === 'video-clipper.online') return;
+
         if (document.querySelector('.site-notice')) return;
 
         var header = document.querySelector('.main-header');
@@ -18,7 +20,7 @@
         var notice = document.createElement('div');
         notice.className = 'site-notice';
         notice.setAttribute('role', 'status');
-        notice.innerHTML = '<p><span class="notice-line1">VideoClipper online will be discontinued soon.</span><span class="notice-line2">Thank you for using the service.</span></p>';
+        notice.innerHTML = '<p><span class="notice-line1">Starting from July 18, the new domain will be <a href="https://video-clipper.online" target="_blank" style="text-decoration: underline; color: inherit;">video-clipper.online</a>.</span></p>';
         header.insertAdjacentElement('afterend', notice);
 
         var contentEl = getContentEl();
