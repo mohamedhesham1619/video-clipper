@@ -85,8 +85,8 @@ func SubmitClipHandler(cfg *config.Config) http.HandlerFunc {
 		// Start a goroutine to handle the download process
 		go func() {
 
-			// StartClipDownload function start the download process and doesn't wait for it to finish instead it returns the running command
-			// First attempt: without cookie, with HLS preference
+			// StartClipDownload starts the download and returns the running command.
+			// First attempt: without cookie, with HLS preference (web_safari + POT).
 			ytdlpCmd, err := clip.StartClipDownload(cfg, videoRequest, &downloadProcess, false, true)
 
 			// If there was an error during the download, send an error message on the channel and clean up.

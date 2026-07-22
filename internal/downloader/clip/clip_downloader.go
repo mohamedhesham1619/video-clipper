@@ -48,8 +48,9 @@ func StartClipDownload(cfg *config.Config, videoRequest models.ClipRequest, down
 func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, processID string, useYoutubeCookie bool, preferHLS bool) *exec.Cmd {
 
 	var formatString string
+	isYouTube := utils.IsYouTubeURL(videoRequest.VideoURL)
 
-	if utils.IsYouTubeURL(videoRequest.VideoURL) {
+	if isYouTube {
 		// Youtube often seperate the audio and video streams, so we need to prefer seperate streams to get the required video quality.
 
 		if preferHLS {
@@ -90,19 +91,17 @@ func prepareYtDlpCommand(cfg *config.Config, videoRequest models.ClipRequest, pr
 		"-o", outputFile,
 	}
 
-	// If it's a YouTube request
-	if utils.IsYouTubeURL(videoRequest.VideoURL) {
-
-		// If we should use the YouTube cookie
+	if isYouTube {
 		if useYoutubeCookie {
-			cookie := cookie.YouTube()
-			slog.Info("Using YouTube cookie", "cookie", filepath.Base(cookie), "process ID", processID)
-			args = append(args, "--cookies", cookie)
-			args = append(args, "--extractor-args", fmt.Sprintf("youtubepot-bgutilhttp:base_url=%s", cfg.YouTube.PoTokenProvider))
-		} else {
-			// If we should only use the Po token provider
-			args = append(args, "--extractor-args", fmt.Sprintf("youtubepot-bgutilhttp:base_url=%s", cfg.YouTube.PoTokenProvider))
+			cookiePath := cookie.YouTube()
+			slog.Info("Using YouTube cookie", "cookie", filepath.Base(cookiePath), "process ID", processID)
+			args = append(args, "--cookies", cookiePath)
 		}
+		// web_safari exposes HLS (fast); keep POT as its own --extractor-args (same as before).
+		args = append(args,
+			"--extractor-args", "youtube:player_client=web_safari",
+			"--extractor-args", fmt.Sprintf("youtubepot-bgutilhttp:base_url=%s", cfg.YouTube.PoTokenProvider),
+		)
 	}
 
 	args = append(args, videoRequest.VideoURL)
