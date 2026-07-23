@@ -8,14 +8,14 @@
 </p>
 
 <p align="center">
-  <a href="https://videoclipper.online">
+  <a href="https://video-clipper.online">
     <img src="https://img.shields.io/badge/Start%20Clipping-%236f42c1?style=for-the-badge&logo=rocket&logoColor=white&labelColor=2c2f33" alt="Start Clipping" style="border-radius: 30px;"/>
   </a>
 </p>
 
 <p align="center">
   <img 
-    src="https://img.shields.io/endpoint?url=https%3A%2F%2Fvideoclipper.online%2Fapi%2Fstats%2Fclips" 
+    src="https://img.shields.io/endpoint?url=https%3A%2F%2Fvideo-clipper.online%2Fapi%2Fstats%2Fclips" 
     alt="Clips Created" 
   />
 </p>
@@ -64,19 +64,19 @@ The following diagram illustrates the end-to-end flow, from client submission to
 
 ```mermaid
 sequenceDiagram
-  participant Client as Client
-  participant Backend as Backend
-  participant In-Memory Store as In-Memory Store
+  participant Client
+  participant Backend
+  participant Store as In-Memory Store
 
   %% Submit Phase
   Client ->> Backend: POST /submit (URL, start, end, quality)
   Backend -->> Backend: Start downloading & processing (yt-dlp + ffmpeg)
-  Backend ->> In-Memory Store: Store process {ID, progress channel, file path}
+  Backend ->> Store: Store process {ID, progress channel, file path}
   Backend ->> Client: Return { process ID }
 
   %% Progress Phase (SSE stream)
   Client ->> Backend: GET /progress/{process ID} (SSE)
-  Backend ->> In-Memory Store: Read from process's progress channel
+  Backend ->> Store: Read from process's progress channel
 
   %% SSE Events
   Backend -->> Client: SSE event: progress (periodic percentage updates)
@@ -85,14 +85,12 @@ sequenceDiagram
   Backend -->> Client: SSE event: complete (includes download url)
   Backend -->> Client: SSE event: error (if any error occurred)
 
-  
- 
   %% Client Download
   Client ->> Backend: GET /download/{process ID}
-  Backend ->> In-Memory Store: Get file path
+  Backend ->> Store: Get file path
   Backend ->> Client: Serve file for download
 
-  Backend ->> In-Memory Store: Clean up resources
+  Backend ->> Store: Clean up resources
 
 ```
 
